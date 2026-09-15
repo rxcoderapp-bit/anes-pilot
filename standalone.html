@@ -1,0 +1,2825 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AnesPilot - 麻醉副駕駛 | 手術室隨身臨床輔助系統</title>
+  <meta name="description" content="專為麻醉科醫師設計的手術室臨床速查、小兒藥量、危急應變、局麻藥毒性及抗凝血決策系統。">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#05070a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Dark OR & High Contrast Clinical Styles -->
+  <style>
+/* AnesPilot - Clinical Design System */
+
+:root {
+  --bg-primary: #05070a;
+  --bg-secondary: #0d121c;
+  --bg-card: #121926;
+  --bg-card-hover: #192335;
+  --border-subtle: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #ef4444;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+body.theme-light {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --border-subtle: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+}
+
+/* Base resets & typography */
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+/* App Container */
+.app-container {
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header & Quick Profile Bar */
+.profile-pill {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 100px;
+}
+
+/* Glove-friendly large controls */
+.glove-btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-md);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.glove-btn:active {
+  transform: scale(0.97);
+}
+
+.glove-input {
+  min-height: 46px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.glove-input:focus {
+  border-color: var(--accent-cyan);
+}
+
+/* Slider customized for surgery gloves */
+input[type="range"].glove-slider {
+  -webkit-appearance: none;
+  height: 10px;
+  background: #1e293b;
+  border-radius: 8px;
+  outline: none;
+}
+
+input[type="range"].glove-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #38bdf8;
+  border: 3px solid #0369a1;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+input[type="range"].glove-slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+/* Crisis Mode Pulse & Background Alert */
+@keyframes alertFlash {
+  0% { background-color: rgba(239, 68, 68, 0.08); }
+  50% { background-color: rgba(239, 68, 68, 0.22); }
+  100% { background-color: rgba(239, 68, 68, 0.08); }
+}
+
+.crisis-active-mode {
+  animation: alertFlash 1.8s infinite ease-in-out;
+  border-color: rgba(239, 68, 68, 0.6) !important;
+}
+
+/* Metronome Heart Pulse */
+@keyframes heartBeatAnim {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); }
+  60% { transform: scale(1); }
+}
+
+.metronome-pulse {
+  animation: heartBeatAnim 0.545s infinite ease-in-out;
+  color: #f43f5e;
+}
+
+/* Navigation Tabs */
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-top: 3px solid transparent;
+  flex: 1;
+  text-align: center;
+}
+
+.nav-tab.active {
+  color: var(--accent-cyan);
+  border-top-color: var(--accent-cyan);
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.12) 0%, transparent 100%);
+}
+
+.nav-tab.crisis-tab.active {
+  color: var(--accent-rose);
+  border-top-color: var(--accent-rose);
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.18) 0%, transparent 100%);
+}
+
+/* Badge tags */
+.drug-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+/* Card animations */
+.anes-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.anes-card:hover {
+  border-color: #334155;
+}
+
+</style>
+</head>
+<body class="bg-[#05070a] text-slate-100 min-h-screen">
+  <div class="app-container pb-24 md:pb-8">
+    
+    <!-- Top Nav Header -->
+    <header class="sticky top-0 z-30 bg-[#070b12]/95 backdrop-blur-md border-b border-slate-800/80 px-3 py-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-cyan-900/50">
+            A
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-extrabold text-base tracking-tight text-white">AnesPilot</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.0</span>
+            </div>
+            <div class="text-[10px] text-slate-400 font-medium">麻醉副駕駛 &bull; 開刀房臨床隨身手冊</div>
+          </div>
+        </div>
+
+        <!-- Quick Patient Summary Badge & Crisis Action -->
+        <div class="flex items-center gap-2">
+          <!-- Theme Toggle -->
+          <button id="btn-theme-toggle" class="glove-btn py-1.5 px-2.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800">
+            <span id="theme-icon">🌙 刀房暗室</span>
+          </button>
+
+          <!-- CRISIS RED BUTTON -->
+          <button id="btn-quick-crisis" class="glove-btn py-1.5 px-3 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs rounded-lg shadow-lg shadow-red-950/80 border border-red-500 flex items-center gap-1.5 animate-pulse">
+            <span>🚨</span>
+            <span class="tracking-wide">CRISIS 危急應變</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Patient Profile Adjuster Bar -->
+      <div class="mt-2.5 p-2 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <!-- Current Patient Stats Display -->
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-slate-400">體重:</span>
+            <span id="profile-display-weight" class="font-black text-emerald-400 text-base">70 kg</span>
+          </div>
+          <div class="h-3 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-slate-400">年齡:</span>
+            <span id="profile-display-age" class="font-bold text-slate-200 text-xs">35 歲 (成人)</span>
+          </div>
+          <div class="h-3 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1 text-[11px] text-slate-400">
+            <span id="profile-display-ibw">IBW: 65.5 kg</span>
+          </div>
+        </div>
+
+        <!-- Patient Quick Presets -->
+        <div class="flex items-center gap-1.5 overflow-x-auto text-xs py-0.5">
+          <span class="text-[10px] text-slate-500 font-bold uppercase mr-0.5">速套:</span>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="10" data-a="1" data-h="75" data-f="false">
+            👶 1歲 10kg
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="18" data-a="5" data-h="110" data-f="true">
+            🧒 5歲 18kg
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="55" data-a="32" data-h="160" data-f="true">
+            👩 55kg (女)
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 font-semibold text-[11px] whitespace-nowrap border border-cyan-900/60" data-w="70" data-a="40" data-h="172" data-f="false">
+            👨 70kg (男)
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold text-[11px] whitespace-nowrap" data-w="100" data-a="50" data-h="170" data-f="false">
+            🦹 100kg (肥胖)
+          </button>
+        </div>
+      </div>
+
+      <!-- Fine-tune Controls (Collapsible or interactive slider) -->
+      <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">體重 (kg)</label>
+          <div class="flex items-center gap-1 mt-0.5">
+            <input type="number" id="input-weight" min="1" max="200" value="70" step="0.5" class="glove-input w-20 py-1 text-center font-black text-emerald-400">
+            <input type="range" id="slider-weight" min="2" max="120" value="70" step="1" class="glove-slider flex-1">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">年齡 (歲)</label>
+          <div class="flex items-center gap-1 mt-0.5">
+            <input type="number" id="input-age" min="0" max="100" value="35" step="0.5" class="glove-input w-full py-1 text-center font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">身高 (cm，計算 IBW)</label>
+          <div class="flex items-center gap-1 mt-0.5">
+            <input type="number" id="input-height" min="40" max="220" value="170" step="1" class="glove-input w-full py-1 text-center font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">性別</label>
+          <div class="mt-0.5">
+            <button id="btn-gender-toggle" class="glove-btn w-full py-2 bg-sky-950/60 text-sky-300 border border-sky-700/50 text-xs">
+              男性 ♂
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Desktop / Tablet Top Tabs (Hidden on small screens) -->
+    <div class="hidden md:flex bg-[#0a0f18] border-b border-slate-800 px-3 overflow-x-auto">
+      <div class="nav-tab active" data-tab="dosing">
+        <span>⚡ 體重速查盤</span>
+      </div>
+      <div class="nav-tab crisis-tab" data-tab="crisis">
+        <span>🚨 危機應變</span>
+      </div>
+      <div class="nav-tab" data-tab="toxicity">
+        <span>🧪 局麻藥毒性</span>
+      </div>
+      <div class="nav-tab" data-tab="asra">
+        <span>🩸 ASRA 抗凝血</span>
+      </div>
+      <div class="nav-tab" data-tab="infusion">
+        <span>⏱️ 升壓輸注幫浦</span>
+      </div>
+      <div class="nav-tab" data-tab="scores">
+        <span>📊 術前評估量表</span>
+      </div>
+      <div class="nav-tab" data-tab="logbook">
+        <span>📓 麻醉日誌 & SBAR</span>
+      </div>
+    </div>
+
+    <!-- Main Content Workspaces -->
+    <main class="p-3 flex-1">
+      <!-- 1. Dosing Tab Panel -->
+      <section id="panel-dosing" class="tab-content">
+        <div id="dosing-results-container"></div>
+      </section>
+
+      <!-- 2. Crisis Tab Panel -->
+      <section id="panel-crisis" class="tab-content hidden">
+        <div id="crisis-container"></div>
+      </section>
+
+      <!-- 3. Toxicity Tab Panel -->
+      <section id="panel-toxicity" class="tab-content hidden">
+        <div id="toxicity-container"></div>
+      </section>
+
+      <!-- 4. ASRA Tab Panel -->
+      <section id="panel-asra" class="tab-content hidden">
+        <div id="asra-container"></div>
+      </section>
+
+      <!-- 5. Infusion Tab Panel -->
+      <section id="panel-infusion" class="tab-content hidden">
+        <div id="infusion-container"></div>
+      </section>
+
+      <!-- 6. Scores Tab Panel -->
+      <section id="panel-scores" class="tab-content hidden">
+        <div id="scores-container"></div>
+      </section>
+
+      <!-- 7. Logbook Tab Panel -->
+      <section id="panel-logbook" class="tab-content hidden">
+        <div id="logbook-container"></div>
+      </section>
+    </main>
+
+    <!-- Mobile Bottom Tab Navigation (Fixed at bottom for thumb friendliness) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b12]/95 backdrop-blur-lg border-t border-slate-800 flex justify-around items-stretch safe-area-bottom">
+      <div class="nav-tab active" data-tab="dosing">
+        <span class="text-base">⚡</span>
+        <span>速查盤</span>
+      </div>
+      <div class="nav-tab crisis-tab text-rose-400" data-tab="crisis">
+        <span class="text-base">🚨</span>
+        <span>危機</span>
+      </div>
+      <div class="nav-tab" data-tab="toxicity">
+        <span class="text-base">🧪</span>
+        <span>局麻毒性</span>
+      </div>
+      <div class="nav-tab" data-tab="asra">
+        <span class="text-base">🩸</span>
+        <span>抗凝血</span>
+      </div>
+      <div class="nav-tab" data-tab="infusion">
+        <span class="text-base">⏱️</span>
+        <span>輸注</span>
+      </div>
+      <div class="nav-tab" data-tab="scores">
+        <span class="text-base">📊</span>
+        <span>量表</span>
+      </div>
+      <div class="nav-tab" data-tab="logbook">
+        <span class="text-base">📓</span>
+        <span>日誌</span>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Main ES Module Script -->
+  <script>
+/**
+ * AnesPilot - Clinical Drug Data & Formulas
+ * Standardized across international and Taiwan anesthesia practices.
+ */
+
+const DRUG_DATABASE = {
+  // Airway Calculations
+  calculateAirway(ageYears, weightKg, isFemale = false) {
+    let ettCuffed, ettUncuffed, ettDepth, lmaSize, bladeType, suctionFr;
+
+    if (ageYears < 0.08) {
+      // Premature / Neonate (< 1 month)
+      if (weightKg < 1.0) {
+        ettUncuffed = 2.5; ettCuffed = 2.5; ettDepth = 6.0; bladeType = "Miller 00"; suctionFr = "5 - 6 Fr"; lmaSize = "N/A (<2kg)";
+      } else if (weightKg < 2.5) {
+        ettUncuffed = 3.0; ettCuffed = 2.5; ettDepth = 7.0; bladeType = "Miller 0"; suctionFr = "6 Fr"; lmaSize = "N/A (<2kg)";
+      } else {
+        ettUncuffed = 3.5; ettCuffed = 3.0; ettDepth = 8.5 - 9.0; bladeType = "Miller 0 - 1"; suctionFr = "6 - 8 Fr"; lmaSize = "1 (<5kg)";
+      }
+    } else if (ageYears < 1.0) {
+      // Infant (1 - 12 months)
+      ettUncuffed = 3.5;
+      ettCuffed = 3.0;
+      ettDepth = Math.min(11, Math.round(((weightKg / 2) + 6) * 10) / 10);
+      bladeType = "Miller 1";
+      suctionFr = "8 Fr";
+      lmaSize = weightKg < 5 ? "1 (<5kg)" : "1.5 (5-10kg)";
+    } else if (ageYears < 2.0) {
+      // 1 - 2 years
+      ettUncuffed = 4.0;
+      ettCuffed = 3.5;
+      ettDepth = 11.5;
+      bladeType = "Miller 1 - 1.5 / Mac 2";
+      suctionFr = "8 - 10 Fr";
+      lmaSize = "1.5 - 2 (10-20kg)";
+    } else if (ageYears < 14.0) {
+      // Pediatric 2 - 14 years
+      // Motoyama & Khine formula:
+      const cuffedCalc = (ageYears / 4) + 3.5;
+      const uncuffedCalc = (ageYears / 4) + 4.0;
+      ettCuffed = Math.round(cuffedCalc * 2) / 2;
+      ettUncuffed = Math.round(uncuffedCalc * 2) / 2;
+      ettDepth = Math.round(((ageYears / 2) + 12) * 10) / 10;
+      
+      if (ageYears < 4) {
+        bladeType = "Mac 2 / Miller 1.5";
+      } else if (ageYears < 9) {
+        bladeType = "Mac 2 - 3";
+      } else {
+        bladeType = "Mac 3";
+      }
+      suctionFr = "10 - 12 Fr";
+      
+      if (weightKg < 10) lmaSize = "1.5";
+      else if (weightKg < 20) lmaSize = "2";
+      else if (weightKg < 30) lmaSize = "2.5";
+      else if (weightKg < 50) lmaSize = "3";
+      else lmaSize = "4";
+    } else {
+      // Adult (>= 14 years)
+      if (isFemale) {
+        ettCuffed = 7.0;
+        ettUncuffed = 7.0;
+        ettDepth = 20.5;
+        bladeType = "Mac 3";
+        lmaSize = weightKg < 50 ? "3" : (weightKg < 70 ? "4" : "5");
+      } else {
+        ettCuffed = 7.5;
+        ettUncuffed = 7.5;
+        ettDepth = 22.5;
+        bladeType = "Mac 3 - 4";
+        lmaSize = weightKg < 70 ? "4" : "5";
+      }
+      suctionFr = "12 - 14 Fr";
+    }
+
+    return {
+      ettCuffed,
+      ettUncuffed,
+      ettDepth,
+      lmaSize,
+      bladeType,
+      suctionFr
+    };
+  },
+
+  // Calculate Ideal Body Weight (Devine Formula)
+  calculateIBW(heightCm, isFemale) {
+    if (!heightCm || heightCm < 60) return null;
+    const heightInches = heightCm / 2.54;
+    if (heightInches <= 60) {
+      return isFemale ? 45.5 : 50.0;
+    }
+    const inchesOver5ft = heightInches - 60;
+    const ibw = isFemale ? 45.5 + 2.3 * inchesOver5ft : 50.0 + 2.3 * inchesOver5ft;
+    return Math.round(ibw * 10) / 10;
+  },
+
+  // Calculate Maintenance Fluids (4-2-1 Rule)
+  calculateFluids(weightKg) {
+    let hourlyRate = 0;
+    if (weightKg <= 10) {
+      hourlyRate = weightKg * 4;
+    } else if (weightKg <= 20) {
+      hourlyRate = 40 + (weightKg - 10) * 2;
+    } else {
+      hourlyRate = 60 + (weightKg - 20) * 1;
+    }
+    return {
+      hourlyRate: Math.round(hourlyRate),
+      npo8hr: Math.round(hourlyRate * 8),
+      bolus20ml: Math.round(weightKg * 20)
+    };
+  },
+
+  // Calculate Estimated Blood Volume (EBV) & MABL
+  calculateBlood(weightKg, ageYears, isFemale, startHct = 36, targetHct = 24) {
+    let ebvFactor = 70; // mL/kg
+    if (ageYears < 0.08) {
+      ebvFactor = 85; // Neonate
+    } else if (ageYears < 1) {
+      ebvFactor = 80; // Infant
+    } else if (ageYears < 12) {
+      ebvFactor = 75; // Child
+    } else {
+      ebvFactor = isFemale ? 65 : 70; // Adult
+    }
+
+    const ebv = Math.round(weightKg * ebvFactor);
+    const avgHct = (startHct + targetHct) / 2;
+    const mabl = Math.max(0, Math.round(ebv * ((startHct - targetHct) / avgHct)));
+
+    return { ebv, mabl, ebvFactor };
+  },
+
+  // Detailed drug dosages
+  getDosages(weightKg, ageYears, isFemale = false, ibw = null) {
+    const w = weightKg;
+    const activeIbw = (ibw && ibw > 0) ? ibw : w;
+    const isPed = ageYears < 12;
+    const isInfant = ageYears < 1;
+
+    return {
+      // 1. Induction & Muscle Relaxants
+      induction: [
+        {
+          name: "Propofol (二異丙酚)",
+          badge: "TBW",
+          perKg: isPed ? "2.5 - 3.5 mg/kg" : "1.5 - 2.5 mg/kg",
+          dose: isPed
+            ? `${Math.round(w * 2.5)} - ${Math.round(w * 3.5)} mg`
+            : `${Math.round(w * 1.5)} - ${Math.round(w * 2.5)} mg`,
+          note: isPed ? "小兒分佈體積大，誘導劑量偏高" : "年長衰弱者建議降至 1.0 - 1.5 mg/kg"
+        },
+        {
+          name: "Ketamine (氯胺酮)",
+          badge: "TBW",
+          perKg: "1.0 - 2.0 mg/kg IV (4-6 mg/kg IM)",
+          dose: `${Math.round(w * 1.0)} - ${Math.round(w * 2.0)} mg IV`,
+          note: "血行動態不穩、氣喘患者首選"
+        },
+        {
+          name: "Etomidate (依托咪酯)",
+          badge: "TBW",
+          perKg: "0.2 - 0.3 mg/kg IV",
+          dose: `${(w * 0.2).toFixed(1)} - ${(w * 0.3).toFixed(1)} mg`,
+          note: "心血管極穩定，可能短暫抑制腎上腺"
+        },
+        {
+          name: "Rocuronium (羅庫溴銨) - 常規誘導",
+          badge: "IBW",
+          perKg: "0.6 mg/kg",
+          dose: `${(activeIbw * 0.6).toFixed(1)} mg`,
+          note: "起效約 60-90 秒，依理想體重給藥"
+        },
+        {
+          name: "Rocuronium (RSI 快速插管)",
+          badge: "IBW",
+          perKg: "1.0 - 1.2 mg/kg",
+          dose: `${(activeIbw * 1.0).toFixed(1)} - ${(activeIbw * 1.2).toFixed(1)} mg`,
+          note: "起效約 45-60 秒，若遇難插管需 Sugammadex 16mg/kg 救援"
+        },
+        {
+          name: "Cisatracurium (順式阿曲庫銨)",
+          badge: "IBW",
+          perKg: "0.15 - 0.2 mg/kg",
+          dose: `${(activeIbw * 0.15).toFixed(1)} - ${(activeIbw * 0.2).toFixed(1)} mg`,
+          note: "Hofmann 消除，肝腎功能不全首選"
+        },
+        {
+          name: "Succinylcholine (去極化肌鬆)",
+          badge: "TBW",
+          perKg: isInfant ? "2.0 - 3.0 mg/kg" : (isPed ? "1.5 - 2.0 mg/kg" : "1.0 - 1.5 mg/kg"),
+          dose: isInfant ? `${(w * 2.5).toFixed(1)} mg` : `${(w * 1.2).toFixed(1)} mg`,
+          note: "嬰兒需較高劑量；小兒建議先給 Atropine 預防心搏過緩"
+        },
+        {
+          name: "Sugammadex (中度阻滯恢復 TOF ≥2)",
+          badge: "TBW",
+          perKg: "2.0 mg/kg",
+          dose: `${Math.round(w * 2.0)} mg (${(w * 2.0 / 100).toFixed(1)} 瓶 100mg/mL)`,
+          note: "依實際體重給予，約 2-3 分鐘完全恢復"
+        },
+        {
+          name: "Sugammadex (深度阻滯恢復 PTC 1-2)",
+          badge: "TBW",
+          perKg: "4.0 mg/kg",
+          dose: `${Math.round(w * 4.0)} mg (${(w * 4.0 / 100).toFixed(1)} 瓶 100mg/mL)`,
+          note: "深度阻滯無 TOF 反應時使用"
+        },
+        {
+          name: "Sugammadex (RSI 術後即刻緊急逆轉)",
+          badge: "TBW",
+          perKg: "16.0 mg/kg",
+          dose: `${Math.round(w * 16.0)} mg`,
+          note: "剛給予 Rocuronium 1.2mg/kg 後 CICO 緊急救援"
+        }
+      ],
+
+      // 2. Analgesia & Sedation
+      analgesia: [
+        {
+          name: "Fentanyl (芬太尼)",
+          badge: "TBW",
+          perKg: "1 - 2 mcg/kg",
+          dose: `${Math.round(w * 1.0)} - ${Math.round(w * 2.0)} mcg`,
+          note: "常用濃度 50 mcg/mL；插管前 2-3 分鐘給予"
+        },
+        {
+          name: "Alfentanil (阿芬太尼)",
+          badge: "TBW",
+          perKg: "10 - 20 mcg/kg",
+          dose: `${Math.round(w * 10)} - ${Math.round(w * 20)} mcg`,
+          note: "超快速起效（1分鐘），短效操作適用"
+        },
+        {
+          name: "Morphine (嗎啡)",
+          badge: "TBW",
+          perKg: "0.05 - 0.15 mg/kg",
+          dose: `${(w * 0.05).toFixed(1)} - ${(w * 0.15).toFixed(1)} mg`,
+          note: "起效約 15-20 分鐘，長效術後止痛"
+        },
+        {
+          name: "Neostigmine 逆轉劑",
+          badge: "TBW",
+          perKg: "0.04 - 0.05 mg/kg (Max 5 mg)",
+          dose: `${Math.min(5, Math.round(w * 0.045 * 10) / 10)} mg`,
+          note: "需併用 Glycopyrrolate 或 Atropine 拮抗副交感反應"
+        },
+        {
+          name: "Glycopyrrolate (胃長寧)",
+          badge: "TBW",
+          perKg: "0.01 mg/kg (搭配 Neostigmine 每 1mg 配 0.2mg)",
+          dose: `${(w * 0.01).toFixed(2)} mg`,
+          note: "不通過 BBB，不引起中樞抗膽鹼症候群"
+        },
+        {
+          name: "Naloxone (納洛酮 - 類鴉片逆轉)",
+          badge: "TBW",
+          perKg: "1 - 4 mcg/kg (成人間隔 40-100 mcg 滴定)",
+          dose: `${Math.round(w * 2)} mcg`,
+          note: "慢速滴定至呼吸改善，防急性戒斷及嚴重劇痛"
+        },
+        {
+          name: "Flumazenil (安易醒 - BZD 逆轉)",
+          badge: "TBW",
+          perKg: "0.01 mg/kg (成人初始 0.2 mg IV)",
+          dose: isPed ? `${(w * 0.01).toFixed(2)} mg` : "0.2 mg (每 60 秒可加 0.1 mg，至多 1 mg)",
+          note: "半衰期約 1 小時，需注意 BZD 再鎮靜 (resedation)"
+        }
+      ],
+
+      // 3. Emergency & Resuscitation
+      emergency: [
+        {
+          name: "Epinephrine (急救心跳驟停 Cardiac Arrest)",
+          badge: "急救紅標",
+          perKg: isPed ? "10 mcg/kg IV (0.01 mg/kg)" : "1 mg IV q3-5min",
+          dose: isPed
+            ? `${Math.round(w * 10)} mcg (1:10,000 稀釋液 ${(w * 0.1).toFixed(1)} mL)`
+            : "1 mg (1 支 1:1,000 原液或 10 mL 1:10,000)",
+          note: "每 3 - 5 分鐘一次，推藥後沖 10-20 mL 生理食鹽水"
+        },
+        {
+          name: "Epinephrine (術中休克/嚴重過敏 Bolus 滴定)",
+          badge: "滴定劑量",
+          perKg: "0.5 - 1 mcg/kg IV",
+          dose: isPed ? `${(w * 0.5).toFixed(1)} - ${(w * 1.0).toFixed(1)} mcg` : "10 - 50 mcg IV 滴定",
+          note: "建議備好 10 mcg/mL (Epi stick: 1mg 抽入 100mL 或 0.1mg 入 10mL)"
+        },
+        {
+          name: "Atropine (阿托品 - 緩脈急救)",
+          badge: "急救",
+          perKg: "0.02 mg/kg (小兒最低劑量 0.1 mg，單次上限 0.5 mg)",
+          dose: isPed
+            ? `${Math.max(0.1, Math.min(0.5, Math.round(w * 0.02 * 100) / 100)).toFixed(2)} mg`
+            : "0.5 - 1.0 mg IV (成人上限 3 mg)",
+          note: "劑量過低 (<0.1mg) 反而可能引發中樞性心動過緩"
+        },
+        {
+          name: "去顫電擊 (Defibrillation - VF/pVT)",
+          badge: "電擊",
+          perKg: isPed ? "首劑 2 J/kg，後續 4 J/kg (Max 10 J/kg 或成人量)" : "120 - 200 J 雙相波 (Biphasic)",
+          dose: isPed ? `首劑 ${Math.round(w * 2)} J → 後續 ${Math.round(w * 4)} J` : "200 J (Biphasic)",
+          note: "電擊後立即恢復 CPR 2 分鐘，不可中斷"
+        },
+        {
+          name: "同步心臟電擊 (Synchronized Cardioversion)",
+          badge: "心律不整",
+          perKg: isPed ? "0.5 - 1.0 J/kg，後續 2.0 J/kg" : "50 - 100 J (狹心室波 / 房撲) 或 120-200J",
+          dose: isPed ? `${Math.round(w * 0.5)} - ${Math.round(w * 1.0)} J` : "100 J",
+          note: "必須確認儀器已開啟 Sync 旗標並對準 R 波"
+        },
+        {
+          name: "10% Calcium Gluconate (葡萄糖酸鈣)",
+          badge: "高血鉀/低血鈣",
+          perKg: "0.5 mL/kg (50 mg/kg) 慢推 5-10 分鐘",
+          dose: `${(w * 0.5).toFixed(1)} mL (約 ${(w * 50).toFixed(0)} mg)`,
+          note: "保護心肌細胞膜，惡性高熱或大量輸血低鈣血症必備"
+        },
+        {
+          name: "8.4% Sodium Bicarbonate (碳酸氫鈉)",
+          badge: "代謝性酸中毒",
+          perKg: "1 mEq/kg (1 mL/kg)",
+          dose: `${Math.round(w * 1.0)} mL (mEq)`,
+          note: "嚴重心跳驟停長時急救或高血鉀酸中毒"
+        },
+        {
+          name: "10% Dextrose (小兒低血糖救援)",
+          badge: "小兒血糖",
+          perKg: "2.0 - 5.0 mL/kg IV Bolus",
+          dose: `${Math.round(w * 2.0)} - ${Math.round(w * 5.0)} mL (D10W)`,
+          note: "等於 0.2 - 0.5 g/kg 葡萄糖；避免使用高濃度 D50W 刺激血管"
+        }
+      ]
+    };
+  }
+};
+
+;
+/**
+ * AnesPilot - ASRA Guidelines Coagulation Database
+ * Based on ASRA Coagulation Guidelines (4th/5th Editions)
+ * for Neuraxial (Spinal/Epidural) and Deep Regional Nerve Blocks.
+ */
+
+const ASRA_DATABASE = [
+  // DOACs
+  {
+    id: "apixaban",
+    name: "Apixaban (Eliquis 艾必克凝)",
+    category: "DOAC (Factor Xa 抑制劑)",
+    standardWaitHours: 72,
+    renalWarningWaitHours: 96,
+    crClThreshold: 30,
+    catheterRemovalWaitHours: 30,
+    restartAfterRemovalHours: 6,
+    recommendation: "常規建議停藥 72 小時（低風險至少 48 小時；若 CrCl < 30 mL/min 需延長至 96 小時）。",
+    notes: "置入或拔除硬脊膜外導管後，至少隔 6 小時方可重新給藥。"
+  },
+  {
+    id: "rivaroxaban",
+    name: "Rivaroxaban (Xarelto 拜瑞妥)",
+    category: "DOAC (Factor Xa 抑制劑)",
+    standardWaitHours: 72,
+    renalWarningWaitHours: 96,
+    crClThreshold: 30,
+    catheterRemovalWaitHours: 26,
+    restartAfterRemovalHours: 6,
+    recommendation: "常規建議停藥 72 小時（最低安全極限 48 小時）。",
+    notes: "拔管需距上次給藥至少 26 小時，拔管後隔 6 小時可重新服藥。"
+  },
+  {
+    id: "dabigatran",
+    name: "Dabigatran (Pradaxa 普達妥)",
+    category: "DOAC (直接凝血酶抑制劑)",
+    standardWaitHours: 72,
+    renalWarningWaitHours: 120, // 5 days if renal impaired
+    crClThreshold: 50,
+    catheterRemovalWaitHours: 36,
+    restartAfterRemovalHours: 6,
+    recommendation: "CrCl ≥ 80: 72小時 (3天)；CrCl 50-79: 96小時 (4天)；CrCl 30-49: 120小時 (5天)。",
+    notes: "主要經腎臟排泄(80%)，腎功能不全半衰期顯著延長。"
+  },
+  {
+    id: "edoxaban",
+    name: "Edoxaban (Lixiana 里心得)",
+    category: "DOAC (Factor Xa 抑制劑)",
+    standardWaitHours: 72,
+    renalWarningWaitHours: 96,
+    crClThreshold: 30,
+    catheterRemovalWaitHours: 28,
+    restartAfterRemovalHours: 6,
+    recommendation: "常規建議停藥 72 小時（3天）。",
+    notes: "拔管後至少間隔 6 小時才可重新給藥。"
+  },
+
+  // Antiplatelets
+  {
+    id: "clopidogrel",
+    name: "Clopidogrel (Plavix 保栓通)",
+    category: "抗血小板 (P2Y12 抑制劑)",
+    standardWaitHours: 120, // 5 days
+    renalWarningWaitHours: 120,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 120,
+    restartAfterRemovalHours: 0,
+    recommendation: "建議停藥 5 - 7 天（最低 5 天 / 120 小時）。",
+    notes: "若置放硬脊膜外導管期間不可重新給予 Loading dose。拔管後可直接重啟常規維持劑量。"
+  },
+  {
+    id: "ticagrelor",
+    name: "Ticagrelor (Brilinta 百無寧)",
+    category: "抗血小板 (可逆性 P2Y12 抑制劑)",
+    standardWaitHours: 72, // 3 - 5 days (72 - 120 hrs)
+    renalWarningWaitHours: 72,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 72,
+    restartAfterRemovalHours: 6,
+    recommendation: "建議停藥 3 - 5 天（最低 72 小時，ASRA 最新指引建議 3-5 天）。",
+    notes: "拔管後 6 小時可重啟。"
+  },
+  {
+    id: "prasugrel",
+    name: "Prasugrel (Effient 抑凝安)",
+    category: "抗血小板 (強效 P2Y12 抑制劑)",
+    standardWaitHours: 168, // 7 days
+    renalWarningWaitHours: 168,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 168,
+    restartAfterRemovalHours: 6,
+    recommendation: "強烈建議停藥 7 - 10 天（至少 168 小時）。",
+    notes: "不可逆血小板抑制作用最強，必須嚴格遵守停藥時間。"
+  },
+  {
+    id: "aspirin",
+    name: "Aspirin (阿斯匹靈)",
+    category: "抗血小板 (COX-1 抑制劑)",
+    standardWaitHours: 0, // Alone is safe
+    renalWarningWaitHours: 0,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 0,
+    restartAfterRemovalHours: 0,
+    recommendation: "單一低劑量 Aspirin (75-100 mg) 並非神經軸阻滯的絕對禁忌，可正常施打。",
+    notes: "注意：若合併 NSAIDs、其他抗血小板或抗凝血劑時，脊椎血腫風險加乘！"
+  },
+  {
+    id: "cilostazol",
+    name: "Cilostazol (Pletal 培達)",
+    category: "抗血小板 (PDE3 抑制劑)",
+    standardWaitHours: 42,
+    renalWarningWaitHours: 42,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 42,
+    restartAfterRemovalHours: 6,
+    recommendation: "建議停藥 42 小時。",
+    notes: "拔管後 6 小時可恢復用藥。"
+  },
+
+  // Heparins
+  {
+    id: "lmwh_prophylactic",
+    name: "LMWH 預防劑量 (如 Clexane 40mg QD)",
+    category: "低分子量肝素 (預防劑量)",
+    standardWaitHours: 12,
+    renalWarningWaitHours: 24,
+    crClThreshold: 30,
+    catheterRemovalWaitHours: 12,
+    restartAfterRemovalHours: 4,
+    recommendation: "最後一劑需間隔至少 12 小時方可穿刺施打。",
+    notes: "穿刺或拔管後至少間隔 4 小時方可施打下一劑 LMWH。"
+  },
+  {
+    id: "lmwh_therapeutic",
+    name: "LMWH 治療劑量 (如 Clexane 1mg/kg Q12H / 1.5mg/kg QD)",
+    category: "低分子量肝素 (治療/全劑量)",
+    standardWaitHours: 24,
+    renalWarningWaitHours: 36,
+    crClThreshold: 30,
+    catheterRemovalWaitHours: 24,
+    restartAfterRemovalHours: 4,
+    recommendation: "最後一劑需間隔至少 24 小時方可穿刺施打。",
+    notes: "硬脊膜外導管留置期間嚴禁給予治療劑量 LMWH！拔管後 4 小時方可重啟。"
+  },
+  {
+    id: "ufh_iv",
+    name: "UFH 靜脈持續點滴 (治療性 Heparin IV Infusion)",
+    category: "傳統未分餾肝素 (靜脈治療量)",
+    standardWaitHours: 6,
+    renalWarningWaitHours: 6,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 6,
+    restartAfterRemovalHours: 1,
+    recommendation: "停藥至少 4 - 6 小時，且必須檢驗 aPTT 確認恢復正常範圍後方可穿刺。",
+    notes: "穿刺後若需重啟肝素點滴，建議至少等待 1 小時。"
+  },
+  {
+    id: "ufh_sc",
+    name: "UFH 皮下預防劑量 (5000 IU SC BID/TID)",
+    category: "傳統未分餾肝素 (皮下預防量)",
+    standardWaitHours: 6,
+    renalWarningWaitHours: 6,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 6,
+    restartAfterRemovalHours: 1,
+    recommendation: "建議停藥 4 - 6 小時後再進行神經軸阻滯穿刺。",
+    notes: "每日總劑量 > 10,000 IU 時建議先抽檢 aPTT。"
+  },
+
+  // Warfarin
+  {
+    id: "warfarin",
+    name: "Warfarin (Coumadin 可邁丁)",
+    category: "維生素 K 拮抗劑 (VKA)",
+    standardWaitHours: 120, // 5 days
+    renalWarningWaitHours: 120,
+    crClThreshold: null,
+    catheterRemovalWaitHours: 120,
+    restartAfterRemovalHours: 0,
+    recommendation: "建議停藥 5 天，且術前抽血檢驗確認 INR ≤ 1.4 方可施打神經軸阻滯。",
+    notes: "若有硬脊膜外導管，拔管時之 INR 亦必須 < 1.5。"
+  }
+];
+
+;
+/**
+ * AnesPilot - Dosing Engine
+ */
+
+
+class DosingEngine {
+  static calculateAll(params) {
+    const { ageYears, weightKg, heightCm, isFemale } = params;
+
+    const ibw = DRUG_DATABASE.calculateIBW(heightCm, isFemale);
+    const airway = DRUG_DATABASE.calculateAirway(ageYears, weightKg, isFemale);
+    const fluids = DRUG_DATABASE.calculateFluids(weightKg);
+    const blood = DRUG_DATABASE.calculateBlood(weightKg, ageYears, isFemale);
+    const dosages = DRUG_DATABASE.getDosages(weightKg, ageYears, isFemale, ibw);
+
+    // Calculate BSA (Mosteller formula)
+    let bsa = null;
+    if (heightCm && weightKg) {
+      bsa = Math.round(Math.sqrt((heightCm * weightKg) / 3600) * 100) / 100;
+    }
+
+    // Ventilator recommendation: 6 - 8 mL/kg of IBW (or TBW if no height)
+    const ventBaseWeight = (ibw && ibw > 0) ? ibw : weightKg;
+    const tvLow = Math.round(ventBaseWeight * 6);
+    const tvHigh = Math.round(ventBaseWeight * 8);
+
+    return {
+      weightKg,
+      ageYears,
+      isFemale,
+      heightCm,
+      ibw,
+      bsa,
+      airway,
+      fluids,
+      blood,
+      dosages,
+      ventilator: {
+        tvLow,
+        tvHigh,
+        baseWeight: ventBaseWeight,
+        isUsingIbw: Boolean(ibw)
+      }
+    };
+  }
+}
+
+;
+/**
+ * AnesPilot - Crisis Engine
+ * Checklist workflows, calculations (MH, LAST, CICO, Anaphylaxis, ACLS),
+ * Audio-driven CPR metronome (110 bpm) and step timers using Web Audio API.
+ */
+
+class AudioService {
+  constructor() {
+    this.ctx = null;
+    this.metronomeInterval = null;
+    this.isMetronomeRunning = false;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === "suspended") {
+      this.ctx.resume();
+    }
+  }
+
+  beep(freq = 800, duration = 0.08, type = "sine") {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch (e) {
+      console.warn("Audio play blocked:", e);
+    }
+  }
+
+  startMetronome(bpm = 110, onTick) {
+    this.init();
+    this.stopMetronome();
+    this.isMetronomeRunning = true;
+    const intervalMs = (60 / bpm) * 1000;
+    let count = 0;
+
+    this.metronomeInterval = setInterval(() => {
+      count++;
+      const isHigh = count % 2 === 1;
+      this.beep(isHigh ? 950 : 750, 0.06, "square");
+      if (onTick) onTick(count);
+    }, intervalMs);
+  }
+
+  stopMetronome() {
+    if (this.metronomeInterval) {
+      clearInterval(this.metronomeInterval);
+      this.metronomeInterval = null;
+    }
+    this.isMetronomeRunning = false;
+  }
+
+  alarm() {
+    this.init();
+    this.beep(880, 0.15, "triangle");
+    setTimeout(() => this.beep(1100, 0.2, "triangle"), 160);
+    setTimeout(() => this.beep(1320, 0.3, "triangle"), 380);
+  }
+}
+
+const audioService = new AudioService();
+
+const CRISIS_MODULES = {
+  // 1. Malignant Hyperthermia
+  mh: {
+    title: "惡性高熱 (Malignant Hyperthermia - MH)",
+    badge: "極危急",
+    subtitle: "吸入性麻醉劑或 Suxamethonium 引發骨骼肌高代謝危機",
+    calculateDoses(weightKg) {
+      const initialMg = Math.round(weightKg * 2.5 * 10) / 10;
+      const maxMg = Math.round(weightKg * 10.0 * 10) / 10;
+      const stdVials20mg = Math.ceil(initialMg / 20);
+      const ryanodexVials250mg = Math.ceil(initialMg / 250);
+      const waterPerVialStd = "60 mL 無菌注射用水 (Sterile water without preservative)";
+      const waterPerRyanodex = "5 mL 無菌注射用水 / 瓶";
+
+      return {
+        initialMg,
+        maxMg,
+        stdVials20mg,
+        ryanodexVials250mg,
+        waterPerVialStd,
+        waterPerRyanodex
+      };
+    },
+    actionSteps: [
+      { id: "mh1", title: "立刻停用所有揮發性氣體與 Succinylcholine", desc: "換上新呼吸迴路或加裝 Activated Charcoal 碳吸附過濾器，改全靜脈麻醉 (TIVA)。" },
+      { id: "mh2", title: "以 100% 高流速氧氣 (>10 L/min) 進行過度通氣 (Hyperventilate)", desc: "將潮氣量及呼吸次數提高 2-3 倍，以排除激增之二氧化碳。" },
+      { id: "mh3", title: "呼叫全力支援，推來 MH 急救車與 Dantrolene", desc: "一人調度，至少指派 2-3 人協助專職泡藥 (每瓶 20mg 需劇烈搖晃加 60mL 水溶解)。" },
+      { id: "mh4", title: "靜脈推注 Dantrolene 首劑 2.5 mg/kg", desc: "快速 IV push 直至症狀（心搏過速、高體溫、高碳酸血症、肌肉僵直）緩解，必要時每 5-10 分鐘重複追加至最高 10 mg/kg。" },
+      { id: "mh5", title: "積極降溫措施", desc: "靜脈滴注冷生理食鹽水 (4°C, 10-20 mL/kg)、體表冰敷、體腔灌洗。當體溫降至 38.5°C 即停止積極降溫防低體溫反彈。" },
+      { id: "mh6", title: "監測與處置高血鉀 (Hyperkalemia) 及酸中毒", desc: "抽取動脈血氣分析 (ABG)、鉀離子、CK、肌紅素尿。嚴重高鉀給予 10% Calcium gluconate 10-20mL、Regular Insulin 10U + 50% Glucose 50mL。" },
+      { id: "mh7", title: "維持尿量 > 1 - 2 mL/kg/hr", desc: "放置導尿管，必要時給予 Mannitol 或 Furosemide，防急性腎衰竭。" }
+    ]
+  },
+
+  // 2. LAST (Local Anesthetic Systemic Toxicity)
+  last: {
+    title: "局部麻醉藥全身毒性 (LAST)",
+    badge: "立即停止注射",
+    subtitle: "神經或心臟毒性反應（耳鳴、金屬味、痙攣、心律不整、心跳驟停）",
+    calculateDoses(weightKg) {
+      const bolusMl = Math.round(weightKg * 1.5 * 10) / 10;
+      const infusionMlMin = Math.round(weightKg * 0.25 * 10) / 10;
+      const maxMl = Math.round(weightKg * 12.0);
+
+      return {
+        bolusMl,
+        infusionMlMin,
+        maxMl,
+        infusionDurationMin: 10
+      };
+    },
+    actionSteps: [
+      { id: "l1", title: "立即停止施打所有局部麻醉藥物", desc: "呼叫急救支援並請護理師推來 20% 脂肪乳劑 (Lipid Emulsion) 與急救推車。" },
+      { id: "l2", title: "維持呼吸道通暢，給予 100% 氧氣", desc: "預防並即時矯正低血氧及酸中毒（酸中毒會加劇局麻藥對心肌毒性）。" },
+      { id: "l3", title: "控制痙攣抽搐", desc: "首選 Benzodiazepine (Midazolam 1-2 mg IV)；避免使用高劑量 Propofol（避免加重心血管衰竭）。" },
+      { id: "l4", title: "靜脈推注 20% Lipid Emulsion 首劑 (1.5 mL/kg)", desc: "於 2-3 分鐘內推注完成。" },
+      { id: "l5", title: "立即啟動 20% Lipid Emulsion 持續滴注 (0.25 mL/kg/min)", desc: "持續滴注至少 10-15 分鐘直至心血管功能穩定。" },
+      { id: "l6", title: "若血行動態持續不穩或心跳驟停", desc: "可於 5 分鐘後重複給予 1-2 次 Bolus (1.5 mL/kg)，並可將輸注速率提高至 0.5 mL/kg/min。總上限 12 mL/kg。" },
+      { id: "l7", title: "ACLS 心肺復甦調整注意事項", desc: "避免使用 Vasopressin、鈣離子阻斷劑、Beta 阻斷劑；Epinephrine 劑量應減小（小劑量滴定 ≤ 1 mcg/kg IV），避免誘發心律不整。" }
+    ]
+  },
+
+  // 3. Difficult Airway (DAS CICO Algorithm)
+  cico: {
+    title: "困難呼吸道 / CICO (無法插管且無法通氣)",
+    badge: "黃金決策",
+    subtitle: "遵循 DAS Guidelines 四階梯挽救流程",
+    calculateDoses(weightKg) {
+      return {
+        sugammadexRsiRescue: Math.round(weightKg * 16)
+      };
+    },
+    actionSteps: [
+      { id: "c1", title: "Plan A：面罩通氣與氣管插管 (優化環境)", desc: "使用影像喉頭鏡 (Video Laryngoscope)、Bougie 探針、調整病人姿勢 (Sniffing position/Ramping)、限制插管嘗試不超過 3 次。" },
+      { id: "c2", title: "Plan B：維持氧合 - 放置聲門上呼吸道 (SAD / LMA)", desc: "選用適當尺寸二代 LMA (含胃管減壓管道)，最多嘗試 2 次。若通氣成功，評估喚醒病人、經 LMA 導管插管或繼續手術。" },
+      { id: "c3", title: "Plan C：宣布失敗，最終嘗試面罩通氣 (Wake up the patient)", desc: "雙人雙手面罩加壓 (2-person technique)、置入咽後導氣管 (OPA)、確保肌鬆已充分 (若使用 Rocuronium 可立即給予 Sugammadex 16 mg/kg)。" },
+      { id: "c4", title: "Plan D：【宣布 CICO】立即執行緊急外科氣道 (eFONA)", desc: "伸展頸部，確認環甲膜位置。使用「手術刀-Bougie-氣管內管」(Scalpel-Bougie-Tube, ID 5.0-6.0) 執行環甲膜切開術。" }
+    ]
+  },
+
+  // 4. Anaphylaxis in OR
+  anaphylaxis: {
+    title: "手術室過敏性休克 (Anaphylaxis)",
+    badge: "休克搶救",
+    subtitle: "肌鬆劑、抗生素、乳膠 (Latex)、消毒液 (Chlorhexidine) 引發",
+    calculateDoses(weightKg) {
+      const epiIvBolusUg = Math.round(weightKg * 1.0);
+      const epiImMg = Math.min(0.5, Math.round(weightKg * 0.01 * 100) / 100);
+      const fluidBolusMl = Math.round(weightKg * 20);
+
+      return {
+        epiIvBolusUg,
+        epiImMg,
+        fluidBolusMl
+      };
+    },
+    actionSteps: [
+      { id: "a1", title: "立即停止疑似過敏原藥物與輸液", desc: "如剛給予之抗生素、肌鬆劑、人工血漿，通知外科更換乳膠手套。" },
+      { id: "a2", title: "給予 100% 氧氣，並採頭低腳高姿位 (Trendelenburg)", desc: "防低血壓致心腦灌流不足，必要時立即插管保護呼吸道。" },
+      { id: "a3", title: "給予 Epinephrine (首選救命藥物)", desc: "依嚴重度：輕中度(Grade 2) IV 10-50 mcg 滴定；重度(Grade 3/4) IV 100-200 mcg 推注，或 IM 0.01 mg/kg。必要時啟動持續點滴。" },
+      { id: "a4", title: "大量晶體輸液衝注 (Fluid Challenge)", desc: "成人快速加壓輸注 1-2 公升 Normal Saline 或 Balanced Crystalloid (小兒 20 mL/kg)。" },
+      { id: "a5", title: "二線輔助藥物 (於血行動態穩定後給予)", desc: "Diphenhydramine 50mg IV (抗組織胺)；Hydrocortisone 100-200mg 或 Dexamethasone 8mg IV (預防雙相反應)；氣管痙攣可給予 Salbutamol 噴劑或 Aminophylline。" }
+    ]
+  },
+
+  // 5. Intraoperative ACLS
+  acls: {
+    title: "手術中心跳驟停 (Intraoperative ACLS)",
+    badge: "心肺復甦",
+    subtitle: "高品質 CPR、110 bpm 節拍器、2分鐘循環評估",
+    calculateDoses(weightKg) {
+      const isPed = weightKg < 40;
+      const defibInitial = isPed ? Math.round(weightKg * 2) : 200;
+      const defibNext = isPed ? Math.round(weightKg * 4) : 200;
+      const epiDose = isPed ? `${Math.round(weightKg * 10)} mcg` : "1 mg";
+      const amiodaroneInitial = isPed ? `${Math.round(weightKg * 5)} mg` : "300 mg";
+      const amiodaroneNext = isPed ? `${Math.round(weightKg * 2.5)} mg` : "150 mg";
+
+      return {
+        defibInitial,
+        defibNext,
+        epiDose,
+        amiodaroneInitial,
+        amiodaroneNext
+      };
+    },
+    actionSteps: [
+      { id: "ac1", title: "呼叫支援，立即啟動高品質 CPR (壓胸頻率 100-120 bpm)", desc: "深度 5-6 公分，完全回彈，盡量避免中斷。啟動節拍器輔助。" },
+      { id: "ac2", title: "停用所有麻醉氣體，給予 100% 氧氣", desc: "確保氣道通暢，換氣頻率每 6 秒一次 (10 次/分)，避免過度通氣。" },
+      { id: "ac3", title: "評估心律：可電擊 (VF/pVT) vs 不可電擊 (PEA/Asystole)", desc: "可電擊：立即電擊 (200J Biphasic) 隨即恢復 CPR 2 分鐘；不可電擊：立即給予 Epinephrine 1mg 並持續 CPR。" },
+      { id: "ac4", title: "每 2 分鐘換手壓胸，評估脈搏與心律", desc: "Epinephrine 1mg (小兒 10mcg/kg) 每 3-5 分鐘一次。頑固性心室震顫在第 3 次電擊後給予 Amiodarone 300mg (小兒 5mg/kg)。" },
+      { id: "ac5", title: "尋找並排除可逆病因 (4H 4T)", desc: "Hypovolemia (失血), Hypoxia (缺氧), Hydrogen ion (酸中毒), Hypo/Hyperkalemia (電解質); Tension pneumothorax (張力性氣胸), Tamponade (心包填塞), Toxins (局麻毒性/藥物過量), Thrombosis (肺栓塞/心梗)。" }
+    ]
+  }
+};
+
+;
+/**
+ * AnesPilot - Local Anesthetic Toxicity Index Tracker
+ * Accurately tracks additive cardiotoxicity & neurotoxicity across multiple agents.
+ */
+
+const LA_AGENTS = {
+  lidocaine_plain: {
+    name: "Lidocaine (單方 / 無血管收縮劑)",
+    defaultConcPercent: 1.0, // 1% = 10 mg/mL
+    maxMgPerKg: 4.5,
+    maxCeilingMg: 300,
+    unitMgPerMl: 10
+  },
+  lidocaine_epi: {
+    name: "Lidocaine + Epinephrine (加腎上腺素)",
+    defaultConcPercent: 1.0, // 1% = 10 mg/mL
+    maxMgPerKg: 7.0,
+    maxCeilingMg: 500,
+    unitMgPerMl: 10
+  },
+  ropivacaine: {
+    name: "Ropivacaine (羅哌卡因)",
+    defaultConcPercent: 0.2, // 0.2% = 2 mg/mL, or 0.5% = 5 mg/mL
+    maxMgPerKg: 3.0,
+    maxCeilingMg: 225,
+    unitMgPerMl: 2
+  },
+  bupivacaine_plain: {
+    name: "Bupivacaine (麻佳因 / 單方)",
+    defaultConcPercent: 0.5, // 0.5% = 5 mg/mL
+    maxMgPerKg: 2.0,
+    maxCeilingMg: 175,
+    unitMgPerMl: 5
+  },
+  bupivacaine_epi: {
+    name: "Bupivacaine + Epinephrine",
+    defaultConcPercent: 0.5,
+    maxMgPerKg: 2.5,
+    maxCeilingMg: 225,
+    unitMgPerMl: 5
+  },
+  levobupivacaine: {
+    name: "Levobupivacaine (左旋麻佳因)",
+    defaultConcPercent: 0.5,
+    maxMgPerKg: 2.5,
+    maxCeilingMg: 150,
+    unitMgPerMl: 5
+  }
+};
+
+class ToxicityEngine {
+  static calculateToxicity(weightKg, administeredList, hasHighRiskFactors = false) {
+    const riskFactor = hasHighRiskFactors ? 0.8 : 1.0; // 20% safety margin reduction for high-risk patients
+    let totalFraction = 0;
+    const breakdown = [];
+
+    administeredList.forEach(item => {
+      const agent = LA_AGENTS[item.agentId];
+      if (!agent) return;
+
+      const safeMaxMg = Math.min(agent.maxCeilingMg, agent.maxMgPerKg * weightKg) * riskFactor;
+      // Calculate mg given:
+      // item can have volumeMl and concPercent, or directly mg
+      let mgGiven = item.mg;
+      if (mgGiven == null || isNaN(mgGiven)) {
+        const conc = item.concPercent || agent.defaultConcPercent;
+        const mgPerMl = conc * 10;
+        mgGiven = (item.volumeMl || 0) * mgPerMl;
+      }
+
+      const fraction = safeMaxMg > 0 ? (mgGiven / safeMaxMg) : 0;
+      totalFraction += fraction;
+
+      breakdown.push({
+        agentId: item.agentId,
+        name: agent.name,
+        mgGiven: Math.round(mgGiven * 10) / 10,
+        safeMaxMg: Math.round(safeMaxMg * 10) / 10,
+        fractionPercent: Math.round(fraction * 1000) / 10,
+        volumeMl: item.volumeMl
+      });
+    });
+
+    const totalPercent = Math.round(totalFraction * 1000) / 10;
+    const remainingFraction = Math.max(0, 1.0 - totalFraction);
+
+    // Remaining capacity in commonly used agents:
+    // 1) 1% Lidocaine plain (10 mg/mL)
+    const lidoSafeMax = Math.min(LA_AGENTS.lidocaine_plain.maxCeilingMg, LA_AGENTS.lidocaine_plain.maxMgPerKg * weightKg) * riskFactor;
+    const remainingLido1PercentMl = Math.max(0, Math.round((lidoSafeMax * remainingFraction) / 10 * 10) / 10);
+
+    // 2) 0.2% Ropivacaine (2 mg/mL)
+    const ropiSafeMax = Math.min(LA_AGENTS.ropivacaine.maxCeilingMg, LA_AGENTS.ropivacaine.maxMgPerKg * weightKg) * riskFactor;
+    const remainingRopi02PercentMl = Math.max(0, Math.round((ropiSafeMax * remainingFraction) / 2 * 10) / 10);
+
+    // 3) 0.5% Bupivacaine (5 mg/mL)
+    const bupiSafeMax = Math.min(LA_AGENTS.bupivacaine_plain.maxCeilingMg, LA_AGENTS.bupivacaine_plain.maxMgPerKg * weightKg) * riskFactor;
+    const remainingBupi05PercentMl = Math.max(0, Math.round((bupiSafeMax * remainingFraction) / 5 * 10) / 10);
+
+    let status = "SAFE"; // SAFE (<70%), CAUTION (70-99%), TOXIC (>=100%)
+    let statusClass = "text-emerald-400 border-emerald-500/30 bg-emerald-950/20";
+    let statusText = "安全性良好 (劑量在安全許可範圍內)";
+
+    if (totalPercent >= 100) {
+      status = "TOXIC";
+      statusClass = "text-rose-400 border-rose-500/50 bg-rose-950/30 animate-pulse";
+      statusText = "🚨 毒性超標警戒！立即停止給藥，嚴密監測 LAST 症候！";
+    } else if (totalPercent >= 70) {
+      status = "CAUTION";
+      statusClass = "text-amber-400 border-amber-500/40 bg-amber-950/30";
+      statusText = "⚠️ 接近中毒上限警戒區 (≥ 70%)，建議減少或停止追加！";
+    }
+
+    return {
+      totalPercent,
+      remainingFraction,
+      status,
+      statusClass,
+      statusText,
+      breakdown,
+      remainingCapacity: {
+        lido1PercentMl: remainingLido1PercentMl,
+        ropi02PercentMl: remainingRopi02PercentMl,
+        bupi05PercentMl: remainingBupi05PercentMl
+      }
+    };
+  }
+}
+
+;
+/**
+ * AnesPilot - Infusion & Dilution Calculator Engine
+ */
+
+const INFUSION_DRUGS = {
+  norepinephrine: {
+    name: "Norepinephrine (Levophed 去甲腎上腺素)",
+    unit: "mcg/kg/min",
+    isWeightBased: true,
+    doseMin: 0.02,
+    doseMax: 1.0,
+    presets: [
+      { label: "4 mg in 50 mL (80 mcg/mL)", totalDrugMg: 4, totalVolMl: 50, concMcgMl: 80 },
+      { label: "4 mg in 250 mL (16 mcg/mL)", totalDrugMg: 4, totalVolMl: 250, concMcgMl: 16 }
+    ]
+  },
+  epinephrine: {
+    name: "Epinephrine (Adrenaline 腎上腺素)",
+    unit: "mcg/kg/min",
+    isWeightBased: true,
+    doseMin: 0.01,
+    doseMax: 0.5,
+    presets: [
+      { label: "1 mg in 100 mL (10 mcg/mL)", totalDrugMg: 1, totalVolMl: 100, concMcgMl: 10 },
+      { label: "4 mg in 250 mL (16 mcg/mL)", totalDrugMg: 4, totalVolMl: 250, concMcgMl: 16 }
+    ]
+  },
+  nicardipine: {
+    name: "Nicardipine (Cardene 降壓藥)",
+    unit: "mg/hr",
+    isWeightBased: false,
+    doseMin: 2.5,
+    doseMax: 15.0,
+    presets: [
+      { label: "10 mg in 100 mL (0.1 mg/mL)", totalDrugMg: 10, totalVolMl: 100, concMcgMl: 100 },
+      { label: "25 mg in 250 mL (0.1 mg/mL)", totalDrugMg: 25, totalVolMl: 250, concMcgMl: 100 }
+    ]
+  },
+  dopamine: {
+    name: "Dopamine (多巴胺)",
+    unit: "mcg/kg/min",
+    isWeightBased: true,
+    doseMin: 2.0,
+    doseMax: 20.0,
+    presets: [
+      { label: "200 mg in 250 mL (800 mcg/mL)", totalDrugMg: 200, totalVolMl: 250, concMcgMl: 800 },
+      { label: "400 mg in 250 mL (1600 mcg/mL)", totalDrugMg: 400, totalVolMl: 250, concMcgMl: 1600 }
+    ]
+  },
+  propofol: {
+    name: "Propofol (二異丙酚 - 靜脈維持/鎮靜)",
+    unit: "mg/kg/hr",
+    isWeightBased: true,
+    doseMin: 1.0,
+    doseMax: 12.0,
+    presets: [
+      { label: "1% 原液 (10 mg/mL = 10,000 mcg/mL)", totalDrugMg: 500, totalVolMl: 50, concMcgMl: 10000 },
+      { label: "2% 原液 (20 mg/mL = 20,000 mcg/mL)", totalDrugMg: 1000, totalVolMl: 50, concMcgMl: 20000 }
+    ]
+  },
+  remifentanil: {
+    name: "Remifentanil (Ultiva 超短效類鴉片)",
+    unit: "mcg/kg/min",
+    isWeightBased: true,
+    doseMin: 0.05,
+    doseMax: 0.5,
+    presets: [
+      { label: "1 mg in 50 mL (20 mcg/mL)", totalDrugMg: 1, totalVolMl: 50, concMcgMl: 20 },
+      { label: "2 mg in 50 mL (40 mcg/mL)", totalDrugMg: 2, totalVolMl: 50, concMcgMl: 40 }
+    ]
+  },
+  dexmedetomidine: {
+    name: "Dexmedetomidine (Precedex 鎮靜)",
+    unit: "mcg/kg/hr",
+    isWeightBased: true,
+    doseMin: 0.2,
+    doseMax: 1.0,
+    presets: [
+      { label: "200 mcg in 50 mL (4 mcg/mL)", totalDrugMg: 0.2, totalVolMl: 50, concMcgMl: 4 },
+      { label: "400 mcg in 100 mL (4 mcg/mL)", totalDrugMg: 0.4, totalVolMl: 100, concMcgMl: 4 }
+    ]
+  }
+};
+
+class InfusionEngine {
+  static doseToRate(drugId, presetIndex, targetDose, weightKg, customConcMcgMl = null) {
+    const drug = INFUSION_DRUGS[drugId];
+    if (!drug) return 0;
+    const conc = customConcMcgMl || drug.presets[presetIndex]?.concMcgMl || 1;
+
+    let rateMlHr = 0;
+    if (drug.unit === "mcg/kg/min") {
+      // Dose (mcg/kg/min) * weight (kg) * 60 min/hr / conc (mcg/mL)
+      rateMlHr = (targetDose * weightKg * 60) / conc;
+    } else if (drug.unit === "mcg/kg/hr") {
+      // Dose (mcg/kg/hr) * weight (kg) / conc (mcg/mL)
+      rateMlHr = (targetDose * weightKg) / conc;
+    } else if (drug.unit === "mg/kg/hr") {
+      // targetDose is mg/kg/hr -> conc is in mcg/mL (10,000 mcg/mL = 10 mg/mL)
+      const concMgMl = conc / 1000;
+      rateMlHr = (targetDose * weightKg) / concMgMl;
+    } else if (drug.unit === "mg/hr") {
+      // conc in mcg/mL -> conc in mg/mL is conc/1000
+      const concMgMl = conc / 1000;
+      rateMlHr = targetDose / concMgMl;
+    }
+
+    return Math.round(rateMlHr * 100) / 100;
+  }
+
+  static rateToDose(drugId, presetIndex, rateMlHr, weightKg, customConcMcgMl = null) {
+    const drug = INFUSION_DRUGS[drugId];
+    if (!drug) return 0;
+    const conc = customConcMcgMl || drug.presets[presetIndex]?.concMcgMl || 1;
+
+    let dose = 0;
+    if (drug.unit === "mcg/kg/min") {
+      // rate (mL/hr) * conc (mcg/mL) / (weight * 60)
+      dose = (rateMlHr * conc) / (weightKg * 60);
+    } else if (drug.unit === "mcg/kg/hr") {
+      dose = (rateMlHr * conc) / weightKg;
+    } else if (drug.unit === "mg/kg/hr") {
+      const concMgMl = conc / 1000;
+      dose = (rateMlHr * concMgMl) / weightKg;
+    } else if (drug.unit === "mg/hr") {
+      const concMgMl = conc / 1000;
+      dose = rateMlHr * concMgMl;
+    }
+
+    return Math.round(dose * 1000) / 1000;
+  }
+}
+
+;
+/**
+ * AnesPilot - Pre-op Risk Scores Engine
+ * STOP-Bang (OSA), Apfel (PONV), RCRI (Cardiac Risk)
+ */
+
+class ScoresEngine {
+  // STOP-Bang for OSA
+  static calculateStopBang(answers) {
+    // answers is array of boolean [S, T, O, P, B, A, N, G]
+    const score = answers.filter(Boolean).length;
+    let riskLevel = "低度風險 (Low Risk)";
+    let badgeClass = "text-emerald-400 border-emerald-500/30 bg-emerald-950/30";
+    let recommendation = "常規呼吸道處置，術後依照標準監測。";
+
+    if (score >= 5 || (score >= 3 && (answers[4] || answers[6] || answers[7]))) {
+      riskLevel = "高度風險 (High Risk for OSA)";
+      badgeClass = "text-rose-400 border-rose-500/50 bg-rose-950/40";
+      recommendation = "🚨 術中易發生難以面罩通氣/插管！拔管需清醒且完全肌鬆逆轉，術後慎用高劑量類鴉片類藥物，強烈建議持續血氧監測或 CPAP。";
+    } else if (score >= 3) {
+      riskLevel = "中度風險 (Intermediate Risk)";
+      badgeClass = "text-amber-400 border-amber-500/40 bg-amber-950/30";
+      recommendation = "⚠️ 警惕睡眠呼吸中止症，備妥合適口咽導氣管與影像喉頭鏡。";
+    }
+
+    return { score, total: 8, riskLevel, badgeClass, recommendation };
+  }
+
+  // Apfel Score for Postoperative Nausea & Vomiting (PONV)
+  static calculateApfel(female, nonSmoker, historyPonvOrMotion, postopOpioids) {
+    const factors = [female, nonSmoker, historyPonvOrMotion, postopOpioids];
+    const score = factors.filter(Boolean).length;
+
+    const riskPercentages = [10, 21, 39, 61, 79];
+    const riskPercent = riskPercentages[score];
+
+    let strategy = "";
+    let badgeClass = "text-emerald-400 border-emerald-500/30 bg-emerald-950/30";
+
+    if (score === 0 || score === 1) {
+      strategy = "低風險（~10-21%）：一般常規處置，無需預防性併用多種止吐劑，可視情況給予單一藥物 (如 Dexamethasone 4-8 mg)。";
+    } else if (score === 2) {
+      badgeClass = "text-amber-400 border-amber-500/40 bg-amber-950/30";
+      strategy = "中度風險（~39%）：建議給予 2 種不同機轉之止吐藥（如誘導時 Dexamethasone 4-8 mg + 關傷口時 Ondansetron 4 mg 或 Granisetron 1 mg）。";
+    } else {
+      badgeClass = "text-rose-400 border-rose-500/50 bg-rose-950/40";
+      strategy = "高度風險（~61-79%）：強烈建議採用多模式 PONV 預防組合：\n1. 優先考慮全靜脈麻醉 (TIVA with Propofol)，避免使用吸入性氣體與 N2O。\n2. 給予 2-3 種止吐劑 (Dexamethasone + 5-HT3 antagonist + Droperidol 0.625mg)。\n3. 考慮局部神經阻滯減少術後鴉片類藥物用量，充分給予靜脈輸液。";
+    }
+
+    return { score, riskPercent, strategy, badgeClass };
+  }
+
+  // Revised Cardiac Risk Index (RCRI / Lee's Criteria)
+  static calculateRcri(criteria) {
+    // 6 criteria:
+    // 1. High-risk surgery (intraperitoneal, intrathoracic, suprainguinal vascular)
+    // 2. History of ischemic heart disease (MI, angina, CABG/PCI)
+    // 3. History of congestive heart failure
+    // 4. History of cerebrovascular disease (TIA, stroke)
+    // 5. Preoperative insulin therapy for diabetes
+    // 6. Preoperative serum creatinine > 2.0 mg/dL (177 umol/L)
+    const score = criteria.filter(Boolean).length;
+
+    let cardiacEventRisk = "3.9% (Class I)";
+    let badgeClass = "text-emerald-400 border-emerald-500/30 bg-emerald-950/30";
+    let recommendation = "心血管併發症風險低，常規監測。";
+
+    if (score === 1) {
+      cardiacEventRisk = "6.0% (Class II)";
+      badgeClass = "text-emerald-300 border-emerald-500/30 bg-emerald-950/30";
+      recommendation = "輕度心血管風險，維持術中血壓平穩，避免心搏過速與低血壓。";
+    } else if (score === 2) {
+      cardiacEventRisk = "10.1% (Class III)";
+      badgeClass = "text-amber-400 border-amber-500/40 bg-amber-950/30";
+      recommendation = "⚠️ 中度心血管風險，術中建議建立動脈導管 (A-line) 即時血壓監測，備好升壓劑。";
+    } else if (score >= 3) {
+      cardiacEventRisk = "15.0% 以上 (Class IV)";
+      badgeClass = "text-rose-400 border-rose-500/50 bg-rose-950/40";
+      recommendation = "🚨 高度心血管風險！應詳細評估心臟功能（心電圖、心臟超音波 Echo），考慮進階血行動態監測 (A-line, FloTrac, TEE)，術後安排加護病房 (ICU) 照護。";
+    }
+
+    return { score, cardiacEventRisk, recommendation, badgeClass };
+  }
+}
+
+;
+/**
+ * AnesPilot - Main Application Controller
+ */
+
+
+
+
+
+
+
+
+// Global Application State
+const state = {
+  // Patient Profile
+  patient: {
+    ageYears: 35,
+    weightKg: 70,
+    heightCm: 170,
+    isFemale: false,
+    isPediatric: false
+  },
+  // Theme
+  theme: "dark", // "dark" or "light"
+  // Active Navigation Tab
+  activeTab: "dosing", // dosing, crisis, toxicity, asra, infusion, scores, logbook
+  // Crisis Sub-tab
+  activeCrisisId: "mh",
+  // Toxicity administered records
+  toxicityAdministered: [
+    { id: 1, agentId: "lidocaine_plain", concPercent: 1.0, volumeMl: 10, mg: 100 }
+  ],
+  toxicityHighRisk: false,
+  // ASRA state
+  asraSelectedDrugId: "apixaban",
+  asraHoursSinceLastDose: 36,
+  asraCrCl: 60,
+  // Infusion state
+  infusionDrugId: "norepinephrine",
+  infusionPresetIdx: 0,
+  infusionTargetDose: 0.1,
+  infusionRateMlHr: 0,
+  infusionCustomConc: null,
+  // Scores state
+  stopBangAnswers: [false, false, false, false, false, false, false, false],
+  apfelFemale: true,
+  apfelNonSmoker: true,
+  apfelHistory: false,
+  apfelOpioids: true,
+  rcriCriteria: [false, false, false, false, false, false],
+  // Logbook cases
+  cases: JSON.parse(localStorage.getItem("anes_cases") || "[]")
+};
+
+// --- Initialization ---
+document.addEventListener("DOMContentLoaded", () => {
+  initEventListeners();
+  applyTheme(state.theme);
+  renderAll();
+});
+
+function initEventListeners() {
+  // Navigation Tabs
+  document.querySelectorAll(".nav-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.tab;
+      setActiveTab(target);
+    });
+  });
+
+  // Emergency Red Button (Direct to Crisis)
+  const btnEmergency = document.getElementById("btn-quick-crisis");
+  if (btnEmergency) {
+    btnEmergency.addEventListener("click", () => setActiveTab("crisis"));
+  }
+
+  // Theme Toggle
+  const btnTheme = document.getElementById("btn-theme-toggle");
+  if (btnTheme) {
+    btnTheme.addEventListener("click", toggleTheme);
+  }
+
+  // Patient Parameter Controls
+  const weightInput = document.getElementById("input-weight");
+  const weightSlider = document.getElementById("slider-weight");
+  const ageInput = document.getElementById("input-age");
+  const heightInput = document.getElementById("input-height");
+  const genderToggle = document.getElementById("btn-gender-toggle");
+
+  if (weightInput && weightSlider) {
+    const syncWeight = (val) => {
+      const num = parseFloat(val) || 1;
+      state.patient.weightKg = Math.max(1, Math.min(200, num));
+      weightInput.value = state.patient.weightKg;
+      weightSlider.value = state.patient.weightKg;
+      renderAll();
+    };
+    weightInput.addEventListener("input", (e) => syncWeight(e.target.value));
+    weightSlider.addEventListener("input", (e) => syncWeight(e.target.value));
+  }
+
+  if (ageInput) {
+    ageInput.addEventListener("input", (e) => {
+      const num = parseFloat(e.target.value) || 0;
+      state.patient.ageYears = Math.max(0, Math.min(110, num));
+      state.patient.isPediatric = state.patient.ageYears < 12;
+      renderAll();
+    });
+  }
+
+  if (heightInput) {
+    heightInput.addEventListener("input", (e) => {
+      const num = parseFloat(e.target.value) || 0;
+      state.patient.heightCm = num;
+      renderAll();
+    });
+  }
+
+  if (genderToggle) {
+    genderToggle.addEventListener("click", () => {
+      state.patient.isFemale = !state.patient.isFemale;
+      genderToggle.textContent = state.patient.isFemale ? "女性 ♀" : "男性 ♂";
+      genderToggle.className = state.patient.isFemale 
+        ? "glove-btn bg-pink-950/60 text-pink-300 border border-pink-700/50"
+        : "glove-btn bg-sky-950/60 text-sky-300 border border-sky-700/50";
+      renderAll();
+    });
+  }
+
+  // Quick Patient Presets
+  document.querySelectorAll(".preset-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const w = parseFloat(btn.dataset.w);
+      const a = parseFloat(btn.dataset.a);
+      const h = parseFloat(btn.dataset.h);
+      const female = btn.dataset.f === "true";
+
+      state.patient.weightKg = w;
+      state.patient.ageYears = a;
+      state.patient.heightCm = h;
+      state.patient.isFemale = female;
+      state.patient.isPediatric = a < 12;
+
+      if (weightInput) weightInput.value = w;
+      if (weightSlider) weightSlider.value = w;
+      if (ageInput) ageInput.value = a;
+      if (heightInput) heightInput.value = h;
+      if (genderToggle) {
+        genderToggle.textContent = female ? "女性 ♀" : "男性 ♂";
+      }
+
+      renderAll();
+    });
+  });
+}
+
+// --- Navigation Management ---
+function setActiveTab(tabId) {
+  state.activeTab = tabId;
+  document.querySelectorAll(".nav-tab").forEach(tab => {
+    tab.classList.toggle("active", tab.dataset.tab === tabId);
+  });
+  document.querySelectorAll(".tab-content").forEach(panel => {
+    panel.classList.toggle("hidden", panel.id !== `panel-${tabId}`);
+  });
+  renderActiveTab();
+}
+
+// --- Theme Management ---
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  applyTheme(state.theme);
+}
+
+function applyTheme(theme) {
+  const body = document.body;
+  const icon = document.getElementById("theme-icon");
+  if (theme === "light") {
+    body.classList.add("theme-light");
+    if (icon) icon.textContent = "☀️ 日照模式";
+  } else {
+    body.classList.remove("theme-light");
+    if (icon) icon.textContent = "🌙 刀房暗室";
+  }
+}
+
+// --- Master Render Coordinator ---
+function renderAll() {
+  renderProfilePill();
+  renderActiveTab();
+}
+
+function renderProfilePill() {
+  const p = state.patient;
+  const dosing = DosingEngine.calculateAll(p);
+  const pillWeight = document.getElementById("profile-display-weight");
+  const pillAge = document.getElementById("profile-display-age");
+  const pillIbw = document.getElementById("profile-display-ibw");
+
+  if (pillWeight) pillWeight.textContent = `${p.weightKg} kg`;
+  if (pillAge) {
+    if (p.ageYears < 1) {
+      const months = Math.round(p.ageYears * 12);
+      pillAge.textContent = `${months > 0 ? months : 1} 個月大 (嬰幼兒)`;
+    } else {
+      pillAge.textContent = `${p.ageYears} 歲 ${p.isPediatric ? '(小兒)' : '(成人)'}`;
+    }
+  }
+  if (pillIbw) {
+    pillIbw.textContent = dosing.ibw ? `IBW: ${dosing.ibw} kg` : `BSA: ${dosing.bsa || '--'} m²`;
+  }
+}
+
+function renderActiveTab() {
+  switch (state.activeTab) {
+    case "dosing":
+      renderDosingTab();
+      break;
+    case "crisis":
+      renderCrisisTab();
+      break;
+    case "toxicity":
+      renderToxicityTab();
+      break;
+    case "asra":
+      renderAsraTab();
+      break;
+    case "infusion":
+      renderInfusionTab();
+      break;
+    case "scores":
+      renderScoresTab();
+      break;
+    case "logbook":
+      renderLogbookTab();
+      break;
+  }
+}
+
+// ==========================================
+// 1. DOSING TAB RENDERER
+// ==========================================
+function renderDosingTab() {
+  const container = document.getElementById("dosing-results-container");
+  if (!container) return;
+
+  const data = DosingEngine.calculateAll(state.patient);
+  const { airway, fluids, blood, dosages, ventilator } = data;
+
+  container.innerHTML = `
+    <!-- Airway & Equipment Header Card -->
+    <div class="anes-card mb-4 border-l-4 border-l-cyan-500">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
+          <span>🫁</span> 呼吸道與插管管件推薦 (Airway & Equipment)
+        </h3>
+        <span class="drug-badge bg-cyan-950 text-cyan-300 border border-cyan-700/50">
+          ${state.patient.ageYears < 12 ? '小兒計算' : '成人體型'}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">氣管內管 Cuffed ID</div>
+          <div class="text-xl font-extrabold text-white mt-0.5">${airway.ettCuffed} mm</div>
+          <div class="text-[11px] text-slate-500">有氣囊氣管內管</div>
+        </div>
+
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">氣管內管 Uncuffed ID</div>
+          <div class="text-xl font-extrabold text-white mt-0.5">${airway.ettUncuffed} mm</div>
+          <div class="text-[11px] text-slate-500">無氣囊管 (小兒備用)</div>
+        </div>
+
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">插管深度 (門齒刻度)</div>
+          <div class="text-xl font-extrabold text-amber-300 mt-0.5">${airway.ettDepth} cm</div>
+          <div class="text-[11px] text-slate-500">Lip-to-tip 深度估算</div>
+        </div>
+
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">喉頭罩 LMA 尺寸</div>
+          <div class="text-xl font-extrabold text-emerald-400 mt-0.5">Size ${airway.lmaSize}</div>
+          <div class="text-[11px] text-slate-500">依體重級距配搭</div>
+        </div>
+
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">喉頭鏡葉片 (Blade)</div>
+          <div class="text-base font-bold text-white mt-1">${airway.bladeType}</div>
+          <div class="text-[11px] text-slate-500">直葉(Miller) / 彎葉(Mac)</div>
+        </div>
+
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">抽吸管 / 保護性潮氣量</div>
+          <div class="text-base font-bold text-sky-300 mt-1">${ventilator.tvLow} - ${ventilator.tvHigh} mL</div>
+          <div class="text-[11px] text-slate-500">6-8 mL/kg (${ventilator.isUsingIbw ? 'IBW' : 'TBW'}) | 吸引管: ${airway.suctionFr}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Induction & Muscle Relaxants -->
+    <div class="anes-card mb-4 border-l-4 border-l-blue-500">
+      <h3 class="font-bold text-lg text-blue-400 mb-3 flex items-center gap-2">
+        <span>💉</span> 誘導與肌鬆劑 (Induction & Neuromuscular)
+      </h3>
+      <div class="space-y-2">
+        ${dosages.induction.map(d => renderDrugRow(d)).join("")}
+      </div>
+    </div>
+
+    <!-- Analgesia & Reversal -->
+    <div class="anes-card mb-4 border-l-4 border-l-purple-500">
+      <h3 class="font-bold text-lg text-purple-400 mb-3 flex items-center gap-2">
+        <span>💊</span> 止痛、鎮靜與拮抗逆轉 (Analgesia & Reversals)
+      </h3>
+      <div class="space-y-2">
+        ${dosages.analgesia.map(d => renderDrugRow(d)).join("")}
+      </div>
+    </div>
+
+    <!-- Emergency & Resuscitation -->
+    <div class="anes-card mb-4 border-l-4 border-l-rose-500">
+      <h3 class="font-bold text-lg text-rose-400 mb-3 flex items-center gap-2">
+        <span>⚡</span> 急救與心肺復甦 (Emergency Resuscitation)
+      </h3>
+      <div class="space-y-2">
+        ${dosages.emergency.map(d => renderDrugRow(d, true)).join("")}
+      </div>
+    </div>
+
+    <!-- Fluid & Blood Management -->
+    <div class="anes-card border-l-4 border-l-amber-500">
+      <h3 class="font-bold text-lg text-amber-400 mb-3 flex items-center gap-2">
+        <span>💧</span> 輸液與最大容許失血量 (Fluid & Blood)
+      </h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">4-2-1 維持輸液速率</div>
+          <div class="text-xl font-bold text-amber-300 mt-0.5">${fluids.hourlyRate} mL/hr</div>
+          <div class="text-[11px] text-slate-500">常規維持量</div>
+        </div>
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">禁食 NPO 8 小時水分赤字</div>
+          <div class="text-xl font-bold text-white mt-0.5">${fluids.npo8hr} mL</div>
+          <div class="text-[11px] text-slate-500">建議手術前 3 小時補足</div>
+        </div>
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">預估總血容量 (EBV)</div>
+          <div class="text-xl font-bold text-rose-400 mt-0.5">${blood.ebv} mL</div>
+          <div class="text-[11px] text-slate-500">係數: ${blood.ebvFactor} mL/kg</div>
+        </div>
+        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-slate-400">容許失血量 (MABL)</div>
+          <div class="text-xl font-bold text-rose-300 mt-0.5">${blood.mabl} mL</div>
+          <div class="text-[11px] text-slate-500">Hct 36%降至24%容許值</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDrugRow(drug, isEmergency = false) {
+  const bgClass = isEmergency ? "bg-rose-950/20 border-rose-900/30" : "bg-slate-900/40 border-slate-800";
+  const badgeClass = drug.badge === "IBW" 
+    ? "bg-amber-950 text-amber-300 border-amber-800" 
+    : (isEmergency ? "bg-rose-950 text-rose-300 border-rose-800" : "bg-slate-800 text-slate-300 border-slate-700");
+
+  return `
+    <div class="p-3 rounded-lg border ${bgClass} flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-100">${drug.name}</span>
+          <span class="drug-badge border ${badgeClass}">${drug.badge}</span>
+        </div>
+        <div class="text-xs text-slate-400 mt-0.5">${drug.perKg} &bull; <span class="text-slate-500">${drug.note}</span></div>
+      </div>
+      <div class="text-right sm:self-center">
+        <div class="text-lg font-black text-emerald-400">${drug.dose}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ==========================================
+// 2. CRISIS ENGINE RENDERER
+// ==========================================
+let crisisTimers = {};
+
+function renderCrisisTab() {
+  const container = document.getElementById("crisis-container");
+  if (!container) return;
+
+  const crisisKeys = Object.keys(CRISIS_MODULES);
+  const currentMod = CRISIS_MODULES[state.activeCrisisId] || CRISIS_MODULES.mh;
+  const doses = currentMod.calculateDoses(state.patient.weightKg);
+
+  container.innerHTML = `
+    <!-- Top Crisis Selector Tabs -->
+    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-4">
+      ${crisisKeys.map(k => {
+        const mod = CRISIS_MODULES[k];
+        const isActive = k === state.activeCrisisId;
+        return `
+          <button class="glove-btn text-xs py-2 px-1 text-center font-bold rounded-lg border transition-all ${
+            isActive 
+              ? 'bg-rose-700 text-white border-rose-500 shadow-lg shadow-rose-950/80'
+              : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
+          }" onclick="window.switchCrisis('${k}')">
+            ${mod.title.split(' ')[0]}
+          </button>
+        `;
+      }).join("")}
+    </div>
+
+    <!-- Active Crisis Header Banner -->
+    <div class="anes-card crisis-active-mode mb-4 border-2 border-rose-600 bg-rose-950/30">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🚨</span>
+            <h2 class="text-xl font-black text-rose-400 tracking-wide">${currentMod.title}</h2>
+            <span class="drug-badge bg-rose-900 text-rose-200 border border-rose-700 font-black">${currentMod.badge}</span>
+          </div>
+          <p class="text-sm text-slate-300 mt-1">${currentMod.subtitle}</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          ${state.activeCrisisId === 'acls' ? `
+            <button id="btn-metronome" class="glove-btn bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm px-4 shadow-md" onclick="window.toggleMetronome()">
+              <span id="metro-heart" class="text-lg">❤️</span>
+              <span id="metro-text">開啟 CPR 110bpm 節拍器</span>
+            </button>
+          ` : `
+            <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs py-2" onclick="window.startCrisisTimer('${state.activeCrisisId}')">
+              ⏱️ 啟動應變計時器
+            </button>
+          `}
+        </div>
+      </div>
+
+      <!-- Live Calculation Card for Current Crisis -->
+      <div class="mt-4 pt-3 border-t border-rose-900/40">
+        ${renderCrisisDosePanel(state.activeCrisisId, doses, state.patient.weightKg)}
+      </div>
+    </div>
+
+    <!-- Action Checklists -->
+    <div class="anes-card border-slate-800">
+      <h3 class="font-bold text-slate-200 mb-3 flex items-center justify-between">
+        <span>📋 標準處置檢核單 (Action Checklist)</span>
+        <button class="text-xs text-slate-400 hover:text-white" onclick="window.resetChecklist()">重置勾選</button>
+      </h3>
+      <div class="space-y-2">
+        ${currentMod.actionSteps.map((step, idx) => `
+          <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900/80 border border-slate-800/80 cursor-pointer transition">
+            <input type="checkbox" id="check-${step.id}" class="mt-1 w-5 h-5 rounded accent-rose-500 bg-slate-950 cursor-pointer">
+            <div>
+              <div class="font-bold text-slate-100 text-sm">${idx + 1}. ${step.title}</div>
+              <div class="text-xs text-slate-400 mt-0.5 leading-relaxed">${step.desc}</div>
+            </div>
+          </label>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderCrisisDosePanel(crisisId, doses, weightKg) {
+  if (crisisId === "mh") {
+    return `
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
+          <div class="text-xs text-rose-300 font-bold">Dantrolene 首劑劑量 (2.5 mg/kg)</div>
+          <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.initialMg} mg</div>
+          <div class="text-[11px] text-slate-400">上限至多追加至 10 mg/kg (${doses.maxMg} mg)</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-amber-400 font-bold">傳統標準瓶 (20 mg/瓶)</div>
+          <div class="text-2xl font-black text-amber-400 mt-0.5">${doses.stdVials20mg} 瓶</div>
+          <div class="text-[11px] text-slate-400">${doses.waterPerVialStd}</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-emerald-400 font-bold">Ryanodex 新型懸浮劑 (250 mg/瓶)</div>
+          <div class="text-2xl font-black text-emerald-400 mt-0.5">${doses.ryanodexVials250mg} 瓶</div>
+          <div class="text-[11px] text-slate-400">${doses.waterPerRyanodex}</div>
+        </div>
+      </div>
+    `;
+  } else if (crisisId === "last") {
+    return `
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
+          <div class="text-xs text-rose-300 font-bold">20% 脂肪乳劑 首劑 Bolus (1.5 mL/kg)</div>
+          <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.bolusMl} mL</div>
+          <div class="text-[11px] text-slate-400">2-3 分鐘內推注完成</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-cyan-400 font-bold">持續滴注速率 (0.25 mL/kg/min)</div>
+          <div class="text-2xl font-black text-cyan-400 mt-0.5">${doses.infusionMlMin} mL/min</div>
+          <div class="text-[11px] text-slate-400">換算幫浦: ${(doses.infusionMlMin * 60).toFixed(0)} mL/hr</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-amber-400 font-bold">累積最大容許總量 (12 mL/kg)</div>
+          <div class="text-2xl font-black text-amber-400 mt-0.5">${doses.maxMl} mL</div>
+          <div class="text-[11px] text-slate-400">初次 5 分鐘後若不穩可再 Bolus 1-2 次</div>
+        </div>
+      </div>
+    `;
+  } else if (crisisId === "cico") {
+    return `
+      <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
+        <div>
+          <div class="text-xs text-amber-400 font-bold">Rocuronium RSI 插管失敗即刻逆轉救命劑量</div>
+          <div class="text-xl font-black text-white mt-0.5">Sugammadex 16 mg/kg = <span class="text-rose-400">${doses.sugammadexRsiRescue} mg</span></div>
+          <div class="text-xs text-slate-400">約需 ${Math.ceil(doses.sugammadexRsiRescue / 100)} 支 100mg/mL 瓶</div>
+        </div>
+        <div class="text-right">
+          <span class="drug-badge bg-rose-950 text-rose-300 border border-rose-700">準備 Scalpel-Bougie-Tube eFONA</span>
+        </div>
+      </div>
+    `;
+  } else if (crisisId === "anaphylaxis") {
+    return `
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
+          <div class="text-xs text-rose-300 font-bold">Epinephrine IV 滴定推注 (1 mcg/kg)</div>
+          <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.epiIvBolusUg} mcg</div>
+          <div class="text-[11px] text-slate-400">1:100,000 稀釋液 (10mcg/mL)</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-cyan-400 font-bold">Epinephrine IM 肌肉注射 (0.01 mg/kg)</div>
+          <div class="text-2xl font-black text-cyan-400 mt-0.5">${doses.epiImMg} mg</div>
+          <div class="text-[11px] text-slate-400">大腿前外側肌注 (上限 0.5 mg)</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-amber-400 font-bold">加壓晶體輸液衝注 (20 mL/kg)</div>
+          <div class="text-2xl font-black text-amber-400 mt-0.5">${doses.fluidBolusMl} mL</div>
+          <div class="text-[11px] text-slate-400">Normal Saline / Balanced Salt</div>
+        </div>
+      </div>
+    `;
+  } else if (crisisId === "acls") {
+    return `
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
+          <div class="text-xs text-rose-300 font-bold">去顫電擊 首劑能量</div>
+          <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.defibInitial} J</div>
+          <div class="text-[11px] text-slate-400">後續 ${doses.defibNext} J (雙相波)</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-amber-400 font-bold">Epinephrine (每3-5分)</div>
+          <div class="text-2xl font-black text-amber-400 mt-0.5">${doses.epiDose}</div>
+          <div class="text-[11px] text-slate-400">給藥後以 20mL NS 沖洗管路</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-cyan-400 font-bold">Amiodarone 首劑 (VF/pVT)</div>
+          <div class="text-2xl font-black text-cyan-400 mt-0.5">${doses.amiodaroneInitial}</div>
+          <div class="text-[11px] text-slate-400">第 3 次電擊後給予</div>
+        </div>
+        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
+          <div class="text-xs text-cyan-400 font-bold">Amiodarone 第二劑</div>
+          <div class="text-2xl font-black text-cyan-400 mt-0.5">${doses.amiodaroneNext}</div>
+          <div class="text-[11px] text-slate-400">第 5 次電擊後給予</div>
+        </div>
+      </div>
+    `;
+  }
+  return "";
+}
+
+window.switchCrisis = (id) => {
+  state.activeCrisisId = id;
+  renderCrisisTab();
+};
+
+window.resetChecklist = () => {
+  document.querySelectorAll('#crisis-container input[type="checkbox"]').forEach(c => c.checked = false);
+};
+
+window.toggleMetronome = () => {
+  const heart = document.getElementById("metro-heart");
+  const text = document.getElementById("metro-text");
+  const btn = document.getElementById("btn-metronome");
+
+  if (audioService.isMetronomeRunning) {
+    audioService.stopMetronome();
+    if (heart) heart.classList.remove("metronome-pulse");
+    if (text) text.textContent = "開啟 CPR 110bpm 節拍器";
+    if (btn) btn.className = "glove-btn bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm px-4 shadow-md";
+  } else {
+    audioService.startMetronome(110);
+    if (heart) heart.classList.add("metronome-pulse");
+    if (text) text.textContent = "🔊 節拍器運作中 (點此關閉)";
+    if (btn) btn.className = "glove-btn bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-4 shadow-md";
+  }
+};
+
+window.startCrisisTimer = (id) => {
+  audioService.alarm();
+  alert("計時器已啟動！5 分鐘後將提醒您重新評估處置效果。");
+};
+
+// ==========================================
+// 3. TOXICITY TRACKER RENDERER
+// ==========================================
+function renderToxicityTab() {
+  const container = document.getElementById("toxicity-container");
+  if (!container) return;
+
+  const result = ToxicityEngine.calculateToxicity(
+    state.patient.weightKg,
+    state.toxicityAdministered,
+    state.toxicityHighRisk
+  );
+
+  const gaugeWidth = Math.min(100, result.totalPercent);
+  const barColor = result.totalPercent >= 100 ? 'bg-rose-500' : (result.totalPercent >= 70 ? 'bg-amber-500' : 'bg-emerald-500');
+
+  container.innerHTML = `
+    <!-- Top Visual Gauge Card -->
+    <div class="anes-card mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+          <span>🧪</span> 局部麻醉藥綜合毒性儀表板 (Toxicity Index)
+        </h3>
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-slate-300 flex items-center gap-1.5 cursor-pointer bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800">
+            <input type="checkbox" id="check-tox-risk" ${state.toxicityHighRisk ? 'checked' : ''} onchange="window.toggleToxRisk(this.checked)" class="w-4 h-4 accent-amber-500">
+            <span>高風險體質 (年長衰弱/心肝腎衰竭，上限降20%)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Meter Progress Bar -->
+      <div class="mt-4">
+        <div class="flex items-end justify-between mb-1.5">
+          <span class="text-xs text-slate-400 font-semibold">安全毒性加總指數 (Total Fraction)</span>
+          <span class="text-2xl font-black ${result.totalPercent >= 100 ? 'text-rose-400' : (result.totalPercent >= 70 ? 'text-amber-400' : 'text-emerald-400')}">
+            ${result.totalPercent}%
+          </span>
+        </div>
+        <div class="w-full h-4 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+          <div class="h-full rounded-full transition-all duration-300 ${barColor}" style="width: ${gaugeWidth}%"></div>
+        </div>
+        <div class="flex justify-between text-[11px] text-slate-500 mt-1 font-mono">
+          <span>0%</span>
+          <span class="text-amber-500">70% 警戒線</span>
+          <span class="text-rose-500">100% 中毒上限</span>
+        </div>
+      </div>
+
+      <!-- Status Banner -->
+      <div class="mt-3 p-3 rounded-lg border text-sm font-bold flex items-center justify-between ${result.statusClass}">
+        <div>${result.statusText}</div>
+        ${result.totalPercent >= 100 ? `
+          <button class="glove-btn bg-rose-600 text-white text-xs py-1.5 px-3 rounded font-black shadow" onclick="window.switchCrisis('last'); setActiveTab('crisis');">
+            進入 LAST 搶救流程 ➔
+          </button>
+        ` : ''}
+      </div>
+
+      <!-- Remaining Safe Capacity -->
+      ${result.totalPercent < 100 ? `
+        <div class="mt-3 grid grid-cols-3 gap-2 bg-slate-900/60 p-3 rounded-lg border border-slate-800 text-center">
+          <div>
+            <div class="text-[11px] text-slate-400">尚可注射 1% Lidocaine</div>
+            <div class="text-base font-extrabold text-emerald-400 mt-0.5">${result.remainingCapacity.lido1PercentMl} mL</div>
+          </div>
+          <div>
+            <div class="text-[11px] text-slate-400">尚可注射 0.2% Ropivacaine</div>
+            <div class="text-base font-extrabold text-cyan-400 mt-0.5">${result.remainingCapacity.ropi02PercentMl} mL</div>
+          </div>
+          <div>
+            <div class="text-[11px] text-slate-400">尚可注射 0.5% Bupivacaine</div>
+            <div class="text-base font-extrabold text-sky-400 mt-0.5">${result.remainingCapacity.bupi05PercentMl} mL</div>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- Administered Drug List -->
+    <div class="anes-card mb-4">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="font-bold text-slate-200">已給予之局麻藥物清單 (外科浸潤 + 神經阻滯)</h4>
+        <button class="glove-btn bg-cyan-600 hover:bg-cyan-500 text-white text-xs py-1.5 px-3" onclick="window.showAddToxModal()">
+          + 新增施打藥物
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        ${result.breakdown.length === 0 ? `
+          <div class="text-center py-6 text-slate-500 text-sm">目前尚未加入任何局部麻醉藥紀錄。</div>
+        ` : result.breakdown.map((item, idx) => `
+          <div class="flex items-center justify-between p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+            <div>
+              <div class="font-bold text-slate-200 text-sm">${item.name}</div>
+              <div class="text-xs text-slate-400">
+                已給 ${item.volumeMl ? `${item.volumeMl} mL = ` : ''}${item.mgGiven} mg / 安全上限 ${item.safeMaxMg} mg
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-sm ${item.fractionPercent > 50 ? 'text-amber-400' : 'text-slate-300'}">
+                佔上限 ${item.fractionPercent}%
+              </span>
+              <button class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1 rounded bg-rose-950/40 border border-rose-800/40" onclick="window.removeToxItem(${idx})">
+                刪除
+              </button>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+window.toggleToxRisk = (checked) => {
+  state.toxicityHighRisk = checked;
+  renderToxicityTab();
+};
+
+window.removeToxItem = (idx) => {
+  state.toxicityAdministered.splice(idx, 1);
+  renderToxicityTab();
+};
+
+window.showAddToxModal = () => {
+  const agentKeys = Object.keys(LA_AGENTS);
+  const optionsHtml = agentKeys.map(k => `<option value="${k}">${LA_AGENTS[k].name}</option>`).join("");
+  
+  const vol = prompt("請輸入施打劑量體積 (mL)，例如: 20", "20");
+  if (!vol) return;
+  const volNum = parseFloat(vol);
+  if (isNaN(volNum) || volNum <= 0) return;
+
+  const agentId = prompt("請選擇藥物序號 (1: 1% Lidocaine, 2: 1% Lido+Epi, 3: 0.2% Ropivacaine, 4: 0.5% Bupivacaine)", "3");
+  let selectedAgent = "ropivacaine";
+  let conc = 0.2;
+  if (agentId === "1") { selectedAgent = "lidocaine_plain"; conc = 1.0; }
+  else if (agentId === "2") { selectedAgent = "lidocaine_epi"; conc = 1.0; }
+  else if (agentId === "4") { selectedAgent = "bupivacaine_plain"; conc = 0.5; }
+
+  state.toxicityAdministered.push({
+    id: Date.now(),
+    agentId: selectedAgent,
+    concPercent: conc,
+    volumeMl: volNum,
+    mg: volNum * conc * 10
+  });
+
+  renderToxicityTab();
+};
+
+// ==========================================
+// 4. ASRA COAGULATION GUIDE RENDERER
+// ==========================================
+function renderAsraTab() {
+  const container = document.getElementById("asra-container");
+  if (!container) return;
+
+  const drug = ASRA_DATABASE.find(d => d.id === state.asraSelectedDrugId) || ASRA_DATABASE[0];
+  const isRenalImpaired = drug.crClThreshold && state.asraCrCl < drug.crClThreshold;
+  const requiredWaitHours = isRenalImpaired ? drug.renalWarningWaitHours : drug.standardWaitHours;
+  const hoursPassed = state.asraHoursSinceLastDose;
+  const hoursRemaining = Math.max(0, requiredWaitHours - hoursPassed);
+
+  let verdict = "SAFE";
+  let verdictClass = "text-emerald-400 border-emerald-500/50 bg-emerald-950/40";
+  let verdictText = "✅ 可安全進行神經軸阻滯穿刺 (Spinal / Epidural Safe)";
+
+  if (requiredWaitHours === 0) {
+    verdict = "SAFE";
+  } else if (hoursRemaining > 0) {
+    verdict = "UNSAFE";
+    verdictClass = "text-rose-400 border-rose-500/50 bg-rose-950/50";
+    verdictText = `❌ 距安全間隔尚差 ${hoursRemaining} 小時！嚴禁施打神經軸阻滯 (脊椎硬腦膜外血腫高危)`;
+  }
+
+  container.innerHTML = `
+    <!-- Top Selector Card -->
+    <div class="anes-card mb-4 border-l-4 border-l-emerald-500">
+      <h3 class="font-bold text-lg text-emerald-400 mb-3 flex items-center gap-2">
+        <span>🩸</span> ASRA 抗凝血藥物與神經軸阻滯決策樹
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1 font-semibold">選擇病患正在使用的抗凝/抗血小板藥</label>
+          <select id="select-asra-drug" class="w-full glove-input text-sm" onchange="window.onAsraDrugChange(this.value)">
+            ${ASRA_DATABASE.map(d => `
+              <option value="${d.id}" ${d.id === state.asraSelectedDrugId ? 'selected' : ''}>
+                ${d.name} (${d.category.split(' ')[0]})
+              </option>
+            `).join("")}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1 font-semibold">最後一次服藥距今 (小時)</label>
+          <input type="number" min="0" max="300" value="${state.asraHoursSinceLastDose}" class="w-full glove-input text-sm" oninput="window.onAsraHoursChange(this.value)">
+          <div class="text-[11px] text-slate-500 mt-1 font-mono">約 ${(state.asraHoursSinceLastDose / 24).toFixed(1)} 天前</div>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1 font-semibold">腎功能 eGFR / CrCl (mL/min)</label>
+          <input type="number" min="10" max="150" value="${state.asraCrCl}" class="w-full glove-input text-sm" oninput="window.onAsraCrClChange(this.value)">
+          <div class="text-[11px] ${isRenalImpaired ? 'text-amber-400 font-bold' : 'text-slate-500'} mt-1">
+            ${isRenalImpaired ? '⚠️ 腎功能不全，延長停藥等待時間' : '正常腎功能範圍'}
+          </div>
+        </div>
+      </div>
+
+      <!-- Verdict Banner -->
+      <div class="p-4 rounded-xl border text-base font-black flex items-center justify-between ${verdictClass}">
+        <div>${verdictText}</div>
+        <div class="text-xs font-bold font-mono px-3 py-1 bg-slate-900/80 rounded border border-slate-700">
+          指引建議停藥: ${requiredWaitHours} 小時
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Guidelines & Catheter Recommendations -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="anes-card">
+        <h4 class="font-bold text-slate-200 text-sm mb-2 flex items-center gap-1.5">
+          <span>📌</span> ASRA 穿刺前停藥建議 (Pre-op Guidance)
+        </h4>
+        <p class="text-sm text-slate-300 leading-relaxed">${drug.recommendation}</p>
+        <div class="mt-3 text-xs text-slate-400 bg-slate-900/60 p-2.5 rounded border border-slate-800">
+          <span class="text-slate-300 font-bold">備註說明：</span>${drug.notes}
+        </div>
+      </div>
+
+      <div class="anes-card">
+        <h4 class="font-bold text-slate-200 text-sm mb-2 flex items-center gap-1.5">
+          <span>🩺</span> 硬脊膜外導管拔管與術後恢復 (Catheter & Resumption)
+        </h4>
+        <ul class="text-xs text-slate-300 space-y-2">
+          <li class="p-2 rounded bg-slate-900/60 border border-slate-800">
+            <span class="font-bold text-amber-300">導管拔除前需停藥：</span>
+            ${drug.catheterRemovalWaitHours > 0 ? `距離上次給藥至少 ${drug.catheterRemovalWaitHours} 小時` : '無需特殊停藥'}
+          </li>
+          <li class="p-2 rounded bg-slate-900/60 border border-slate-800">
+            <span class="font-bold text-cyan-300">拔管後重啟藥物等待：</span>
+            ${drug.restartAfterRemovalHours > 0 ? `拔除導管後至少間隔 ${drug.restartAfterRemovalHours} 小時方可服藥` : '可直接重啟'}
+          </li>
+          <li class="p-2 rounded bg-slate-900/60 border border-slate-800 text-slate-400">
+            <span class="font-bold text-rose-300">血腫警示：</span>若術後出現下肢進行性無力或麻木，需立即安排 MRI 並照會神經外科行減壓手術（黃金 8 小時）。
+          </li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+window.onAsraDrugChange = (id) => {
+  state.asraSelectedDrugId = id;
+  renderAsraTab();
+};
+
+window.onAsraHoursChange = (val) => {
+  state.asraHoursSinceLastDose = parseFloat(val) || 0;
+  renderAsraTab();
+};
+
+window.onAsraCrClChange = (val) => {
+  state.asraCrCl = parseFloat(val) || 60;
+  renderAsraTab();
+};
+
+// ==========================================
+// 5. INFUSION CALCULATOR RENDERER
+// ==========================================
+function renderInfusionTab() {
+  const container = document.getElementById("infusion-container");
+  if (!container) return;
+
+  const drug = INFUSION_DRUGS[state.infusionDrugId] || INFUSION_DRUGS.norepinephrine;
+  const preset = drug.presets[state.infusionPresetIdx] || drug.presets[0];
+  const rateMlHr = InfusionEngine.doseToRate(
+    state.infusionDrugId,
+    state.infusionPresetIdx,
+    state.infusionTargetDose,
+    state.patient.weightKg
+  );
+
+  container.innerHTML = `
+    <div class="anes-card mb-4 border-l-4 border-l-sky-500">
+      <h3 class="font-bold text-lg text-sky-400 mb-3 flex items-center gap-2">
+        <span>⏱️</span> 血管活性與鎮靜輸注幫浦調速器 (Infusion Calculator)
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1 font-semibold">選擇藥物</label>
+          <select class="w-full glove-input text-sm" onchange="window.onInfusionDrugChange(this.value)">
+            ${Object.keys(INFUSION_DRUGS).map(k => `
+              <option value="${k}" ${k === state.infusionDrugId ? 'selected' : ''}>
+                ${INFUSION_DRUGS[k].name}
+              </option>
+            `).join("")}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-400 mb-1 font-semibold">常用醫院稀釋泡法 (Concentration Preset)</label>
+          <select class="w-full glove-input text-sm" onchange="window.onInfusionPresetChange(this.value)">
+            ${drug.presets.map((p, idx) => `
+              <option value="${idx}" ${idx === state.infusionPresetIdx ? 'selected' : ''}>
+                ${p.label}
+              </option>
+            `).join("")}
+          </select>
+        </div>
+      </div>
+
+      <!-- Target Dose Adjuster -->
+      <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-bold text-slate-200">期望給藥劑量 (${drug.unit})</span>
+          <div class="flex items-center gap-2">
+            <input type="number" step="0.01" min="${drug.doseMin}" max="${drug.doseMax}" value="${state.infusionTargetDose}" class="glove-input text-center w-24 py-1 text-sky-300 font-black text-lg" oninput="window.onInfusionDoseChange(this.value)">
+            <span class="text-xs text-slate-400 font-mono">${drug.unit}</span>
+          </div>
+        </div>
+        <input type="range" min="${drug.doseMin}" max="${drug.doseMax}" step="0.01" value="${state.infusionTargetDose}" class="w-full glove-slider cursor-pointer" oninput="window.onInfusionDoseChange(this.value)">
+        <div class="flex justify-between text-[11px] text-slate-500 mt-1 font-mono">
+          <span>最低: ${drug.doseMin}</span>
+          <span>常用範圍</span>
+          <span>最高: ${drug.doseMax}</span>
+        </div>
+      </div>
+
+      <!-- Output Pump Rate -->
+      <div class="p-4 rounded-xl bg-gradient-to-r from-sky-950/60 to-blue-950/60 border border-sky-800/60 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold text-sky-300 uppercase tracking-wide">注射幫浦設定流速 (Syringe Pump Rate)</div>
+          <div class="text-4xl font-black text-white mt-1">
+            ${rateMlHr} <span class="text-xl text-sky-400 font-normal">mL/hr</span>
+          </div>
+          <div class="text-xs text-slate-400 mt-1">
+            基準體重: ${state.patient.weightKg} kg &bull; 濃度: ${preset.concMcgMl} mcg/mL
+          </div>
+        </div>
+
+        <div class="text-right">
+          <span class="drug-badge bg-sky-900/80 text-sky-200 border border-sky-600">
+            精確雙向算式
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+window.onInfusionDrugChange = (id) => {
+  state.infusionDrugId = id;
+  state.infusionPresetIdx = 0;
+  const drug = INFUSION_DRUGS[id];
+  state.infusionTargetDose = (drug.doseMin + drug.doseMax) / 4;
+  renderInfusionTab();
+};
+
+window.onInfusionPresetChange = (idx) => {
+  state.infusionPresetIdx = parseInt(idx, 10);
+  renderInfusionTab();
+};
+
+window.onInfusionDoseChange = (val) => {
+  state.infusionTargetDose = parseFloat(val) || 0.01;
+  renderInfusionTab();
+};
+
+// ==========================================
+// 6. PRE-OP SCORES RENDERER
+// ==========================================
+function renderScoresTab() {
+  const container = document.getElementById("scores-container");
+  if (!container) return;
+
+  const stopBang = ScoresEngine.calculateStopBang(state.stopBangAnswers);
+  const apfel = ScoresEngine.calculateApfel(state.apfelFemale, state.apfelNonSmoker, state.apfelHistory, state.apfelOpioids);
+  const rcri = ScoresEngine.calculateRcri(state.rcriCriteria);
+
+  const stopBangLabels = [
+    "S - Snoring (大聲打鼾，隔著房門可聽到)",
+    "T - Tired (白天容易疲累、瞌睡或嗜睡)",
+    "O - Observed (睡眠中曾被目睹呼吸停止)",
+    "P - Pressure (患有高血壓或服用降壓藥)",
+    "B - BMI > 35 kg/m²",
+    "A - Age > 50 歲",
+    "N - Neck 頸圍 > 40 cm (16吋)",
+    "G - Gender 男性 (Male)"
+  ];
+
+  const rcriLabels = [
+    "1. 執行高風險手術 (開胸、開腹、主動脈或重大周邊血管)",
+    "2. 缺血性心臟病史 (心肌梗塞、心絞痛、CABG / PCI 支架)",
+    "3. 充血性心臟衰竭病史 (CHF / 肺水腫)",
+    "4. 腦血管疾病病史 (中風 Stroke 或短暫性腦缺血 TIA)",
+    "5. 術前正接受胰島素治療之糖尿病",
+    "6. 術前抽血肌酸酐 Serum Creatinine > 2.0 mg/dL"
+  ];
+
+  container.innerHTML = `
+    <!-- Apfel PONV Score -->
+    <div class="anes-card mb-4 border-l-4 border-l-purple-500">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-purple-400 flex items-center gap-2">
+          <span>🤢</span> Apfel 術後噁心嘔吐量表 (PONV Risk Score)
+        </h3>
+        <span class="text-xl font-black text-purple-300">得分: ${apfel.score} / 4</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" ${state.apfelFemale ? 'checked' : ''} onchange="window.toggleApfel('female', this.checked)" class="w-4 h-4 accent-purple-500">
+          <span class="text-xs text-slate-200">女性 (Female)</span>
+        </label>
+        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" ${state.apfelNonSmoker ? 'checked' : ''} onchange="window.toggleApfel('nonSmoker', this.checked)" class="w-4 h-4 accent-purple-500">
+          <span class="text-xs text-slate-200">不吸菸者 (Non-smoker)</span>
+        </label>
+        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" ${state.apfelHistory ? 'checked' : ''} onchange="window.toggleApfel('history', this.checked)" class="w-4 h-4 accent-purple-500">
+          <span class="text-xs text-slate-200">PONV 或暈車病史</span>
+        </label>
+        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" ${state.apfelOpioids ? 'checked' : ''} onchange="window.toggleApfel('opioids', this.checked)" class="w-4 h-4 accent-purple-500">
+          <span class="text-xs text-slate-200">預期術後使用鴉片類</span>
+        </label>
+      </div>
+
+      <div class="p-3 rounded-lg border ${apfel.badgeClass}">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-bold text-sm">術後噁心嘔吐預估發生率：約 ${apfel.riskPercent}%</span>
+          <span class="text-xs font-mono font-bold uppercase">指引處置</span>
+        </div>
+        <div class="text-xs leading-relaxed whitespace-pre-line">${apfel.strategy}</div>
+      </div>
+    </div>
+
+    <!-- STOP-Bang OSA Score -->
+    <div class="anes-card mb-4 border-l-4 border-l-amber-500">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
+          <span>😴</span> STOP-Bang 睡眠呼吸中止症快速篩檢
+        </h3>
+        <span class="text-xl font-black text-amber-300">得分: ${stopBang.score} / 8</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+        ${stopBangLabels.map((lbl, idx) => `
+          <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" ${state.stopBangAnswers[idx] ? 'checked' : ''} onchange="window.toggleStopBang(${idx}, this.checked)" class="w-4 h-4 accent-amber-500">
+            <span class="text-xs text-slate-200">${lbl}</span>
+          </label>
+        `).join("")}
+      </div>
+
+      <div class="p-3 rounded-lg border ${stopBang.badgeClass}">
+        <div class="font-bold text-sm mb-1">${stopBang.riskLevel}</div>
+        <div class="text-xs leading-relaxed">${stopBang.recommendation}</div>
+      </div>
+    </div>
+
+    <!-- RCRI Cardiac Risk -->
+    <div class="anes-card border-l-4 border-l-rose-500">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-rose-400 flex items-center gap-2">
+          <span>🫀</span> RCRI (Lee's Index) 心血管風險評估
+        </h3>
+        <span class="text-xl font-black text-rose-300">得分: ${rcri.score} / 6</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+        ${rcriLabels.map((lbl, idx) => `
+          <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" ${state.rcriCriteria[idx] ? 'checked' : ''} onchange="window.toggleRcri(${idx}, this.checked)" class="w-4 h-4 accent-rose-500">
+            <span class="text-xs text-slate-200">${lbl}</span>
+          </label>
+        `).join("")}
+      </div>
+
+      <div class="p-3 rounded-lg border ${rcri.badgeClass}">
+        <div class="font-bold text-sm mb-1">主要心臟不良事件 (MACE) 發生率：${rcri.cardiacEventRisk}</div>
+        <div class="text-xs leading-relaxed">${rcri.recommendation}</div>
+      </div>
+    </div>
+  `;
+}
+
+window.toggleApfel = (key, checked) => {
+  if (key === 'female') state.apfelFemale = checked;
+  if (key === 'nonSmoker') state.apfelNonSmoker = checked;
+  if (key === 'history') state.apfelHistory = checked;
+  if (key === 'opioids') state.apfelOpioids = checked;
+  renderScoresTab();
+};
+
+window.toggleStopBang = (idx, checked) => {
+  state.stopBangAnswers[idx] = checked;
+  renderScoresTab();
+};
+
+window.toggleRcri = (idx, checked) => {
+  state.rcriCriteria[idx] = checked;
+  renderScoresTab();
+};
+
+// ==========================================
+// 7. ANES LOGBOOK & SBAR HANDOVER RENDERER
+// ==========================================
+function renderLogbookTab() {
+  const container = document.getElementById("logbook-container");
+  if (!container) return;
+
+  container.innerHTML = `
+    <!-- Top SBAR Handover Quick Generator -->
+    <div class="anes-card mb-4 border-l-4 border-l-cyan-500">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
+          <span>🤝</span> SBAR 手術中麻醉交接班快查 (Relief Handover)
+        </h3>
+        <button class="glove-btn bg-cyan-600 text-white text-xs py-1.5 px-3" onclick="window.copySbarTemplate()">
+          📋 複製 SBAR 交班文本
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mt-3">
+        <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-800">
+          <div class="font-bold text-cyan-300 mb-1">S - Situation (情境)</div>
+          <div class="text-slate-400">目前術式進度、主刀醫師、預計剩餘時間、緊急狀況摘要。</div>
+        </div>
+        <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-800">
+          <div class="font-bold text-cyan-300 mb-1">B - Background (背景)</div>
+          <div class="text-slate-400">年齡體重、ASA分級、過敏史、抗凝劑停藥、困難呼吸道史。</div>
+        </div>
+        <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-800">
+          <div class="font-bold text-cyan-300 mb-1">A - Assessment (評估)</div>
+          <div class="text-slate-400">A-line/CVC、目前血壓心律、升壓劑劑量、失血量(EBL)、給水及尿量。</div>
+        </div>
+        <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-800">
+          <div class="font-bold text-cyan-300 mb-1">R - Recommendation (交班建議)</div>
+          <div class="text-slate-400">肌鬆劑追加時間、預計拔管計畫或送 ICU、術後止痛 (PCA/Block)。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anonymous Case Logger -->
+    <div class="anes-card">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-slate-200 flex items-center gap-2">
+          <span>📓</span> 匿名化手術麻醉快速日誌 (Personal AnesLog)
+        </h3>
+        <button class="glove-btn bg-emerald-600 text-white text-xs py-1.5 px-3" onclick="window.addCaseModal()">
+          + 記錄新病例
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        ${state.cases.length === 0 ? `
+          <div class="text-center py-8 text-slate-500 text-sm">尚未有任何記錄。點擊右上角新增您的第一筆麻醉病例！</div>
+        ` : state.cases.map((c, idx) => `
+          <div class="p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-100 text-sm">${c.procedure}</span>
+                <span class="drug-badge bg-slate-800 text-cyan-300 border border-slate-700">${c.anesType}</span>
+                ${c.isDifficultAirway ? '<span class="drug-badge bg-rose-950 text-rose-300 border border-rose-800">難插管</span>' : ''}
+              </div>
+              <div class="text-xs text-slate-400 mt-1">
+                ${c.date} &bull; ${c.weight}kg &bull; 插管管徑 ${c.ettSize} &bull; 特殊處置: ${c.lines || '無'}
+              </div>
+              ${c.note ? `<div class="text-xs text-slate-500 mt-0.5">備註: ${c.note}</div>` : ''}
+            </div>
+            <button class="text-slate-500 hover:text-rose-400 text-xs p-1" onclick="window.deleteCase(${idx})">✕</button>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+window.copySbarTemplate = () => {
+  const p = state.patient;
+  const sbarText = `【手術室麻醉交班紀錄 SBAR】\n` +
+    `S: 術式執行中，目前生命徵象穩定。\n` +
+    `B: 病患 ${p.ageYears}歲, ${p.weightKg}kg, ${p.isFemale ? '女' : '男'}.\n` +
+    `A: ETT管徑/深度正常，氣道通暢；已建立周邊或動脈導管監測。\n` +
+    `R: 注意肌鬆維持劑量，術後評估拔管或送恢復室/加護病房。`;
+
+  navigator.clipboard.writeText(sbarText).then(() => {
+    alert("SBAR 交班文字已成功複製至剪貼簿！");
+  }).catch(() => {
+    prompt("請複製以下交班內容：", sbarText);
+  });
+};
+
+window.addCaseModal = () => {
+  const proc = prompt("請輸入手術術式名稱 (例如: Laparoscopic Cholecystectomy)", "腹腔鏡膽囊切除術");
+  if (!proc) return;
+
+  const anesType = prompt("麻醉方式 (GA-ETT / GA-LMA / Spinal / Epidural / Nerve Block)", "GA-ETT");
+  const lines = prompt("管路或特殊處置 (A-line, CVC, Ultrasound block)", "A-line, PNB");
+  const note = prompt("備註 (非必填)", "順利");
+
+  const newCase = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString(),
+    procedure: proc,
+    anesType: anesType || "GA-ETT",
+    weight: state.patient.weightKg,
+    ettSize: state.patient.isPediatric ? "4.0" : (state.patient.isFemale ? "7.0" : "7.5"),
+    lines: lines || "",
+    isDifficultAirway: false,
+    note: note || ""
+  };
+
+  state.cases.unshift(newCase);
+  localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+  renderLogbookTab();
+};
+
+window.deleteCase = (idx) => {
+  if (confirm("確定刪除此筆病例記錄？")) {
+    state.cases.splice(idx, 1);
+    localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+    renderLogbookTab();
+  }
+};
+
+</script>
+
+  <!-- Service Worker Registration for 100% Offline Capability -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('AnesPilot Offline Service Worker Ready:', reg.scope))
+          .catch((err) => console.log('Service Worker setup note:', err));
+      });
+    }
+  </script>
+</body>
+</html>

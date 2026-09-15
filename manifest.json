@@ -1,0 +1,16 @@
+{
+  "short_name": "AnesPilot",
+  "name": "AnesPilot - 麻醉副駕駛",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%2305070a' stroke='%2306b6d4' stroke-width='4'/><path d='M25 50 L40 50 L48 28 L56 72 L64 45 L70 50 L75 50' fill='none' stroke='%2338bdf8' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/></svg>",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#05070a",
+  "theme_color": "#05070a",
+  "display": "standalone",
+  "orientation": "portrait-primary"
+}
