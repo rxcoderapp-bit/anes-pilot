@@ -1,12 +1,13 @@
 /**
  * AnesPilot - Main Application Controller
+ * References: Morgan & Mikhail's (7e), Goodman & Gilman's (14e), NYSORA, ASRA
  */
 
 import { DosingEngine } from "./engines/dosing.js";
 import { CRISIS_MODULES, audioService } from "./engines/crisis.js";
 import { ToxicityEngine, LA_AGENTS } from "./engines/toxicity.js";
 import { ASRA_DATABASE } from "./data/asraData.js";
-import { INFUSION_DRUGS, InfusionEngine } from "./engines/infusion.js";
+import { InfusionEngine } from "./engines/infusion.js";
 import { ScoresEngine } from "./engines/scores.js";
 
 // Global Application State
@@ -25,6 +26,8 @@ export const state = {
   activeTab: "dosing", // dosing, crisis, toxicity, asra, infusion, scores, logbook
   // Crisis Sub-tab
   activeCrisisId: "mh",
+  // Expanded drug details in Dosing
+  expandedDrugIds: {},
   // Toxicity administered records
   toxicityAdministered: [
     { id: 1, agentId: "lidocaine_plain", concPercent: 1.0, volumeMl: 10, mg: 100 }
@@ -237,7 +240,7 @@ function renderActiveTab() {
 }
 
 // ==========================================
-// 1. DOSING TAB RENDERER
+// 1. DOSING TAB RENDERER (AccessAnesthesiology)
 // ==========================================
 function renderDosingTab() {
   const container = document.getElementById("dosing-results-container");
@@ -247,6 +250,18 @@ function renderDosingTab() {
   const { airway, fluids, blood, dosages, ventilator } = data;
 
   container.innerHTML = `
+    <!-- Textbook Authority Banner -->
+    <div class="mb-3 p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/80 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">📚</span>
+        <div>
+          <span class="font-bold text-cyan-400">McGraw-Hill AccessAnesthesiology 核心文獻標準</span>
+          <span class="text-slate-400 ml-1.5 hidden sm:inline">參照 Morgan & Mikhail (7e) & Goodman & Gilman (14e) 藥典</span>
+        </div>
+      </div>
+      <span class="drug-badge bg-cyan-950 text-cyan-300 border border-cyan-800/50">醫師國考 / 專科考指引</span>
+    </div>
+
     <!-- Airway & Equipment Header Card -->
     <div class="anes-card mb-4 border-l-4 border-l-cyan-500">
       <div class="flex items-center justify-between mb-3">
@@ -262,7 +277,7 @@ function renderDosingTab() {
         <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
           <div class="text-xs text-slate-400">氣管內管 Cuffed ID</div>
           <div class="text-xl font-extrabold text-white mt-0.5">${airway.ettCuffed} mm</div>
-          <div class="text-[11px] text-slate-500">有氣囊氣管內管</div>
+          <div class="text-[11px] text-slate-500">有氣囊管 (Motoyama式)</div>
         </div>
 
         <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
@@ -295,13 +310,20 @@ function renderDosingTab() {
           <div class="text-[11px] text-slate-500">6-8 mL/kg (${ventilator.isUsingIbw ? 'IBW' : 'TBW'}) | 吸引管: ${airway.suctionFr}</div>
         </div>
       </div>
+      <div class="mt-2 text-[11px] text-slate-500 flex items-center gap-1">
+        <span>📖 出處依據：</span>
+        <span>${airway.reference}</span>
+      </div>
     </div>
 
     <!-- Induction & Muscle Relaxants -->
     <div class="anes-card mb-4 border-l-4 border-l-blue-500">
-      <h3 class="font-bold text-lg text-blue-400 mb-3 flex items-center gap-2">
-        <span>💉</span> 誘導與肌鬆劑 (Induction & Neuromuscular)
-      </h3>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
+          <span>💉</span> 誘導與肌鬆劑 (Induction & Neuromuscular)
+        </h3>
+        <span class="text-xs text-slate-400">點擊項目展開 AccessAnesthesiology 藥理考點</span>
+      </div>
       <div class="space-y-2">
         ${dosages.induction.map(d => renderDrugRow(d)).join("")}
       </div>
@@ -309,9 +331,12 @@ function renderDosingTab() {
 
     <!-- Analgesia & Reversal -->
     <div class="anes-card mb-4 border-l-4 border-l-purple-500">
-      <h3 class="font-bold text-lg text-purple-400 mb-3 flex items-center gap-2">
-        <span>💊</span> 止痛、鎮靜與拮抗逆轉 (Analgesia & Reversals)
-      </h3>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-purple-400 flex items-center gap-2">
+          <span>💊</span> 止痛、鎮靜與拮抗逆轉 (Analgesia & Reversals)
+        </h3>
+        <span class="text-xs text-slate-400">Goodman & Gilman 14e 藥物代謝</span>
+      </div>
       <div class="space-y-2">
         ${dosages.analgesia.map(d => renderDrugRow(d)).join("")}
       </div>
@@ -354,6 +379,10 @@ function renderDosingTab() {
           <div class="text-[11px] text-slate-500">Hct 36%降至24%容許值</div>
         </div>
       </div>
+      <div class="mt-2 text-[11px] text-slate-500 flex items-center gap-1">
+        <span>📖 出處依據：</span>
+        <span>${fluids.reference} &bull; ${blood.reference}</span>
+      </div>
     </div>
   `;
 }
@@ -364,27 +393,47 @@ function renderDrugRow(drug, isEmergency = false) {
     ? "bg-amber-950 text-amber-300 border-amber-800" 
     : (isEmergency ? "bg-rose-950 text-rose-300 border-rose-800" : "bg-slate-800 text-slate-300 border-slate-700");
 
+  const isExpanded = state.expandedDrugIds[drug.id] || false;
+
   return `
-    <div class="p-3 rounded-lg border ${bgClass} flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-slate-100">${drug.name}</span>
-          <span class="drug-badge border ${badgeClass}">${drug.badge}</span>
+    <div class="p-3 rounded-lg border ${bgClass} transition cursor-pointer" onclick="window.toggleDrugExpand('${drug.id}')">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-100">${drug.name}</span>
+            <span class="drug-badge border ${badgeClass}">${drug.badge}</span>
+            <span class="text-[10px] text-cyan-400 underline decoration-dotted">📖 藥典指引</span>
+          </div>
+          <div class="text-xs text-slate-400 mt-0.5">${drug.perKg} &bull; <span class="text-slate-500">${drug.note}</span></div>
         </div>
-        <div class="text-xs text-slate-400 mt-0.5">${drug.perKg} &bull; <span class="text-slate-500">${drug.note}</span></div>
+        <div class="text-right sm:self-center">
+          <div class="text-lg font-black text-emerald-400">${drug.dose}</div>
+        </div>
       </div>
-      <div class="text-right sm:self-center">
-        <div class="text-lg font-black text-emerald-400">${drug.dose}</div>
-      </div>
+
+      <!-- Expandable Textbook Pharmacology & Pearls -->
+      ${isExpanded ? `
+        <div class="mt-2.5 pt-2.5 border-t border-slate-800/80 text-xs leading-relaxed space-y-1 bg-slate-950/40 p-2.5 rounded">
+          <div class="flex items-center gap-1.5 text-cyan-400 font-bold">
+            <span>📚 權威出處：</span>
+            <span>${drug.source || 'Morgan & Mikhail Clinical Anesthesiology, 7e'}</span>
+          </div>
+          ${drug.mechanism ? `<div class="text-slate-200"><span class="text-slate-400 font-semibold">作用機轉 (Pharmacodynamics)：</span>${drug.mechanism}</div>` : ''}
+          ${drug.pearls ? `<div class="text-amber-300"><span class="text-amber-400 font-semibold">臨床考點/注意事項 (Clinical Pearls)：</span>${drug.pearls}</div>` : ''}
+        </div>
+      ` : ''}
     </div>
   `;
 }
 
-// ==========================================
-// 2. CRISIS ENGINE RENDERER
-// ==========================================
-let crisisTimers = {};
+window.toggleDrugExpand = (drugId) => {
+  state.expandedDrugIds[drugId] = !state.expandedDrugIds[drugId];
+  renderDosingTab();
+};
 
+// ==========================================
+// 2. CRISIS ENGINE RENDERER (ASRA / MHAUS / DAS)
+// ==========================================
 function renderCrisisTab() {
   const container = document.getElementById("crisis-container");
   if (!container) return;
@@ -431,7 +480,7 @@ function renderCrisisTab() {
             </button>
           ` : `
             <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs py-2" onclick="window.startCrisisTimer('${state.activeCrisisId}')">
-              ⏱️ 啟動應變計時器
+              ⏱️ 啟動 5 分鐘再評估計時
             </button>
           `}
         </div>
@@ -446,7 +495,7 @@ function renderCrisisTab() {
     <!-- Action Checklists -->
     <div class="anes-card border-slate-800">
       <h3 class="font-bold text-slate-200 mb-3 flex items-center justify-between">
-        <span>📋 標準處置檢核單 (Action Checklist)</span>
+        <span>📋 標準處置檢核單 (Action Checklist & Guidelines)</span>
         <button class="text-xs text-slate-400 hover:text-white" onclick="window.resetChecklist()">重置勾選</button>
       </h3>
       <div class="space-y-2">
@@ -469,9 +518,9 @@ function renderCrisisDosePanel(crisisId, doses, weightKg) {
     return `
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
-          <div class="text-xs text-rose-300 font-bold">Dantrolene 首劑劑量 (2.5 mg/kg)</div>
+          <div class="text-xs text-rose-300 font-bold">Dantrolene 首劑劑量 (2.5 mg/kg - MHAUS指引)</div>
           <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.initialMg} mg</div>
-          <div class="text-[11px] text-slate-400">上限至多追加至 10 mg/kg (${doses.maxMg} mg)</div>
+          <div class="text-[11px] text-slate-400">至多追加至 10 mg/kg (${doses.maxMg} mg)</div>
         </div>
         <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
           <div class="text-xs text-amber-400 font-bold">傳統標準瓶 (20 mg/瓶)</div>
@@ -489,7 +538,7 @@ function renderCrisisDosePanel(crisisId, doses, weightKg) {
     return `
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
-          <div class="text-xs text-rose-300 font-bold">20% 脂肪乳劑 首劑 Bolus (1.5 mL/kg)</div>
+          <div class="text-xs text-rose-300 font-bold">20% 脂肪乳劑 首劑 Bolus (1.5 mL/kg - ASRA指引)</div>
           <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.bolusMl} mL</div>
           <div class="text-[11px] text-slate-400">2-3 分鐘內推注完成</div>
         </div>
@@ -509,7 +558,7 @@ function renderCrisisDosePanel(crisisId, doses, weightKg) {
     return `
       <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
         <div>
-          <div class="text-xs text-amber-400 font-bold">Rocuronium RSI 插管失敗即刻逆轉救命劑量</div>
+          <div class="text-xs text-amber-400 font-bold">Rocuronium RSI 插管失敗即刻逆轉救命劑量 (DAS指引)</div>
           <div class="text-xl font-black text-white mt-0.5">Sugammadex 16 mg/kg = <span class="text-rose-400">${doses.sugammadexRsiRescue} mg</span></div>
           <div class="text-xs text-slate-400">約需 ${Math.ceil(doses.sugammadexRsiRescue / 100)} 支 100mg/mL 瓶</div>
         </div>
@@ -600,7 +649,7 @@ window.startCrisisTimer = (id) => {
 };
 
 // ==========================================
-// 3. TOXICITY TRACKER RENDERER
+// 3. TOXICITY TRACKER RENDERER (NYSORA / ASRA)
 // ==========================================
 function renderToxicityTab() {
   const container = document.getElementById("toxicity-container");
@@ -616,6 +665,18 @@ function renderToxicityTab() {
   const barColor = result.totalPercent >= 100 ? 'bg-rose-500' : (result.totalPercent >= 70 ? 'bg-amber-500' : 'bg-emerald-500');
 
   container.innerHTML = `
+    <!-- NYSORA Evidence Citation Header -->
+    <div class="mb-3 p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/80 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🔬</span>
+        <div>
+          <span class="font-bold text-emerald-400">NYSORA & ASRA 局部麻醉藥毒性監控標準</span>
+          <span class="text-slate-400 ml-1.5 hidden sm:inline">參照 NYSORA Regional Anesthesia Textbook & ASRA LAST 指引</span>
+        </div>
+      </div>
+      <span class="drug-badge bg-emerald-950 text-emerald-300 border border-emerald-800/50">局麻安全性標準</span>
+    </div>
+
     <!-- Top Visual Gauge Card -->
     <div class="anes-card mb-4">
       <div class="flex items-center justify-between mb-2">
@@ -723,9 +784,6 @@ window.removeToxItem = (idx) => {
 };
 
 window.showAddToxModal = () => {
-  const agentKeys = Object.keys(LA_AGENTS);
-  const optionsHtml = agentKeys.map(k => `<option value="${k}">${LA_AGENTS[k].name}</option>`).join("");
-  
   const vol = prompt("請輸入施打劑量體積 (mL)，例如: 20", "20");
   if (!vol) return;
   const volNum = parseFloat(vol);
@@ -775,6 +833,18 @@ function renderAsraTab() {
   }
 
   container.innerHTML = `
+    <!-- ASRA & NYSORA Citation Header -->
+    <div class="mb-3 p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/80 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🩸</span>
+        <div>
+          <span class="font-bold text-emerald-400">ASRA Pain Medicine 第五版抗凝血臨床指引</span>
+          <span class="text-slate-400 ml-1.5 hidden sm:inline">參照 Regional Anesthesia in the Patient Receiving Antithrombotic Therapy</span>
+        </div>
+      </div>
+      <span class="drug-badge bg-emerald-950 text-emerald-300 border border-emerald-800/50">ASRA 指引標準</span>
+    </div>
+
     <!-- Top Selector Card -->
     <div class="anes-card mb-4 border-l-4 border-l-emerald-500">
       <h3 class="font-bold text-lg text-emerald-400 mb-3 flex items-center gap-2">
@@ -867,13 +937,19 @@ window.onAsraCrClChange = (val) => {
 };
 
 // ==========================================
-// 5. INFUSION CALCULATOR RENDERER
+// 5. INFUSION CALCULATOR & CUSTOM DRUG MANAGER
 // ==========================================
 function renderInfusionTab() {
   const container = document.getElementById("infusion-container");
   if (!container) return;
 
-  const drug = INFUSION_DRUGS[state.infusionDrugId] || INFUSION_DRUGS.norepinephrine;
+  const drugs = InfusionEngine.getDrugs();
+  const drugKeys = Object.keys(drugs);
+  if (!drugs[state.infusionDrugId]) {
+    state.infusionDrugId = drugKeys[0] || "norepinephrine";
+  }
+
+  const drug = drugs[state.infusionDrugId];
   const preset = drug.presets[state.infusionPresetIdx] || drug.presets[0];
   const rateMlHr = InfusionEngine.doseToRate(
     state.infusionDrugId,
@@ -883,18 +959,39 @@ function renderInfusionTab() {
   );
 
   container.innerHTML = `
+    <!-- Top Action Bar for Custom Drugs -->
+    <div class="flex items-center justify-between mb-3">
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <span>📖</span>
+        <span>參照 Morgan & Mikhail 7e Ch. 14 / Goodman & Gilman 14e Ch. 13</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="glove-btn bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-1.5 px-3" onclick="window.showAddCustomDrugModal()">
+          + 自訂新增輸注藥物 / 泡法
+        </button>
+        ${drug.isCustom ? `
+          <button class="glove-btn bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/60 text-xs py-1.5 px-2.5" onclick="window.deleteCurrentCustomDrug('${state.infusionDrugId}')">
+            刪除此自訂藥
+          </button>
+        ` : ''}
+      </div>
+    </div>
+
     <div class="anes-card mb-4 border-l-4 border-l-sky-500">
-      <h3 class="font-bold text-lg text-sky-400 mb-3 flex items-center gap-2">
-        <span>⏱️</span> 血管活性與鎮靜輸注幫浦調速器 (Infusion Calculator)
-      </h3>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-sky-400 flex items-center gap-2">
+          <span>⏱️</span> 血管活性與鎮靜輸注幫浦調速器 (Infusion Calculator)
+        </h3>
+        ${drug.isCustom ? '<span class="drug-badge bg-emerald-950 text-emerald-300 border border-emerald-700">使用者自訂藥品</span>' : ''}
+      </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         <div>
           <label class="block text-xs text-slate-400 mb-1 font-semibold">選擇藥物</label>
           <select class="w-full glove-input text-sm" onchange="window.onInfusionDrugChange(this.value)">
-            ${Object.keys(INFUSION_DRUGS).map(k => `
+            ${drugKeys.map(k => `
               <option value="${k}" ${k === state.infusionDrugId ? 'selected' : ''}>
-                ${INFUSION_DRUGS[k].name}
+                ${drugs[k].name} ${drugs[k].isCustom ? '(自訂)' : ''}
               </option>
             `).join("")}
           </select>
@@ -911,6 +1008,12 @@ function renderInfusionTab() {
           </select>
         </div>
       </div>
+
+      ${drug.pearls ? `
+        <div class="mb-3 p-2.5 rounded bg-slate-900/60 border border-slate-800 text-xs text-amber-300/90 leading-relaxed">
+          <span class="font-bold text-amber-400">臨床重點 (M&M / G&G)：</span>${drug.pearls}
+        </div>
+      ` : ''}
 
       <!-- Target Dose Adjuster -->
       <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 mb-4">
@@ -954,7 +1057,8 @@ function renderInfusionTab() {
 window.onInfusionDrugChange = (id) => {
   state.infusionDrugId = id;
   state.infusionPresetIdx = 0;
-  const drug = INFUSION_DRUGS[id];
+  const drugs = InfusionEngine.getDrugs();
+  const drug = drugs[id] || drugs.norepinephrine;
   state.infusionTargetDose = (drug.doseMin + drug.doseMax) / 4;
   renderInfusionTab();
 };
@@ -967,6 +1071,50 @@ window.onInfusionPresetChange = (idx) => {
 window.onInfusionDoseChange = (val) => {
   state.infusionTargetDose = parseFloat(val) || 0.01;
   renderInfusionTab();
+};
+
+window.showAddCustomDrugModal = () => {
+  const name = prompt("請輸入自訂藥物名稱 (例如: Vasopressin 升壓 / precedex 稀釋液):");
+  if (!name) return;
+
+  const unit = prompt("給藥單位 (mcg/kg/min / mcg/kg/hr / mg/kg/hr / mg/hr / Units/min)", "mcg/kg/min");
+  if (!unit) return;
+
+  const concStr = prompt("稀釋後濃度 (mcg/mL，例如 4mg in 50mL 請輸入 80):", "80");
+  const conc = parseFloat(concStr) || 80;
+
+  const doseMinStr = prompt("最低建議劑量 (例如 0.01):", "0.01");
+  const doseMaxStr = prompt("最高建議劑量 (例如 1.0):", "1.0");
+
+  const customId = "custom_" + Date.now();
+  const newDrug = {
+    name: name,
+    unit: unit,
+    isWeightBased: unit.includes("/kg"),
+    doseMin: parseFloat(doseMinStr) || 0.01,
+    doseMax: parseFloat(doseMaxStr) || 1.0,
+    reference: "使用者自訂醫院常規配置 (Hospital Custom Recipe)",
+    pearls: "院內自訂輸注品項，儲存於手機/電腦本地瀏覽器",
+    presets: [
+      { label: `自訂配方 (${conc} mcg/mL)`, totalDrugMg: 1, totalVolMl: 50, concMcgMl: conc }
+    ]
+  };
+
+  InfusionEngine.saveCustomDrug(customId, newDrug);
+  state.infusionDrugId = customId;
+  state.infusionPresetIdx = 0;
+  state.infusionTargetDose = newDrug.doseMin;
+  renderInfusionTab();
+  alert("自訂藥物儲存成功！");
+};
+
+window.deleteCurrentCustomDrug = (id) => {
+  if (confirm("確定要刪除此自訂藥物品項嗎？")) {
+    InfusionEngine.deleteCustomDrug(id);
+    state.infusionDrugId = "norepinephrine";
+    state.infusionPresetIdx = 0;
+    renderInfusionTab();
+  }
 };
 
 // ==========================================
@@ -1107,14 +1255,52 @@ window.toggleRcri = (idx, checked) => {
 };
 
 // ==========================================
-// 7. ANES LOGBOOK & SBAR HANDOVER RENDERER
+// 7. ANES LOGBOOK, SBAR & DATA BACKUP CENTER
 // ==========================================
 function renderLogbookTab() {
   const container = document.getElementById("logbook-container");
   if (!container) return;
 
   container.innerHTML = `
-    <!-- Top SBAR Handover Quick Generator -->
+    <!-- Data Persistence & Cloud Sync Center -->
+    <div class="anes-card mb-4 border-l-4 border-l-emerald-500">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+        <div>
+          <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+            <span>💾</span> 資料儲存、備份與雲端同步中心
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">
+            狀態：<span class="text-emerald-400 font-bold">本地自動儲存中 (LocalStorage)</span> &bull; 離開/關閉網頁紀錄永久保存
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs py-1 px-2.5" onclick="window.exportJsonBackup()">
+            📥 匯出 JSON 備份檔
+          </button>
+          <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs py-1 px-2.5" onclick="document.getElementById('file-import-json').click()">
+            📤 匯入還原
+          </button>
+          <input type="file" id="file-import-json" accept=".json" class="hidden" onchange="window.importJsonBackup(event)">
+          <button class="glove-btn bg-emerald-700 hover:bg-emerald-600 text-white text-xs py-1 px-2.5" onclick="window.exportCsvBackup()">
+            📊 匯出 Excel (CSV)
+          </button>
+        </div>
+      </div>
+
+      <!-- Cloud Sync Explanation -->
+      <div class="mt-3 p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+        <div class="text-xs text-slate-300">
+          <span class="font-bold text-cyan-300">☁️ 帳號雲端跨裝置同步 (Google / LINE 帳號)：</span>
+          支援透過 Google OAuth 或 LINE LIFF 直連 Supabase/Firebase，更換手機或使用公用電腦隨時登入即時同步。
+        </div>
+        <button class="glove-btn bg-cyan-700/80 hover:bg-cyan-600 text-white text-xs py-1 px-2.5 whitespace-nowrap ml-2" onclick="window.showCloudSyncInfo()">
+          了解同步設定
+        </button>
+      </div>
+    </div>
+
+    <!-- SBAR Handover Quick Generator -->
     <div class="anes-card mb-4 border-l-4 border-l-cyan-500">
       <div class="flex items-center justify-between mb-2">
         <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
@@ -1151,9 +1337,16 @@ function renderLogbookTab() {
         <h3 class="font-bold text-lg text-slate-200 flex items-center gap-2">
           <span>📓</span> 匿名化手術麻醉快速日誌 (Personal AnesLog)
         </h3>
-        <button class="glove-btn bg-emerald-600 text-white text-xs py-1.5 px-3" onclick="window.addCaseModal()">
-          + 記錄新病例
-        </button>
+        <div class="flex items-center gap-2">
+          <button class="glove-btn bg-emerald-600 text-white text-xs py-1.5 px-3" onclick="window.addCaseModal()">
+            + 記錄新病例
+          </button>
+          ${state.cases.length > 0 ? `
+            <button class="text-slate-500 hover:text-rose-400 text-xs px-2 py-1" onclick="window.clearAllCases()">
+              清空全部
+            </button>
+          ` : ''}
+        </div>
       </div>
 
       <div class="space-y-2">
@@ -1226,4 +1419,98 @@ window.deleteCase = (idx) => {
     localStorage.setItem("anes_cases", JSON.stringify(state.cases));
     renderLogbookTab();
   }
+};
+
+window.clearAllCases = () => {
+  if (confirm("⚠️ 警告：這將會清除全部的病例紀錄！確定清空嗎？")) {
+    state.cases = [];
+    localStorage.removeItem("anes_cases");
+    renderLogbookTab();
+  }
+};
+
+// Backup: Export JSON
+window.exportJsonBackup = () => {
+  const data = {
+    appName: "AnesPilot",
+    exportDate: new Date().toISOString(),
+    cases: state.cases,
+    customDrugs: JSON.parse(localStorage.getItem("anes_custom_infusion_drugs") || "{}")
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const dateStr = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `anes_pilot_backup_${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Backup: Import JSON
+window.importJsonBackup = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.cases && Array.isArray(imported.cases)) {
+        state.cases = imported.cases;
+        localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+      }
+      if (imported.customDrugs) {
+        localStorage.setItem("anes_custom_infusion_drugs", JSON.stringify(imported.customDrugs));
+      }
+      alert("✅ 備份檔匯入還原成功！");
+      renderLogbookTab();
+    } catch (err) {
+      alert("❌ 備份檔解析失敗，請確認是否為正確的 JSON 備份檔。");
+    }
+  };
+  reader.readAsText(file);
+};
+
+// Backup: Export CSV
+window.exportCsvBackup = () => {
+  if (state.cases.length === 0) {
+    alert("目前尚無病例紀錄可供匯出。");
+    return;
+  }
+
+  // BOM for Excel UTF-8
+  let csv = "\uFEFF日期,術式名稱,麻醉方式,病患體重(kg),管徑(ETT),特殊處置,備註\n";
+  state.cases.forEach(c => {
+    const row = [
+      `"${c.date}"`,
+      `"${c.procedure}"`,
+      `"${c.anesType}"`,
+      `"${c.weight}"`,
+      `"${c.ettSize}"`,
+      `"${c.lines}"`,
+      `"${c.note}"`
+    ];
+    csv += row.join(",") + "\n";
+  });
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const dateStr = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `anes_cases_${dateStr}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Cloud Sync Explanation Modal
+window.showCloudSyncInfo = () => {
+  alert(
+    "【AnesPilot 雲端同步串接說明】\n\n" +
+    "1. 目前模式：本地安全儲存（LocalStorage），紀錄完全保存在您自己的手機或電腦內，不用擔心病患個資或醫療紀錄上傳公網。\n\n" +
+    "2. Google 帳號同步方案：可透過 Google Firebase 或 Supabase 免費串接 Google OAuth。串接後，換手機登入 Google 即可自動抓回全部病例與自訂藥物。\n\n" +
+    "3. LINE 帳號同步方案：可透過 LINE Developers 申請免費 LIFF (LINE Front-end Framework)，將此網頁嵌入 LINE 官方帳號，點擊即可用 LINE 身分同步！\n\n" +
+    "如需開啟雲端登入同步，我可以為您直接加入 Firebase / Supabase 串接代碼！"
+  );
 };

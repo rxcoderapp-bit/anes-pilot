@@ -15,11 +15,11 @@
   <!-- Custom Dark OR & High Contrast Clinical Styles -->
   <link rel="stylesheet" href="./css/app.css">
 </head>
-<body class="bg-[#05070a] text-slate-100 min-h-screen">
+<body class="min-h-screen">
   <div class="app-container pb-24 md:pb-8">
     
     <!-- Top Nav Header -->
-    <header class="sticky top-0 z-30 bg-[#070b12]/95 backdrop-blur-md border-b border-slate-800/80 px-3 py-2.5">
+    <header class="app-header sticky top-0 z-30 backdrop-blur-md border-b px-3 py-2.5">
       <div class="flex items-center justify-between gap-2">
         <!-- Logo & Branding -->
         <div class="flex items-center gap-2">
@@ -126,7 +126,7 @@
     </header>
 
     <!-- Desktop / Tablet Top Tabs (Hidden on small screens) -->
-    <div class="hidden md:flex bg-[#0a0f18] border-b border-slate-800 px-3 overflow-x-auto">
+    <div class="desktop-tabs-bar hidden md:flex border-b px-3 overflow-x-auto">
       <div class="nav-tab active" data-tab="dosing">
         <span>⚡ 體重速查盤</span>
       </div>
@@ -189,7 +189,7 @@
     </main>
 
     <!-- Mobile Bottom Tab Navigation (Fixed at bottom for thumb friendliness) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b12]/95 backdrop-blur-lg border-t border-slate-800 flex justify-around items-stretch safe-area-bottom">
+    <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg border-t flex justify-around items-stretch safe-area-bottom">
       <div class="nav-tab active" data-tab="dosing">
         <span class="text-base">⚡</span>
         <span>速查盤</span>

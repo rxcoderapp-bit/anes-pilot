@@ -3,7 +3,7 @@
  * Ensures 100% offline availability in ORs without signal.
  */
 
-const CACHE_NAME = "anespilot-v1.0.1";
+const CACHE_NAME = "anespilot-v1.1.0";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
