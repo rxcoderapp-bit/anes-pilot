@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AnesPilot - 麻醉副駕駛 | 手術室隨身臨床輔助系統</title>
+  <meta name="description" content="專為麻醉科醫師設計的手術室臨床速查、小兒藥量、危急應變、局麻藥毒性及抗凝血決策系統。">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#05070a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Dark OR & High Contrast Clinical Styles -->
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body class="bg-[#05070a] text-slate-100 min-h-screen">
+  <div class="app-container pb-24 md:pb-8">
+    
+    <!-- Top Nav Header -->
+    <header class="sticky top-0 z-30 bg-[#070b12]/95 backdrop-blur-md border-b border-slate-800/80 px-3 py-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-600 to-sky-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-cyan-900/50">
+            A
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-extrabold text-base tracking-tight text-white">AnesPilot</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.0</span>
+            </div>
+            <div class="text-[10px] text-slate-400 font-medium">麻醉副駕駛 &bull; 開刀房臨床隨身手冊</div>
+          </div>
+        </div>
+
+        <!-- Quick Patient Summary Badge & Crisis Action -->
+        <div class="flex items-center gap-2">
+          <!-- Theme Toggle -->
+          <button id="btn-theme-toggle" class="glove-btn py-1.5 px-2.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800">
+            <span id="theme-icon">🌙 刀房暗室</span>
+          </button>
+
+          <!-- CRISIS RED BUTTON -->
+          <button id="btn-quick-crisis" class="glove-btn py-1.5 px-3 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs rounded-lg shadow-lg shadow-red-950/80 border border-red-500 flex items-center gap-1.5 animate-pulse">
+            <span>🚨</span>
+            <span class="tracking-wide">CRISIS 危急應變</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Patient Profile Adjuster Bar -->
+      <div class="mt-2.5 p-2 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <!-- Current Patient Stats Display -->
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-slate-400">體重:</span>
+            <span id="profile-display-weight" class="font-black text-emerald-400 text-base">70 kg</span>
+          </div>
+          <div class="h-3 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1">
+            <span class="text-xs text-slate-400">年齡:</span>
+            <span id="profile-display-age" class="font-bold text-slate-200 text-xs">35 歲 (成人)</span>
+          </div>
+          <div class="h-3 w-px bg-slate-700"></div>
+          <div class="flex items-center gap-1 text-[11px] text-slate-400">
+            <span id="profile-display-ibw">IBW: 65.5 kg</span>
+          </div>
+        </div>
+
+        <!-- Patient Quick Presets -->
+        <div class="flex items-center gap-1.5 overflow-x-auto text-xs py-0.5">
+          <span class="text-[10px] text-slate-500 font-bold uppercase mr-0.5">速套:</span>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="10" data-a="1" data-h="75" data-f="false">
+            👶 1歲 10kg
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="18" data-a="5" data-h="110" data-f="true">
+            🧒 5歲 18kg
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="55" data-a="32" data-h="160" data-f="true">
+            👩 55kg (女)
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 font-semibold text-[11px] whitespace-nowrap border border-cyan-900/60" data-w="70" data-a="40" data-h="172" data-f="false">
+            👨 70kg (男)
+          </button>
+          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold text-[11px] whitespace-nowrap" data-w="100" data-a="50" data-h="170" data-f="false">
+            🦹 100kg (肥胖)
+          </button>
+        </div>
+      </div>
+
+      <!-- Fine-tune Controls (Collapsible or interactive slider) -->
+      <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">體重 (kg)</label>
+          <div class="flex items-center gap-1 mt-0.5">
+            <input type="number" id="input-weight" min="1" max="200" value="70" step="0.5" class="glove-input w-20 py-1 text-center font-black text-emerald-400">
+            <input type="range" id="slider-weight" min="2" max="120" value="70" step="1" class="glove-slider flex-1">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">年齡 (歲)</label>
+          <div class="flex items-center gap-1 mt-0.5">
+            <input type="number" id="input-age" min="0" max="100" value="35" step="0.5" class="glove-input w-full py-1 text-center font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">身高 (cm，計算 IBW)</label>
+          <div class="flex items-center gap-1 mt-0.5">
+            <input type="number" id="input-height" min="40" max="220" value="170" step="1" class="glove-input w-full py-1 text-center font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] text-slate-400 font-semibold">性別</label>
+          <div class="mt-0.5">
+            <button id="btn-gender-toggle" class="glove-btn w-full py-2 bg-sky-950/60 text-sky-300 border border-sky-700/50 text-xs">
+              男性 ♂
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Desktop / Tablet Top Tabs (Hidden on small screens) -->
+    <div class="hidden md:flex bg-[#0a0f18] border-b border-slate-800 px-3 overflow-x-auto">
+      <div class="nav-tab active" data-tab="dosing">
+        <span>⚡ 體重速查盤</span>
+      </div>
+      <div class="nav-tab crisis-tab" data-tab="crisis">
+        <span>🚨 危機應變</span>
+      </div>
+      <div class="nav-tab" data-tab="toxicity">
+        <span>🧪 局麻藥毒性</span>
+      </div>
+      <div class="nav-tab" data-tab="asra">
+        <span>🩸 ASRA 抗凝血</span>
+      </div>
+      <div class="nav-tab" data-tab="infusion">
+        <span>⏱️ 升壓輸注幫浦</span>
+      </div>
+      <div class="nav-tab" data-tab="scores">
+        <span>📊 術前評估量表</span>
+      </div>
+      <div class="nav-tab" data-tab="logbook">
+        <span>📓 麻醉日誌 & SBAR</span>
+      </div>
+    </div>
+
+    <!-- Main Content Workspaces -->
+    <main class="p-3 flex-1">
+      <!-- 1. Dosing Tab Panel -->
+      <section id="panel-dosing" class="tab-content">
+        <div id="dosing-results-container"></div>
+      </section>
+
+      <!-- 2. Crisis Tab Panel -->
+      <section id="panel-crisis" class="tab-content hidden">
+        <div id="crisis-container"></div>
+      </section>
+
+      <!-- 3. Toxicity Tab Panel -->
+      <section id="panel-toxicity" class="tab-content hidden">
+        <div id="toxicity-container"></div>
+      </section>
+
+      <!-- 4. ASRA Tab Panel -->
+      <section id="panel-asra" class="tab-content hidden">
+        <div id="asra-container"></div>
+      </section>
+
+      <!-- 5. Infusion Tab Panel -->
+      <section id="panel-infusion" class="tab-content hidden">
+        <div id="infusion-container"></div>
+      </section>
+
+      <!-- 6. Scores Tab Panel -->
+      <section id="panel-scores" class="tab-content hidden">
+        <div id="scores-container"></div>
+      </section>
+
+      <!-- 7. Logbook Tab Panel -->
+      <section id="panel-logbook" class="tab-content hidden">
+        <div id="logbook-container"></div>
+      </section>
+    </main>
+
+    <!-- Mobile Bottom Tab Navigation (Fixed at bottom for thumb friendliness) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b12]/95 backdrop-blur-lg border-t border-slate-800 flex justify-around items-stretch safe-area-bottom">
+      <div class="nav-tab active" data-tab="dosing">
+        <span class="text-base">⚡</span>
+        <span>速查盤</span>
+      </div>
+      <div class="nav-tab crisis-tab text-rose-400" data-tab="crisis">
+        <span class="text-base">🚨</span>
+        <span>危機</span>
+      </div>
+      <div class="nav-tab" data-tab="toxicity">
+        <span class="text-base">🧪</span>
+        <span>局麻毒性</span>
+      </div>
+      <div class="nav-tab" data-tab="asra">
+        <span class="text-base">🩸</span>
+        <span>抗凝血</span>
+      </div>
+      <div class="nav-tab" data-tab="infusion">
+        <span class="text-base">⏱️</span>
+        <span>輸注</span>
+      </div>
+      <div class="nav-tab" data-tab="scores">
+        <span class="text-base">📊</span>
+        <span>量表</span>
+      </div>
+      <div class="nav-tab" data-tab="logbook">
+        <span class="text-base">📓</span>
+        <span>日誌</span>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Main ES Module Script -->
+  <script type="module" src="./js/app.js"></script>
+
+  <!-- Service Worker Registration for 100% Offline Capability -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('AnesPilot Offline Service Worker Ready:', reg.scope))
+          .catch((err) => console.log('Service Worker setup note:', err));
+      });
+    }
+  </script>
+</body>
+</html>
