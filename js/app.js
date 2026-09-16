@@ -436,36 +436,36 @@ function renderDosingTab() {
 function renderDrugRow(drug, isEmergency = false) {
   const bgClass = isEmergency ? "bg-rose-950/20 border-rose-900/30" : "bg-slate-900/40 border-slate-800";
   const badgeClass = drug.badge === "IBW" 
-    ? "bg-amber-950 text-amber-300 border-amber-800" 
-    : (isEmergency ? "bg-rose-950 text-rose-300 border-rose-800" : "bg-slate-800 text-slate-300 border-slate-700");
+    ? "drug-badge-ibw bg-amber-950 text-amber-300 border-amber-800" 
+    : (isEmergency ? "drug-badge-emergency bg-rose-950 text-rose-300 border-rose-800" : "drug-badge-std bg-slate-800 text-slate-300 border-slate-700");
 
   const isExpanded = state.expandedDrugIds[drug.id] || false;
 
   return `
-    <div class="p-3 rounded-lg border ${bgClass} transition cursor-pointer" onclick="window.toggleDrugExpand('${drug.id}')">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-slate-100">${drug.name}</span>
+    <div class="p-3 rounded-lg border ${bgClass} transition cursor-pointer select-text" onclick="window.toggleDrugExpand('${drug.id}')">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 select-text">
+        <div class="select-text">
+          <div class="flex items-center gap-2 select-text">
+            <span class="font-bold text-slate-100 select-text">${drug.name}</span>
             <span class="drug-badge border ${badgeClass}">${drug.badge}</span>
             <span class="text-[10px] text-cyan-400 underline decoration-dotted">📖 藥典指引</span>
           </div>
-          <div class="text-xs text-slate-400 mt-0.5">${drug.perKg} &bull; <span class="text-slate-500">${drug.note}</span></div>
+          <div class="text-xs text-slate-400 mt-0.5 select-text">${drug.perKg} &bull; <span class="text-slate-500 select-text">${drug.note}</span></div>
         </div>
-        <div class="text-right sm:self-center">
-          <div class="text-lg font-black text-emerald-400">${drug.dose}</div>
+        <div class="text-right sm:self-center select-text">
+          <div class="text-lg font-black text-emerald-400 select-text">${drug.dose}</div>
         </div>
       </div>
 
       <!-- Expandable Textbook Pharmacology & Pearls -->
       ${isExpanded ? `
-        <div class="mt-2.5 pt-2.5 border-t border-slate-800/80 text-xs leading-relaxed space-y-1 bg-slate-950/40 p-2.5 rounded">
-          <div class="flex items-center gap-1.5 text-cyan-400 font-bold">
+        <div class="mt-2.5 pt-2.5 border-t border-slate-800/80 text-xs leading-relaxed space-y-1 bg-slate-950/40 p-2.5 rounded select-text">
+          <div class="flex items-center gap-1.5 text-cyan-400 font-bold select-text">
             <span>📚 權威出處：</span>
-            <span>${drug.source || 'Morgan & Mikhail Clinical Anesthesiology, 7e'}</span>
+            <span class="select-text">${drug.source || 'Morgan & Mikhail Clinical Anesthesiology, 7e'}</span>
           </div>
-          ${drug.mechanism ? `<div class="text-slate-200"><span class="text-slate-400 font-semibold">作用機轉 (Pharmacodynamics)：</span>${drug.mechanism}</div>` : ''}
-          ${drug.pearls ? `<div class="text-amber-300"><span class="text-amber-400 font-semibold">臨床考點/注意事項 (Clinical Pearls)：</span>${drug.pearls}</div>` : ''}
+          ${drug.mechanism ? `<div class="text-slate-200 select-text"><span class="text-slate-400 font-semibold">作用機轉 (Pharmacodynamics)：</span>${drug.mechanism}</div>` : ''}
+          ${drug.pearls ? `<div class="text-amber-300 select-text"><span class="text-amber-400 font-semibold">臨床考點/注意事項 (Clinical Pearls)：</span>${drug.pearls}</div>` : ''}
         </div>
       ` : ''}
     </div>
@@ -473,6 +473,10 @@ function renderDrugRow(drug, isEmergency = false) {
 }
 
 window.toggleDrugExpand = (drugId) => {
+  const sel = window.getSelection();
+  if (sel && sel.toString().trim().length > 0) {
+    return;
+  }
   state.expandedDrugIds[drugId] = !state.expandedDrugIds[drugId];
   renderDosingTab();
 };

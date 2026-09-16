@@ -13,7 +13,121 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Custom Dark OR & High Contrast Clinical Styles -->
-  <link rel="stylesheet" href="./css/app.css">
+  <link rel="stylesheet" href="./css/app.css?v=1.3.0">
+  <style>
+    /* Instant Universal Text Selection */
+    *, *::before, *::after {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+    }
+    button, .glove-btn, .nav-tab, input[type="range"], select, .preset-btn {
+      user-select: none !important;
+      -webkit-user-select: none !important;
+    }
+    ::selection {
+      background-color: #38bdf8 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light ::selection {
+      background-color: #7dd3fc !important;
+      color: #0c4a6e !important;
+    }
+
+    /* Guaranteed Light Theme Colors (Zero Cache Lag) */
+    body.theme-light {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light header {
+      background-color: rgba(255, 255, 255, 0.96) !important;
+      border-color: #e2e8f0 !important;
+    }
+    body.theme-light header .text-white {
+      color: #0f172a !important;
+    }
+    body.theme-light .anes-card {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.theme-light .bg-slate-950,
+    body.theme-light .bg-slate-900,
+    body.theme-light .bg-slate-800,
+    body.theme-light .bg-slate-700,
+    body.theme-light [class*="bg-slate-950"],
+    body.theme-light [class*="bg-slate-900"],
+    body.theme-light [class*="bg-slate-800"] {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    body.theme-light .preset-btn {
+      background-color: #ffffff !important;
+      color: #1e293b !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    body.theme-light button.bg-slate-800,
+    body.theme-light .glove-btn.bg-slate-800,
+    body.theme-light button.bg-slate-900,
+    body.theme-light .glove-btn.bg-slate-900,
+    body.theme-light #crisis-container button.bg-slate-900 {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    }
+    body.theme-light #btn-gender-toggle,
+    body.theme-light [class*="bg-sky-950"] {
+      background-color: #e0f2fe !important;
+      color: #0369a1 !important;
+      border: 1px solid #7dd3fc !important;
+    }
+    body.theme-light .drug-badge {
+      background-color: #f1f5f9 !important;
+      color: #1e293b !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.theme-light .drug-badge-std,
+    body.theme-light .drug-badge.bg-slate-800,
+    body.theme-light span.bg-slate-800 {
+      background-color: #e2e8f0 !important;
+      color: #1e293b !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    body.theme-light .drug-badge-ibw,
+    body.theme-light .drug-badge.bg-amber-950,
+    body.theme-light [class*="bg-amber-950"] {
+      background-color: #fef3c7 !important;
+      color: #92400e !important;
+      border: 1px solid #fcd34d !important;
+    }
+    body.theme-light .drug-badge-emergency,
+    body.theme-light .drug-badge.bg-rose-950,
+    body.theme-light .drug-badge.bg-rose-900,
+    body.theme-light [class*="bg-rose-950"],
+    body.theme-light [class*="bg-rose-900"] {
+      background-color: #fee2e2 !important;
+      color: #991b1b !important;
+      border: 1px solid #fca5a5 !important;
+    }
+    body.theme-light .drug-badge.bg-cyan-950,
+    body.theme-light [class*="bg-cyan-950"] {
+      background-color: #e0f2fe !important;
+      color: #0284c7 !important;
+      border: 1px solid #7dd3fc !important;
+    }
+    body.theme-light .text-white,
+    body.theme-light .text-slate-100,
+    body.theme-light .text-slate-200 {
+      color: #0f172a !important;
+    }
+    body.theme-light .text-slate-300 {
+      color: #1e293b !important;
+    }
+    body.theme-light .text-slate-400 {
+      color: #475569 !important;
+    }
+  </style>
 </head>
 <body class="min-h-screen">
   <div class="app-container pb-24 md:pb-8">
@@ -29,7 +143,7 @@
           <div>
             <div class="flex items-center gap-1.5">
               <span class="font-extrabold text-base tracking-tight text-white">AnesPilot</span>
-              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.0</span>
+              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.0</span>
             </div>
             <div class="text-[10px] text-slate-400 font-medium">麻醉副駕駛 &bull; 開刀房臨床隨身手冊</div>
           </div>
@@ -236,18 +350,20 @@
         <span>日誌</span>
       </div>
     </nav>
-
   </div>
 
-  <!-- Main ES Module Script -->
-  <script type="module" src="./js/app.js"></script>
+  <!-- Main ES Module Script with Version Query -->
+  <script type="module" src="./js/app.js?v=1.3.0"></script>
 
-  <!-- Service Worker Registration for 100% Offline Capability -->
+  <!-- Service Worker Registration with Immediate Update -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('AnesPilot Offline Service Worker Ready:', reg.scope))
+        navigator.serviceWorker.register('./sw.js?v=1.3.0')
+          .then((reg) => {
+            console.log('AnesPilot Offline Service Worker Ready (v1.3.0):', reg.scope);
+            reg.update();
+          })
           .catch((err) => console.log('Service Worker setup note:', err));
       });
     }

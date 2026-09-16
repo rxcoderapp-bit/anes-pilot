@@ -52,8 +52,8 @@ def build_standalone():
     with open('index.html', 'r', encoding='utf-8') as f:
         html = f.read()
 
-    html = html.replace('<link rel="stylesheet" href="./css/app.css">', f'<style>\n{css}\n</style>')
-    html = html.replace('<script type="module" src="./js/app.js"></script>', f'<script>\n{combined_js}\n</script>')
+    html = re.sub(r'<link\s+rel="stylesheet"\s+href="\./css/app\.css(?:\?[^"]*)?">', lambda m: f'<style>\n{css}\n</style>', html)
+    html = re.sub(r'<script\s+type="module"\s+src="\./js/app\.js(?:\?[^"]*)?"></script>', lambda m: f'<script>\n{combined_js}\n</script>', html)
 
     with open('standalone.html', 'w', encoding='utf-8') as f:
         f.write(html)

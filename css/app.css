@@ -20,9 +20,11 @@
 }
 
 /* Base resets & typography */
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }
 
 body {
@@ -32,16 +34,14 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  user-select: text;
-  -webkit-user-select: text;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* UI Controls prevent accidental drag-selection */
-.nav-tab, .glove-btn, .preset-btn, input[type="range"] {
-  user-select: none;
-  -webkit-user-select: none;
+.nav-tab, button, .glove-btn, .preset-btn, input[type="range"], select {
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 /* Content Text Highlighting Style */
