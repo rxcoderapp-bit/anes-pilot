@@ -1,6 +1,6 @@
-﻿@echo off
+@echo off
 chcp 65001 >nul
-title GitHub 快速綁定認證
+title GitHub Login Helper
 echo ========================================================
 echo        AnesPilot - GitHub 帳號一次性安全授權綁定
 echo ========================================================
@@ -9,13 +9,13 @@ echo 正在啟動 GitHub 裝置授權模式 (免 127.0.0.1 本機轉址)...
 echo.
 echo --------------------------------------------------------
 echo 【操作步驟】：
-echo 1. 稍後畫面會顯示一組 8 碼英數字（例如：XXXX-XXXX）
+echo 1. 稍後畫面會顯示一組 8 碼英數字（例如：ABCD-1234）
 echo 2. 同時會自動開啟瀏覽器至 https://github.com/login/device
-echo 3. 請在網頁上輸入或貼上該 8 碼代碼，並點擊「Continue」與「Authorize」
+echo 3. 請在網頁上輸入或貼上該 8 碼代碼，並點擊 Continue 與 Authorize
 echo 4. 完成後此視窗將顯示「授權成功」，以後推送完全自動免登入！
 echo --------------------------------------------------------
 echo.
-C:\Program Files\Git\mingw64\bin\git-credential-manager.exe github login --device
+"C:\Program Files\Git\mingw64\bin\git-credential-manager.exe" github login --device
 echo.
 if %errorlevel% equ 0 (
     echo ========================================================
