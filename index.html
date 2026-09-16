@@ -355,9 +355,17 @@
   <!-- Main ES Module Script with Version Query -->
   <script type="module" src="./js/app.js?v=1.3.0"></script>
 
-  <!-- Service Worker Registration with Immediate Update -->
+  <!-- Service Worker Registration with Immediate Update & Cache Buster -->
   <script>
     if ('serviceWorker' in navigator) {
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
+
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js?v=1.3.0')
           .then((reg) => {
@@ -367,6 +375,28 @@
           .catch((err) => console.log('Service Worker setup note:', err));
       });
     }
+
+    // 點擊版本號徽章可立即強制清除離線快取並重載
+    document.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('app-version-badge');
+      if (badge) {
+        badge.style.cursor = 'pointer';
+        badge.title = '點擊立即重整並清除離線快取';
+        badge.addEventListener('click', async () => {
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+          if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let reg of registrations) {
+              await reg.unregister();
+            }
+          }
+          window.location.reload(true);
+        });
+      }
+    });
   </script>
 </body>
 </html>
