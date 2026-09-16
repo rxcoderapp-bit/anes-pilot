@@ -48,9 +48,27 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  user-select: none;
+  user-select: text;
+  -webkit-user-select: text;
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* UI Controls prevent accidental drag-selection */
+.nav-tab, .glove-btn, .preset-btn, input[type="range"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Content Text Highlighting Style */
+::selection {
+  background-color: rgba(6, 182, 212, 0.4);
+  color: inherit;
+}
+
+body.theme-light ::selection {
+  background-color: #bae6fd;
+  color: #0f172a;
 }
 
 /* Custom Scrollbars */
