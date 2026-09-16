@@ -30,11 +30,15 @@ def build_standalone():
     with open('js/engines/scores.js', 'r', encoding='utf-8') as f:
         scores_js = re.sub(r'export\s+', '', f.read())
 
+    with open('js/services/cloudSync.js', 'r', encoding='utf-8') as f:
+        cloud_js = re.sub(r'export\s+', '', f.read())
+
     with open('js/app.js', 'r', encoding='utf-8') as f:
         app_js = re.sub(r'import\s+.*?;', '', f.read())
         app_js = re.sub(r'export\s+(const|function|class)', r'\1', app_js)
 
     combined_js = '\n;\n'.join([
+        cloud_js,
         drug_js,
         asra_js,
         dosing_js,

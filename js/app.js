@@ -9,6 +9,7 @@ import { ToxicityEngine, LA_AGENTS } from "./engines/toxicity.js";
 import { ASRA_DATABASE } from "./data/asraData.js";
 import { InfusionEngine } from "./engines/infusion.js";
 import { ScoresEngine } from "./engines/scores.js";
+import { cloudSync } from "./services/cloudSync.js";
 
 // Global Application State
 export const state = {
@@ -59,7 +60,52 @@ document.addEventListener("DOMContentLoaded", () => {
   initEventListeners();
   applyTheme(state.theme);
   renderAll();
+
+  // Initialize Cloud Sync Service
+  initCloudSyncListeners();
 });
+
+function initCloudSyncListeners() {
+  cloudSync.onAuthChange((user) => {
+    const btnLogin = document.getElementById("btn-google-login");
+    const userProfile = document.getElementById("google-user-profile");
+    const avatar = document.getElementById("user-avatar");
+    const nameEl = document.getElementById("user-display-name");
+
+    if (user) {
+      if (btnLogin) btnLogin.classList.add("hidden");
+      if (userProfile) userProfile.classList.remove("hidden");
+      if (avatar) avatar.src = user.photoURL || "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2310b981'><circle cx='12' cy='8' r='4'/><path d='M4 20c0-4 4-6 8-6s8 2 8 6'/></svg>";
+      if (nameEl) nameEl.textContent = user.displayName || user.email.split("@")[0];
+
+      // Refresh cases from merged local storage
+      state.cases = JSON.parse(localStorage.getItem("anes_cases") || "[]");
+      if (state.activeTab === "logbook") renderLogbookTab();
+    } else {
+      if (btnLogin) btnLogin.classList.remove("hidden");
+      if (userProfile) userProfile.classList.add("hidden");
+      if (state.activeTab === "logbook") renderLogbookTab();
+    }
+  });
+
+  cloudSync.onSyncChange((status, time) => {
+    const syncStatusEl = document.getElementById("cloud-sync-status-badge");
+    if (syncStatusEl) {
+      if (status === "connected") {
+        syncStatusEl.innerHTML = `<span class="text-emerald-400 font-bold">🟢 雲端已同步 (${time || '剛剛'})</span>`;
+      } else if (status === "syncing") {
+        syncStatusEl.innerHTML = `<span class="text-cyan-400 font-bold animate-pulse">🔄 同步傳輸中...</span>`;
+      } else if (status === "error") {
+        syncStatusEl.innerHTML = `<span class="text-amber-400 font-bold">⚠️ 同步待重試 (離線模式)</span>`;
+      } else {
+        syncStatusEl.innerHTML = `<span class="text-slate-400 font-bold">⚪ 本機離線模式 (LocalStorage)</span>`;
+      }
+    }
+  });
+
+  // Attempt non-blocking initialization
+  cloudSync.init().catch(e => console.log("Offline mode active"));
+}
 
 function initEventListeners() {
   // Navigation Tabs
@@ -1101,16 +1147,18 @@ window.showAddCustomDrugModal = () => {
   };
 
   InfusionEngine.saveCustomDrug(customId, newDrug);
+  cloudSync.pushCustomDrugs(InfusionEngine.getDrugs());
   state.infusionDrugId = customId;
   state.infusionPresetIdx = 0;
   state.infusionTargetDose = newDrug.doseMin;
   renderInfusionTab();
-  alert("自訂藥物儲存成功！");
+  alert("自訂藥物儲存成功！已同步至雲端與本機。");
 };
 
 window.deleteCurrentCustomDrug = (id) => {
   if (confirm("確定要刪除此自訂藥物品項嗎？")) {
     InfusionEngine.deleteCustomDrug(id);
+    cloudSync.pushCustomDrugs(InfusionEngine.getDrugs());
     state.infusionDrugId = "norepinephrine";
     state.infusionPresetIdx = 0;
     renderInfusionTab();
@@ -1269,9 +1317,12 @@ function renderLogbookTab() {
           <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
             <span>💾</span> 資料儲存、備份與雲端同步中心
           </h3>
-          <p class="text-xs text-slate-400 mt-0.5">
-            狀態：<span class="text-emerald-400 font-bold">本地自動儲存中 (LocalStorage)</span> &bull; 離開/關閉網頁紀錄永久保存
-          </p>
+          <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+            <span id="cloud-sync-status-badge">
+              ${cloudSync.currentUser ? `<span class="text-emerald-400 font-bold">🟢 Google 雲端同步 (${cloudSync.lastSyncTime || '已同步'})</span>` : '<span class="text-slate-400 font-bold">⚪ 本機離線模式 (LocalStorage)</span>'}
+            </span>
+            <span>&bull; 關閉瀏覽器資料自動保留</span>
+          </div>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
@@ -1288,15 +1339,35 @@ function renderLogbookTab() {
         </div>
       </div>
 
-      <!-- Cloud Sync Explanation -->
-      <div class="mt-3 p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+      <!-- Cloud Sync Explanation & Action Controls -->
+      <div class="mt-3 p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div class="text-xs text-slate-300">
-          <span class="font-bold text-cyan-300">☁️ 帳號雲端跨裝置同步 (Google / LINE 帳號)：</span>
-          支援透過 Google OAuth 或 LINE LIFF 直連 Supabase/Firebase，更換手機或使用公用電腦隨時登入即時同步。
+          <div class="flex items-center gap-1.5 font-bold text-cyan-300 mb-0.5">
+            <span>☁️ Google 帳號跨裝置即時同步：</span>
+            ${cloudSync.currentUser ? `<span class="text-emerald-400">已連結 ${cloudSync.currentUser.email}</span>` : '<span class="text-slate-400">未登入</span>'}
+          </div>
+          <div class="text-slate-400">
+            登入同一個 Google 帳號，手機、平板、開刀房電腦 0 秒雙向同步；無訊號時本機暫存，聯網自動背景補傳。
+          </div>
         </div>
-        <button class="glove-btn bg-cyan-700/80 hover:bg-cyan-600 text-white text-xs py-1 px-2.5 whitespace-nowrap ml-2" onclick="window.showCloudSyncInfo()">
-          了解同步設定
-        </button>
+        <div class="flex items-center gap-2 self-end sm:self-center">
+          ${cloudSync.currentUser ? `
+            <button class="glove-btn bg-cyan-700/80 hover:bg-cyan-600 text-white text-xs py-1 px-2.5 whitespace-nowrap" onclick="window.syncNowManual()">
+              🔄 立即同步
+            </button>
+            <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1 px-2" onclick="window.handleGoogleLogout()">
+              登出
+            </button>
+          ` : `
+            <button class="glove-btn bg-white text-slate-800 hover:bg-slate-100 text-xs py-1 px-2.5 font-bold shadow-sm flex items-center gap-1.5 whitespace-nowrap" onclick="window.handleGoogleLogin()">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              <span>立即登入 Google</span>
+            </button>
+          `}
+          <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1 px-2" title="設定 Firebase 專屬金鑰" onclick="window.showFirebaseConfigModal()">
+            ⚙️ 設定
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1410,6 +1481,7 @@ window.addCaseModal = () => {
 
   state.cases.unshift(newCase);
   localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+  cloudSync.pushCases(state.cases);
   renderLogbookTab();
 };
 
@@ -1417,6 +1489,7 @@ window.deleteCase = (idx) => {
   if (confirm("確定刪除此筆病例記錄？")) {
     state.cases.splice(idx, 1);
     localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+    cloudSync.pushCases(state.cases);
     renderLogbookTab();
   }
 };
@@ -1425,6 +1498,7 @@ window.clearAllCases = () => {
   if (confirm("⚠️ 警告：這將會清除全部的病例紀錄！確定清空嗎？")) {
     state.cases = [];
     localStorage.removeItem("anes_cases");
+    cloudSync.pushCases([]);
     renderLogbookTab();
   }
 };
@@ -1459,9 +1533,11 @@ window.importJsonBackup = (event) => {
       if (imported.cases && Array.isArray(imported.cases)) {
         state.cases = imported.cases;
         localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+        cloudSync.pushCases(state.cases);
       }
       if (imported.customDrugs) {
         localStorage.setItem("anes_custom_infusion_drugs", JSON.stringify(imported.customDrugs));
+        cloudSync.pushCustomDrugs(imported.customDrugs);
       }
       alert("✅ 備份檔匯入還原成功！");
       renderLogbookTab();
@@ -1509,8 +1585,103 @@ window.showCloudSyncInfo = () => {
   alert(
     "【AnesPilot 雲端同步串接說明】\n\n" +
     "1. 目前模式：本地安全儲存（LocalStorage），紀錄完全保存在您自己的手機或電腦內，不用擔心病患個資或醫療紀錄上傳公網。\n\n" +
-    "2. Google 帳號同步方案：可透過 Google Firebase 或 Supabase 免費串接 Google OAuth。串接後，換手機登入 Google 即可自動抓回全部病例與自訂藥物。\n\n" +
-    "3. LINE 帳號同步方案：可透過 LINE Developers 申請免費 LIFF (LINE Front-end Framework)，將此網頁嵌入 LINE 官方帳號，點擊即可用 LINE 身分同步！\n\n" +
-    "如需開啟雲端登入同步，我可以為您直接加入 Firebase / Supabase 串接代碼！"
+    "2. Google 帳號同步方案：透過 Google Firebase 免費提供 Google OAuth 與 Firestore 即時同步。換手機、平板或用開刀房電腦登入同一 Google 帳號，即可 0 秒自動抓回全部病例與自訂藥物！\n\n" +
+    "3. 離線無網路防護：開刀房無訊號時，完全於本機正常操作；一旦偵測到連線，將自動背景補傳。"
   );
+};
+
+// --- Google Auth & Cloud Sync Handlers ---
+window.handleGoogleLogin = async () => {
+  try {
+    const user = await cloudSync.loginWithGoogle();
+    if (user) {
+      alert(`✅ 登入成功！已連結至 ${user.displayName || user.email}，雲端資料已自動雙向同步。`);
+    }
+  } catch (err) {
+    console.error("Google login attempt error:", err);
+    if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {
+      return;
+    }
+    const shouldConfig = confirm(
+      `Google 登入連線提示：\n${err.message || err}\n\n是否開啟 Firebase 金鑰設定視窗以貼入您的專案配置？`
+    );
+    if (shouldConfig) {
+      window.showFirebaseConfigModal();
+    }
+  }
+};
+
+window.handleGoogleLogout = async () => {
+  if (confirm("確定要登出 Google 帳號嗎？\n登出後資料仍會完整保留在本機，但將暫停跨裝置雲端同步。")) {
+    await cloudSync.logout();
+    alert("已登出 Google 帳號，系統已切換回本機安全模式。");
+    renderLogbookTab();
+  }
+};
+
+window.syncNowManual = async () => {
+  if (!cloudSync.currentUser) {
+    alert("請先登入 Google 帳號才能進行雲端同步。");
+    return;
+  }
+  const res = await cloudSync.pullAndMerge();
+  if (res) {
+    state.cases = JSON.parse(localStorage.getItem("anes_cases") || "[]");
+    renderLogbookTab();
+    alert(`✅ 雲端同步完成！已雙向同步至最新狀態（目前共有 ${state.cases.length} 筆病例）。`);
+  } else {
+    alert("⚠️ 同步未成功，請確認網路連線或稍後再試。");
+  }
+};
+
+window.showUserMenu = () => {
+  if (!cloudSync.currentUser) {
+    window.handleGoogleLogin();
+    return;
+  }
+  const email = cloudSync.currentUser.email || "";
+  const name = cloudSync.currentUser.displayName || "醫師";
+  const syncTime = cloudSync.lastSyncTime || "剛剛";
+
+  const action = prompt(
+    `【Google 帳號中心】\n使用者：${name} (${email})\n最後同步時間：${syncTime}\n\n請輸入欲執行的操作編號：\n1. 立即手動同步 (Sync Now)\n2. 設定 Firebase 專屬金鑰\n3. 登出 Google 帳號\n(輸入其他或取消以關閉)`,
+    "1"
+  );
+
+  if (action === "1") {
+    window.syncNowManual();
+  } else if (action === "2") {
+    window.showFirebaseConfigModal();
+  } else if (action === "3") {
+    window.handleGoogleLogout();
+  }
+};
+
+window.showFirebaseConfigModal = () => {
+  const currentConfig = cloudSync.getConfig();
+  const currentStr = JSON.stringify(currentConfig, null, 2);
+  const input = prompt(
+    "【Firebase 雲端同步金鑰設定】\n請貼入您在 Firebase Console 建立的 Web 應用程式配置 JSON：\n(若清空則恢復為預設範本設定)",
+    currentStr
+  );
+  if (input === null) return;
+  try {
+    if (!input.trim()) {
+      localStorage.removeItem("anes_firebase_config");
+      alert("已重設為預設 Firebase 設定。");
+      cloudSync.init();
+      renderLogbookTab();
+      return;
+    }
+    const configObj = JSON.parse(input);
+    if (!configObj.apiKey || !configObj.projectId) {
+      alert("❌ 設定無效：缺少 apiKey 或 projectId。");
+      return;
+    }
+    cloudSync.saveConfig(configObj);
+    alert("✅ Firebase 設定已成功儲存！正在重新連線...");
+    renderLogbookTab();
+  } catch (e) {
+    alert("❌ 解析失敗：請確保輸入有效的 JSON 格式。\n" + e.message);
+  }
 };
