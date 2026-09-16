@@ -1657,31 +1657,51 @@ window.showUserMenu = () => {
   }
 };
 
+function extractFirebaseConfig(input) {
+  const text = input.trim();
+  try {
+    return JSON.parse(text);
+  } catch (e) {}
+
+  const fields = ["apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId"];
+  const result = {};
+  for (const field of fields) {
+    const regex = new RegExp("['\"]?" + field + "['\"]?\\s*:\\s*['\"]([^'\"]+)['\"]");
+    const match = text.match(regex);
+    if (match) {
+      result[field] = match[1];
+    }
+  }
+
+  if (result.apiKey && result.projectId) {
+    return result;
+  }
+  throw new Error("無法從內容中解析出 apiKey 與 projectId，請確認是否有複製完整的配置內容。");
+}
+
 window.showFirebaseConfigModal = () => {
   const currentConfig = cloudSync.getConfig();
   const currentStr = JSON.stringify(currentConfig, null, 2);
   const input = prompt(
-    "【Firebase 雲端同步金鑰設定】\n請貼入您在 Firebase Console 建立的 Web 應用程式配置 JSON：\n(若清空則恢復為預設範本設定)",
+    "【Firebase 專屬雲端金鑰設定】\n" +
+    "請貼入您在 Firebase Console 建立的 Web 應用程式配置：\n" +
+    "(支援直接貼入 const firebaseConfig = { ... } 或標準 JSON 格式；若清空送出則恢復為預設範本)",
     currentStr
   );
   if (input === null) return;
   try {
     if (!input.trim()) {
       localStorage.removeItem("anes_firebase_config");
-      alert("已重設為預設 Firebase 設定。");
+      alert("已重設為系統預設 Firebase 範本設定。");
       cloudSync.init();
       renderLogbookTab();
       return;
     }
-    const configObj = JSON.parse(input);
-    if (!configObj.apiKey || !configObj.projectId) {
-      alert("❌ 設定無效：缺少 apiKey 或 projectId。");
-      return;
-    }
+    const configObj = extractFirebaseConfig(input);
     cloudSync.saveConfig(configObj);
-    alert("✅ Firebase 設定已成功儲存！正在重新連線...");
+    alert(`✅ Firebase 專案 [${configObj.projectId}] 設定已儲存成功！正在連線...`);
     renderLogbookTab();
   } catch (e) {
-    alert("❌ 解析失敗：請確保輸入有效的 JSON 格式。\n" + e.message);
+    alert("❌ 設定解析失敗：\n" + e.message);
   }
 };

@@ -4,14 +4,15 @@
  * Supports Offline-First data synchronization across phones, tablets, and PCs.
  */
 
-// Default Firebase Template Config (Can be customized by user via UI)
+// Default Firebase Configuration for AnesPilot
 const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDemo-AnesPilot-KeyPlaceholder",
-  authDomain: "anes-pilot-demo.firebaseapp.com",
-  projectId: "anes-pilot-demo",
-  storageBucket: "anes-pilot-demo.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef123456"
+  apiKey: "AIzaSyCfqiHXlkg8LL9MUf9uEZYCP_jaXLQl8jc",
+  authDomain: "anes-pilot.firebaseapp.com",
+  projectId: "anes-pilot",
+  storageBucket: "anes-pilot.firebasestorage.app",
+  messagingSenderId: "713624096054",
+  appId: "1:713624096054:web:47358fbb4835b7558d7797",
+  measurementId: "G-CKQGY29D97"
 };
 
 class CloudSyncService {
