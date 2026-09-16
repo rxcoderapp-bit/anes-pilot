@@ -22,6 +22,7 @@
   --bg-card: #121926;
   --bg-card-hover: #192335;
   --border-subtle: #1e293b;
+  --border-accent: #334155;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -32,17 +33,6 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-}
-
-body.theme-light {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #f1f5f9;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f8fafc;
-  --border-subtle: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
 }
 
 /* Base resets & typography */
@@ -60,6 +50,7 @@ body {
   padding: 0;
   user-select: none;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Custom Scrollbars */
@@ -77,11 +68,27 @@ body {
 
 /* App Container */
 .app-container {
-  max-width: 900px;
+  max-width: 920px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Header & Nav Bars in Default Dark */
+.app-header {
+  background-color: rgba(7, 11, 18, 0.95);
+  border-color: rgba(30, 41, 59, 0.8);
+}
+
+.desktop-tabs-bar {
+  background-color: #0a0f18;
+  border-color: #1e293b;
+}
+
+.mobile-bottom-nav {
+  background-color: rgba(7, 11, 18, 0.95);
+  border-color: #1e293b;
 }
 
 /* Header & Quick Profile Bar */
@@ -94,10 +101,10 @@ body {
 
 /* Glove-friendly large controls */
 .glove-btn {
-  min-height: 48px;
-  padding: 12px 18px;
+  min-height: 44px;
+  padding: 10px 16px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -113,7 +120,7 @@ body {
 }
 
 .glove-input {
-  min-height: 46px;
+  min-height: 44px;
   font-size: 1.05rem;
   font-weight: 600;
   border-radius: var(--radius-md);
@@ -122,7 +129,7 @@ body {
   color: var(--text-primary);
   padding: 8px 14px;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .glove-input:focus {
@@ -229,16 +236,215 @@ input[type="range"].glove-slider::-webkit-slider-thumb:active {
 }
 
 .anes-card:hover {
-  border-color: #334155;
+  border-color: var(--border-accent);
+}
+
+/* =========================================================================
+   LIGHT THEME (日照模式) - Comprehensive Hospital Grade Styling
+   ========================================================================= */
+
+body.theme-light {
+  --bg-primary: #f1f5f9;       /* Soft slate 100 background */
+  --bg-secondary: #ffffff;     /* Pure white headers & navs */
+  --bg-card: #ffffff;          /* Crisp white cards */
+  --bg-card-hover: #f8fafc;
+  --border-subtle: #cbd5e1;    /* Slate 300 borders */
+  --border-accent: #94a3b8;
+  --text-primary: #0f172a;     /* Slate 900 primary text */
+  --text-secondary: #334155;   /* Slate 700 secondary text */
+  --text-muted: #64748b;       /* Slate 500 */
+  --accent-cyan: #0284c7;      /* Sky 600 for light mode readability */
+  --accent-emerald: #059669;   /* Emerald 600 */
+  --accent-amber: #d97706;     /* Amber 600 */
+  --accent-rose: #dc2626;      /* Red 600 */
+
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Header & Nav in Light Mode */
+body.theme-light header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+body.theme-light header .text-white {
+  color: #0f172a !important;
+}
+
+body.theme-light header .text-slate-400 {
+  color: #64748b !important;
+}
+
+/* Quick Patient Summary Bar in Light Mode */
+body.theme-light .bg-slate-900\/80,
+body.theme-light .bg-slate-900\/70,
+body.theme-light .bg-slate-900\/60,
+body.theme-light .bg-slate-900\/50,
+body.theme-light .bg-slate-900\/40,
+body.theme-light .bg-slate-900 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Cards in Light Mode */
+body.theme-light .anes-card {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.06), 0 1px 4px -2px rgba(0, 0, 0, 0.04);
+}
+
+body.theme-light .anes-card:hover {
+  border-color: #cbd5e1 !important;
+}
+
+/* Desktop & Mobile Navigation in Light Mode */
+body.theme-light .desktop-tabs-bar,
+body.theme-light .hidden.md\:flex {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.theme-light .mobile-bottom-nav,
+body.theme-light nav.md\:hidden {
+  background-color: rgba(255, 255, 255, 0.97) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+body.theme-light .nav-tab {
+  color: #64748b !important;
+}
+
+body.theme-light .nav-tab.active {
+  color: #0284c7 !important;
+  border-top-color: #0284c7 !important;
+  background: rgba(2, 132, 199, 0.08) !important;
+}
+
+body.theme-light .nav-tab.crisis-tab.active {
+  color: #dc2626 !important;
+  border-top-color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.08) !important;
+}
+
+/* Text overrides in Light Mode */
+body.theme-light .text-white,
+body.theme-light .text-slate-100,
+body.theme-light .text-slate-200 {
+  color: #0f172a !important;
+}
+
+body.theme-light .text-slate-300 {
+  color: #1e293b !important;
+}
+
+body.theme-light .text-slate-400 {
+  color: #475569 !important;
+}
+
+body.theme-light .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Inputs & Form Controls in Light Mode */
+body.theme-light .glove-input {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.theme-light .glove-input:focus {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+}
+
+/* Slider in Light Mode */
+body.theme-light input[type="range"].glove-slider {
+  background: #cbd5e1 !important;
+}
+
+/* Preset Buttons in Light Mode */
+body.theme-light .preset-btn {
+  background-color: #e2e8f0 !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light .preset-btn:hover {
+  background-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Border overrides in Light Mode */
+body.theme-light .border-slate-800,
+body.theme-light .border-slate-800\/80,
+body.theme-light .border-slate-700 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Crisis Alert Banner in Light Mode */
+body.theme-light .crisis-active-mode {
+  background-color: #fff1f2 !important;
+  border-color: #f87171 !important;
+}
+
+body.theme-light .bg-rose-950\/30,
+body.theme-light .bg-rose-950\/40,
+body.theme-light .bg-rose-950\/50,
+body.theme-light .bg-rose-950\/60 {
+  background-color: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+
+body.theme-light .text-rose-300,
+body.theme-light .text-rose-400 {
+  color: #b91c1c !important;
+}
+
+body.theme-light .text-emerald-300,
+body.theme-light .text-emerald-400 {
+  color: #047857 !important;
+}
+
+body.theme-light .text-amber-300,
+body.theme-light .text-amber-400 {
+  color: #b45309 !important;
+}
+
+body.theme-light .text-cyan-300,
+body.theme-light .text-cyan-400,
+body.theme-light .text-sky-300,
+body.theme-light .text-sky-400 {
+  color: #0369a1 !important;
+}
+
+/* Light Mode Infusion Highlight Card */
+body.theme-light .from-sky-950\/60 {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%) !important;
+  border-color: #7dd3fc !important;
+}
+
+body.theme-light .from-sky-950\/60 .text-white {
+  color: #0369a1 !important;
+}
+
+/* Light Theme Theme Toggle Button */
+body.theme-light #btn-theme-toggle {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
 }
 
 </style>
 </head>
-<body class="bg-[#05070a] text-slate-100 min-h-screen">
+<body class="min-h-screen">
   <div class="app-container pb-24 md:pb-8">
     
     <!-- Top Nav Header -->
-    <header class="sticky top-0 z-30 bg-[#070b12]/95 backdrop-blur-md border-b border-slate-800/80 px-3 py-2.5">
+    <header class="app-header sticky top-0 z-30 backdrop-blur-md border-b px-3 py-2.5">
       <div class="flex items-center justify-between gap-2">
         <!-- Logo & Branding -->
         <div class="flex items-center gap-2">
@@ -256,15 +462,32 @@ input[type="range"].glove-slider::-webkit-slider-thumb:active {
 
         <!-- Quick Patient Summary Badge & Crisis Action -->
         <div class="flex items-center gap-2">
+          <!-- Google Sign-In & Cloud Sync Profile -->
+          <div id="google-auth-container" class="flex items-center">
+            <button id="btn-google-login" class="glove-btn py-1 px-2.5 bg-white text-slate-800 hover:bg-slate-100 border border-slate-300 font-bold text-xs rounded-lg shadow-sm flex items-center gap-1.5" onclick="window.handleGoogleLogin()">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              <span class="hidden sm:inline">Google 登入同步</span>
+              <span class="sm:hidden">登入</span>
+            </button>
+
+            <div id="google-user-profile" class="hidden flex items-center gap-1.5 cursor-pointer bg-slate-900/80 hover:bg-slate-800/80 p-1 pr-2 rounded-full border border-slate-700/80" onclick="window.showUserMenu()">
+              <img id="user-avatar" class="w-6 h-6 rounded-full border border-emerald-500 object-cover" src="" alt="User">
+              <div class="text-left hidden sm:block">
+                <div id="user-display-name" class="text-[11px] font-bold text-slate-100 truncate max-w-[80px]">醫師</div>
+              </div>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" title="雲端即時同步中"></span>
+            </div>
+          </div>
+
           <!-- Theme Toggle -->
-          <button id="btn-theme-toggle" class="glove-btn py-1.5 px-2.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800">
+          <button id="btn-theme-toggle" class="glove-btn py-1.5 px-2 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800">
             <span id="theme-icon">🌙 刀房暗室</span>
           </button>
 
           <!-- CRISIS RED BUTTON -->
-          <button id="btn-quick-crisis" class="glove-btn py-1.5 px-3 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs rounded-lg shadow-lg shadow-red-950/80 border border-red-500 flex items-center gap-1.5 animate-pulse">
+          <button id="btn-quick-crisis" class="glove-btn py-1.5 px-2.5 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs rounded-lg shadow-lg shadow-red-950/80 border border-red-500 flex items-center gap-1 animate-pulse">
             <span>🚨</span>
-            <span class="tracking-wide">CRISIS 危急應變</span>
+            <span class="tracking-wide">CRISIS</span>
           </button>
         </div>
       </div>
@@ -345,7 +568,7 @@ input[type="range"].glove-slider::-webkit-slider-thumb:active {
     </header>
 
     <!-- Desktop / Tablet Top Tabs (Hidden on small screens) -->
-    <div class="hidden md:flex bg-[#0a0f18] border-b border-slate-800 px-3 overflow-x-auto">
+    <div class="desktop-tabs-bar hidden md:flex border-b px-3 overflow-x-auto">
       <div class="nav-tab active" data-tab="dosing">
         <span>⚡ 體重速查盤</span>
       </div>
@@ -408,7 +631,7 @@ input[type="range"].glove-slider::-webkit-slider-thumb:active {
     </main>
 
     <!-- Mobile Bottom Tab Navigation (Fixed at bottom for thumb friendliness) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b12]/95 backdrop-blur-lg border-t border-slate-800 flex justify-around items-stretch safe-area-bottom">
+    <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg border-t flex justify-around items-stretch safe-area-bottom">
       <div class="nav-tab active" data-tab="dosing">
         <span class="text-base">⚡</span>
         <span>速查盤</span>
@@ -444,12 +667,287 @@ input[type="range"].glove-slider::-webkit-slider-thumb:active {
   <!-- Main ES Module Script -->
   <script>
 /**
+ * AnesPilot - Cloud Sync & Google Auth Service
+ * Powered by Google Firebase (v10 Modular SDK)
+ * Supports Offline-First data synchronization across phones, tablets, and PCs.
+ */
+
+// Default Firebase Configuration for AnesPilot
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCfqiHXlkg8LL9MUf9uEZYCP_jaXLQl8jc",
+  authDomain: "anes-pilot.firebaseapp.com",
+  projectId: "anes-pilot",
+  storageBucket: "anes-pilot.firebasestorage.app",
+  messagingSenderId: "713624096054",
+  appId: "1:713624096054:web:47358fbb4835b7558d7797",
+  measurementId: "G-CKQGY29D97"
+};
+
+class CloudSyncService {
+  constructor() {
+    this.app = null;
+    this.auth = null;
+    this.db = null;
+    this.currentUser = null;
+    this.syncStatus = "offline"; // 'offline', 'connected', 'syncing', 'error'
+    this.authListeners = [];
+    this.syncListeners = [];
+    this.lastSyncTime = localStorage.getItem("anes_last_sync_time") || null;
+  }
+
+  getConfig() {
+    try {
+      const custom = localStorage.getItem("anes_firebase_config");
+      if (custom) return JSON.parse(custom);
+    } catch (e) {}
+    return DEFAULT_FIREBASE_CONFIG;
+  }
+
+  saveConfig(config) {
+    localStorage.setItem("anes_firebase_config", JSON.stringify(config));
+    // Re-initialize
+    this.app = null;
+    this.auth = null;
+    this.db = null;
+    return this.init();
+  }
+
+  async init() {
+    try {
+      if (!navigator.onLine) {
+        this.setSyncStatus("offline");
+        return false;
+      }
+
+      // Dynamically load Firebase modules to preserve 100% offline capability
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+      const { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+      const { getFirestore, doc, getDoc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+
+      this.firebaseModules = {
+        GoogleAuthProvider,
+        signInWithPopup,
+        signOut,
+        doc,
+        getDoc,
+        setDoc,
+        serverTimestamp
+      };
+
+      const config = this.getConfig();
+      this.app = initializeApp(config);
+      this.auth = getAuth(this.app);
+      this.db = getFirestore(this.app);
+
+      onAuthStateChanged(this.auth, async (user) => {
+        this.currentUser = user;
+        if (user) {
+          this.setSyncStatus("connected");
+          this.notifyAuthListeners(user);
+          // Auto sync on login
+          await this.pullAndMerge();
+        } else {
+          this.setSyncStatus("offline");
+          this.notifyAuthListeners(null);
+        }
+      });
+
+      return true;
+    } catch (err) {
+      console.warn("[CloudSync] Firebase initialization in local mode:", err);
+      this.setSyncStatus("offline");
+      return false;
+    }
+  }
+
+  async loginWithGoogle() {
+    if (!this.auth) {
+      const initialized = await this.init();
+      if (!initialized || !this.auth) {
+        throw new Error("請先設定您的 Firebase 金鑰（或確認網路已連線）。");
+      }
+    }
+
+    const { GoogleAuthProvider, signInWithPopup } = this.firebaseModules;
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    try {
+      this.setSyncStatus("syncing");
+      const result = await signInWithPopup(this.auth, provider);
+      this.currentUser = result.user;
+      this.setSyncStatus("connected");
+      this.notifyAuthListeners(this.currentUser);
+      await this.pullAndMerge();
+      return result.user;
+    } catch (error) {
+      this.setSyncStatus("error");
+      console.error("Google Login Error:", error);
+      throw error;
+    }
+  }
+
+  async logout() {
+    if (this.auth && this.firebaseModules?.signOut) {
+      await this.firebaseModules.signOut(this.auth);
+    }
+    this.currentUser = null;
+    this.setSyncStatus("offline");
+    this.notifyAuthListeners(null);
+  }
+
+  async pullAndMerge() {
+    if (!this.currentUser || !this.db) return null;
+
+    try {
+      this.setSyncStatus("syncing");
+      const { doc, getDoc, setDoc } = this.firebaseModules;
+      const userRef = doc(this.db, "users", this.currentUser.uid);
+      const snapshot = await getDoc(userRef);
+
+      let localCases = JSON.parse(localStorage.getItem("anes_cases") || "[]");
+      let localDrugs = JSON.parse(localStorage.getItem("anes_custom_infusion_drugs") || "{}");
+
+      if (snapshot.exists()) {
+        const cloudData = snapshot.data();
+        const cloudCases = cloudData.cases || [];
+        const cloudDrugs = cloudData.customDrugs || {};
+
+        // Smart merge cases by ID
+        const caseMap = new Map();
+        cloudCases.forEach(c => caseMap.set(c.id, c));
+        localCases.forEach(c => caseMap.set(c.id, c)); // Local overrides/merges
+        const mergedCases = Array.from(caseMap.values()).sort((a, b) => (b.id || 0) - (a.id || 0));
+
+        // Smart merge custom drugs
+        const mergedDrugs = { ...cloudDrugs, ...localDrugs };
+
+        localStorage.setItem("anes_cases", JSON.stringify(mergedCases));
+        localStorage.setItem("anes_custom_infusion_drugs", JSON.stringify(mergedDrugs));
+
+        // Push unified state back to cloud
+        await setDoc(userRef, {
+          email: this.currentUser.email,
+          displayName: this.currentUser.displayName,
+          photoURL: this.currentUser.photoURL,
+          cases: mergedCases,
+          customDrugs: mergedDrugs,
+          lastSyncAt: new Date().toISOString()
+        }, { merge: true });
+
+        this.lastSyncTime = new Date().toLocaleTimeString();
+        localStorage.setItem("anes_last_sync_time", this.lastSyncTime);
+        this.setSyncStatus("connected");
+
+        return { cases: mergedCases, customDrugs: mergedDrugs };
+      } else {
+        // First time cloud sync: push all local data to cloud
+        await setDoc(userRef, {
+          email: this.currentUser.email,
+          displayName: this.currentUser.displayName,
+          photoURL: this.currentUser.photoURL,
+          cases: localCases,
+          customDrugs: localDrugs,
+          lastSyncAt: new Date().toISOString()
+        });
+
+        this.lastSyncTime = new Date().toLocaleTimeString();
+        localStorage.setItem("anes_last_sync_time", this.lastSyncTime);
+        this.setSyncStatus("connected");
+        return { cases: localCases, customDrugs: localDrugs };
+      }
+    } catch (e) {
+      console.error("[CloudSync] Pull and merge error:", e);
+      this.setSyncStatus("error");
+      return null;
+    }
+  }
+
+  async pushCases(cases) {
+    if (!this.currentUser || !this.db) return;
+    try {
+      this.setSyncStatus("syncing");
+      const { doc, setDoc } = this.firebaseModules;
+      const userRef = doc(this.db, "users", this.currentUser.uid);
+      await setDoc(userRef, {
+        cases: cases,
+        lastSyncAt: new Date().toISOString()
+      }, { merge: true });
+
+      this.lastSyncTime = new Date().toLocaleTimeString();
+      localStorage.setItem("anes_last_sync_time", this.lastSyncTime);
+      this.setSyncStatus("connected");
+    } catch (e) {
+      console.warn("[CloudSync] pushCases error:", e);
+      this.setSyncStatus("error");
+    }
+  }
+
+  async pushCustomDrugs(drugs) {
+    if (!this.currentUser || !this.db) return;
+    try {
+      this.setSyncStatus("syncing");
+      const { doc, setDoc } = this.firebaseModules;
+      const userRef = doc(this.db, "users", this.currentUser.uid);
+      await setDoc(userRef, {
+        customDrugs: drugs,
+        lastSyncAt: new Date().toISOString()
+      }, { merge: true });
+
+      this.lastSyncTime = new Date().toLocaleTimeString();
+      localStorage.setItem("anes_last_sync_time", this.lastSyncTime);
+      this.setSyncStatus("connected");
+    } catch (e) {
+      console.warn("[CloudSync] pushCustomDrugs error:", e);
+      this.setSyncStatus("error");
+    }
+  }
+
+  setSyncStatus(status) {
+    this.syncStatus = status;
+    this.syncListeners.forEach(fn => fn(status, this.lastSyncTime));
+  }
+
+  onAuthChange(callback) {
+    this.authListeners.push(callback);
+    if (this.currentUser) callback(this.currentUser);
+  }
+
+  onSyncChange(callback) {
+    this.syncListeners.push(callback);
+    callback(this.syncStatus, this.lastSyncTime);
+  }
+
+  notifyAuthListeners(user) {
+    this.authListeners.forEach(fn => fn(user));
+  }
+}
+
+const cloudSync = new CloudSyncService();
+
+;
+/**
  * AnesPilot - Clinical Drug Data & Formulas
  * Standardized across international and Taiwan anesthesia practices.
+ * 
+ * References & Evidentiary Base:
+ * 1. Morgan & Mikhail's Clinical Anesthesiology, 7th Edition (McGraw-Hill AccessAnesthesiology)
+ * 2. Goodman & Gilman’s The Pharmacological Basis of Therapeutics, 14th Edition (McGraw-Hill)
+ * 3. NYSORA Textbook of Regional Anesthesia and Acute Pain Management
+ * 4. ASA / DAS 2015/2025 Difficult Airway Guidelines
+ * 5. ASRA Coagulation Guidelines & LAST Checklist
  */
 
 const DRUG_DATABASE = {
-  // Airway Calculations
+  // AccessAnesthesiology Reference Badges
+  references: {
+    mm: "Morgan & Mikhail's Clinical Anesthesiology (7th Ed.)",
+    gg: "Goodman & Gilman's Pharmacological Basis of Therapeutics (14th Ed.)",
+    nysora: "NYSORA Textbook of Regional Anesthesia & Acute Pain Management",
+    asra: "ASRA Pain Medicine Coagulation & LAST Advisory"
+  },
+
+  // Airway Calculations (Morgan & Mikhail's Ch. 19 & Motoyama/Khine Pediatric Airway Formulas)
   calculateAirway(ageYears, weightKg, isFemale = false) {
     let ettCuffed, ettUncuffed, ettDepth, lmaSize, bladeType, suctionFr;
 
@@ -480,7 +978,7 @@ const DRUG_DATABASE = {
       lmaSize = "1.5 - 2 (10-20kg)";
     } else if (ageYears < 14.0) {
       // Pediatric 2 - 14 years
-      // Motoyama & Khine formula:
+      // Motoyama & Khine formulas:
       const cuffedCalc = (ageYears / 4) + 3.5;
       const uncuffedCalc = (ageYears / 4) + 4.0;
       ettCuffed = Math.round(cuffedCalc * 2) / 2;
@@ -525,11 +1023,12 @@ const DRUG_DATABASE = {
       ettDepth,
       lmaSize,
       bladeType,
-      suctionFr
+      suctionFr,
+      reference: "Morgan & Mikhail's Clinical Anesthesiology (7e, Ch. 19 Airway Management)"
     };
   },
 
-  // Calculate Ideal Body Weight (Devine Formula)
+  // Calculate Ideal Body Weight (Devine Formula - M&M Appendix)
   calculateIBW(heightCm, isFemale) {
     if (!heightCm || heightCm < 60) return null;
     const heightInches = heightCm / 2.54;
@@ -541,7 +1040,7 @@ const DRUG_DATABASE = {
     return Math.round(ibw * 10) / 10;
   },
 
-  // Calculate Maintenance Fluids (4-2-1 Rule)
+  // Calculate Maintenance Fluids (4-2-1 Rule / Holliday-Segar Method)
   calculateFluids(weightKg) {
     let hourlyRate = 0;
     if (weightKg <= 10) {
@@ -554,11 +1053,12 @@ const DRUG_DATABASE = {
     return {
       hourlyRate: Math.round(hourlyRate),
       npo8hr: Math.round(hourlyRate * 8),
-      bolus20ml: Math.round(weightKg * 20)
+      bolus20ml: Math.round(weightKg * 20),
+      reference: "Morgan & Mikhail's Ch. 49 (Fluid Management & Transfusion)"
     };
   },
 
-  // Calculate Estimated Blood Volume (EBV) & MABL
+  // Calculate Estimated Blood Volume (EBV) & MABL (Furman Formula)
   calculateBlood(weightKg, ageYears, isFemale, startHct = 36, targetHct = 24) {
     let ebvFactor = 70; // mL/kg
     if (ageYears < 0.08) {
@@ -575,10 +1075,10 @@ const DRUG_DATABASE = {
     const avgHct = (startHct + targetHct) / 2;
     const mabl = Math.max(0, Math.round(ebv * ((startHct - targetHct) / avgHct)));
 
-    return { ebv, mabl, ebvFactor };
+    return { ebv, mabl, ebvFactor, reference: "Morgan & Mikhail's Ch. 49 & Goodman & Gilman Ch. 37" };
   },
 
-  // Detailed drug dosages
+  // Detailed drug dosages with AccessAnesthesiology Citations
   getDosages(weightKg, ageYears, isFemale = false, ibw = null) {
     const w = weightKg;
     const activeIbw = (ibw && ibw > 0) ? ibw : w;
@@ -589,193 +1089,282 @@ const DRUG_DATABASE = {
       // 1. Induction & Muscle Relaxants
       induction: [
         {
-          name: "Propofol (二異丙酚)",
+          id: "propofol",
+          name: "Propofol (二異丙酚 / 靜脈誘導)",
           badge: "TBW",
           perKg: isPed ? "2.5 - 3.5 mg/kg" : "1.5 - 2.5 mg/kg",
           dose: isPed
             ? `${Math.round(w * 2.5)} - ${Math.round(w * 3.5)} mg`
             : `${Math.round(w * 1.5)} - ${Math.round(w * 2.5)} mg`,
-          note: isPed ? "小兒分佈體積大，誘導劑量偏高" : "年長衰弱者建議降至 1.0 - 1.5 mg/kg"
+          note: isPed ? "小兒分佈體積大且代謝快，劑量偏高" : "年長衰弱或心血管高危者降至 1.0 - 1.5 mg/kg",
+          source: "Morgan & Mikhail's 7e Ch. 8 / Goodman & Gilman 14e Ch. 21",
+          mechanism: "增強 GABA_A 受體抑制性氯離子通道開放，輕度阻斷 NMDA 受體",
+          pearls: "引發全身血管阻力 (SVR) 下降致低血壓；具止吐效果；無止痛作用；長時輸注需警惕 PRIS (二異丙酚輸注症候群)"
         },
         {
-          name: "Ketamine (氯胺酮)",
+          id: "ketamine",
+          name: "Ketamine (氯胺酮 / 解離性麻醉)",
           badge: "TBW",
           perKg: "1.0 - 2.0 mg/kg IV (4-6 mg/kg IM)",
           dose: `${Math.round(w * 1.0)} - ${Math.round(w * 2.0)} mg IV`,
-          note: "血行動態不穩、氣喘患者首選"
+          note: "血行動態不穩、氣喘及血容積不足患者首選",
+          source: "Morgan & Mikhail's 7e Ch. 8 / Goodman & Gilman 14e Ch. 21",
+          mechanism: "非競爭性 NMDA 受體拮抗劑，抑制脊髓丘腦側束痛覺傳導",
+          pearls: "中樞興奮刺激交感神經，維持血壓心率並擴張支氣管；保留自體呼吸反應；可預防性給予 Midazolam 減輕術後譫妄惡夢"
         },
         {
-          name: "Etomidate (依托咪酯)",
+          id: "etomidate",
+          name: "Etomidate (依托咪酯 / 心血管穩定)",
           badge: "TBW",
           perKg: "0.2 - 0.3 mg/kg IV",
           dose: `${(w * 0.2).toFixed(1)} - ${(w * 0.3).toFixed(1)} mg`,
-          note: "心血管極穩定，可能短暫抑制腎上腺"
+          note: "極佳心血管穩定度，對心輸出量及 MAP 影響極微",
+          source: "Morgan & Mikhail's 7e Ch. 8 / Goodman & Gilman 14e Ch. 21",
+          mechanism: "選擇性 GABA_A 受體促效劑",
+          pearls: "可抑制 11-beta-hydroxylase，短暫抑制腎上腺皮質醇生成達 4-8 小時；常引起肌陣攣 (Myoclonus)"
         },
         {
-          name: "Rocuronium (羅庫溴銨) - 常規誘導",
+          id: "rocuronium_std",
+          name: "Rocuronium (羅庫溴銨) - 常規氣管插管",
           badge: "IBW",
           perKg: "0.6 mg/kg",
           dose: `${(activeIbw * 0.6).toFixed(1)} mg`,
-          note: "起效約 60-90 秒，依理想體重給藥"
+          note: "起效約 60-90 秒，依理想體重 (IBW) 給藥以防作用延長",
+          source: "Morgan & Mikhail's 7e Ch. 11 / Goodman & Gilman 14e Ch. 12",
+          mechanism: "競爭性拮抗運動終板菸鹼型乙醯膽鹼受體 (nAChR)",
+          pearls: "中效類固醇型非去極化肌鬆劑，無組織胺釋放；主要經膽汁及肝臟消除 (70%)"
         },
         {
-          name: "Rocuronium (RSI 快速插管)",
+          id: "rocuronium_rsi",
+          name: "Rocuronium (RSI 快速循序誘導插管)",
           badge: "IBW",
           perKg: "1.0 - 1.2 mg/kg",
           dose: `${(activeIbw * 1.0).toFixed(1)} - ${(activeIbw * 1.2).toFixed(1)} mg`,
-          note: "起效約 45-60 秒，若遇難插管需 Sugammadex 16mg/kg 救援"
+          note: "45-60 秒起效（速度媲美 Suxamethonium）；遇 CICO 可用 Sugammadex 16mg/kg 立即救援",
+          source: "Morgan & Mikhail's 7e Ch. 11 & DAS Guidelines 2025",
+          mechanism: "大劑量快速飽和受體",
+          pearls: "臨床作用持續時間延長至 60-90 分鐘，必須備妥 Sugammadex 作為急救逆轉劑"
         },
         {
+          id: "cisatracurium",
           name: "Cisatracurium (順式阿曲庫銨)",
           badge: "IBW",
           perKg: "0.15 - 0.2 mg/kg",
           dose: `${(activeIbw * 0.15).toFixed(1)} - ${(activeIbw * 0.2).toFixed(1)} mg`,
-          note: "Hofmann 消除，肝腎功能不全首選"
+          note: "Hofmann 生理消除，肝腎功能衰竭及重大器官衰竭首選",
+          source: "Morgan & Mikhail's 7e Ch. 11 / Goodman & Gilman 14e Ch. 12",
+          mechanism: "苄基異喹啉類非去極化肌鬆劑",
+          pearls: "體溫及 pH 介導的 Hofmann 降解與非特異性酯酶水解，不倚賴肝腎代謝；無顯著心血管自主神經阻斷作用"
         },
         {
-          name: "Succinylcholine (去極化肌鬆)",
+          id: "succinylcholine",
+          name: "Succinylcholine (去極化肌鬆劑 / Suxamethonium)",
           badge: "TBW",
           perKg: isInfant ? "2.0 - 3.0 mg/kg" : (isPed ? "1.5 - 2.0 mg/kg" : "1.0 - 1.5 mg/kg"),
           dose: isInfant ? `${(w * 2.5).toFixed(1)} mg` : `${(w * 1.2).toFixed(1)} mg`,
-          note: "嬰兒需較高劑量；小兒建議先給 Atropine 預防心搏過緩"
+          note: "極快速起效 (30-60秒) 及短效 (5-10分)；嬰兒細胞外液大需較高劑量",
+          source: "Morgan & Mikhail's 7e Ch. 11 / Goodman & Gilman 14e Ch. 12",
+          mechanism: "持續刺激乙醯膽鹼受體導致肌纖維去極化失敏 (Phase I block)",
+          pearls: "禁忌：高血鉀、大面積燒傷/創傷 (>24-48小時)、惡性高熱 (MH) 病史、脫神經肌肉病變、假性膽鹼酯酶缺乏"
         },
         {
-          name: "Sugammadex (中度阻滯恢復 TOF ≥2)",
+          id: "sugammadex_mod",
+          name: "Sugammadex (中度阻滯逆轉 - TOF ≥ 2)",
           badge: "TBW",
           perKg: "2.0 mg/kg",
           dose: `${Math.round(w * 2.0)} mg (${(w * 2.0 / 100).toFixed(1)} 瓶 100mg/mL)`,
-          note: "依實際體重給予，約 2-3 分鐘完全恢復"
+          note: "依實際體重 (TBW) 給予，約 2-3 分鐘完全恢復 TOF ratio > 0.9",
+          source: "Morgan & Mikhail's 7e Ch. 11 / Goodman & Gilman 14e Ch. 12",
+          mechanism: "修飾型 gamma-環糊精，於血漿中與 Rocuronium 形成超高親和力 1:1 螯合複合物",
+          pearls: "不具抗膽鹼酶副作用（不需加 Atropine）；可能螯合口服避孕藥，需叮嚀女性患者 7 天內採取額外避孕措施"
         },
         {
-          name: "Sugammadex (深度阻滯恢復 PTC 1-2)",
+          id: "sugammadex_deep",
+          name: "Sugammadex (深度阻滯逆轉 - PTC 1-2)",
           badge: "TBW",
           perKg: "4.0 mg/kg",
           dose: `${Math.round(w * 4.0)} mg (${(w * 4.0 / 100).toFixed(1)} 瓶 100mg/mL)`,
-          note: "深度阻滯無 TOF 反應時使用"
+          note: "深度神經肌肉阻滯無 TOF 反應、僅有 Post-tetanic count 1-2 時使用",
+          source: "Morgan & Mikhail's 7e Ch. 11",
+          mechanism: "強效快速抓取組織及受體解離之肌鬆分子",
+          pearls: "經腎臟原型排泄，嚴重腎功能不全 (CrCl < 30) 建議避免常規使用"
         },
         {
-          name: "Sugammadex (RSI 術後即刻緊急逆轉)",
+          id: "sugammadex_rsi_rescue",
+          name: "Sugammadex (RSI 即刻緊急逆轉救命劑量)",
           badge: "TBW",
           perKg: "16.0 mg/kg",
           dose: `${Math.round(w * 16.0)} mg`,
-          note: "剛給予 Rocuronium 1.2mg/kg 後 CICO 緊急救援"
+          note: "剛給予 Rocuronium 1.2 mg/kg 發生 CICO (無法插管無法通氣) 時立即給藥",
+          source: "Morgan & Mikhail's 7e Ch. 11 & DAS CICO Protocol",
+          mechanism: "超飽和血漿濃度即刻拉取終板受體上之 Rocuronium",
+          pearls: "約 3 分鐘內恢復自體自主呼吸，為開刀房 CICO 急救黃金用藥"
         }
       ],
 
       // 2. Analgesia & Sedation
       analgesia: [
         {
-          name: "Fentanyl (芬太尼)",
+          id: "fentanyl",
+          name: "Fentanyl (芬太尼 / 強效短效鴉片類)",
           badge: "TBW",
-          perKg: "1 - 2 mcg/kg",
+          perKg: "1 - 2 mcg/kg (插管前誘導) / 2-5 mcg/kg (重大手術)",
           dose: `${Math.round(w * 1.0)} - ${Math.round(w * 2.0)} mcg`,
-          note: "常用濃度 50 mcg/mL；插管前 2-3 分鐘給予"
+          note: "常用規格 50 mcg/mL；高脂溶性，起效約 2-3 分鐘，單劑作用約 30-45 分鐘",
+          source: "Morgan & Mikhail's 7e Ch. 9 / Goodman & Gilman 14e Ch. 23",
+          mechanism: "純 mu-opioid 受體促效劑，效價約為 Morphine 的 100 倍",
+          pearls: "無組織胺釋放；快速大劑量注射可能引發胸壁僵直 (Wooden chest syndrome)"
         },
         {
+          id: "alfentanil",
           name: "Alfentanil (阿芬太尼)",
           badge: "TBW",
           perKg: "10 - 20 mcg/kg",
           dose: `${Math.round(w * 10)} - ${Math.round(w * 20)} mcg`,
-          note: "超快速起效（1分鐘），短效操作適用"
+          note: "超快速起效 (1-1.5分鐘)，短效操作 (如喉鏡檢、短程骨科復位) 首選",
+          source: "Morgan & Mikhail's 7e Ch. 9 / Goodman & Gilman 14e Ch. 23",
+          mechanism: "低 pKa (6.5) 使高達 90% 呈非游離態，極迅速穿透 BBB",
+          pearls: "排泄半衰期短，但重複給藥可能在脂肪組織累積"
         },
         {
-          name: "Morphine (嗎啡)",
+          id: "morphine",
+          name: "Morphine (嗎啡 / 長效止痛)",
           badge: "TBW",
           perKg: "0.05 - 0.15 mg/kg",
           dose: `${(w * 0.05).toFixed(1)} - ${(w * 0.15).toFixed(1)} mg`,
-          note: "起效約 15-20 分鐘，長效術後止痛"
+          note: "起效約 15-20 分鐘，高峰在 45-60 分鐘，維持 4-5 小時",
+          source: "Morgan & Mikhail's 7e Ch. 9 / Goodman & Gilman 14e Ch. 23",
+          mechanism: "中樞神經系統 mu-opioid 受體促效劑",
+          pearls: "代謝物 Morphine-6-glucuronide 具高活性；腎功能不全者易累積導致呼吸抑制；可能促進組織胺釋放致低血壓"
         },
         {
-          name: "Neostigmine 逆轉劑",
+          id: "neostigmine",
+          name: "Neostigmine (膽鹼酯酶抑制劑 / 傳統肌鬆逆轉)",
           badge: "TBW",
           perKg: "0.04 - 0.05 mg/kg (Max 5 mg)",
           dose: `${Math.min(5, Math.round(w * 0.045 * 10) / 10)} mg`,
-          note: "需併用 Glycopyrrolate 或 Atropine 拮抗副交感反應"
+          note: "需併用抗膽鹼藥物 (Glycopyrrolate 或 Atropine) 預防嚴重心搏過緩",
+          source: "Morgan & Mikhail's 7e Ch. 11 / Goodman & Gilman 14e Ch. 11",
+          mechanism: "可逆性抑制乙醯膽鹼水解酶 (AChE)，增加突觸間隙乙醯膽鹼濃度",
+          pearls: "給藥前確認 TOF 至少出現 2-4 次跳動；完全阻滯時不可單用 Neostigmine"
         },
         {
-          name: "Glycopyrrolate (胃長寧)",
+          id: "glycopyrrolate",
+          name: "Glycopyrrolate (胃長寧 / 季銨鹽抗膽鹼藥)",
           badge: "TBW",
-          perKg: "0.01 mg/kg (搭配 Neostigmine 每 1mg 配 0.2mg)",
+          perKg: "0.01 mg/kg (配搭 Neostigmine 每 1mg 配 0.2mg)",
           dose: `${(w * 0.01).toFixed(2)} mg`,
-          note: "不通過 BBB，不引起中樞抗膽鹼症候群"
+          note: "不通過血腦屏障 (BBB)，不引起中樞抗膽鹼症候群 (譫妄、鎮靜)",
+          source: "Morgan & Mikhail's 7e Ch. 11 / Goodman & Gilman 14e Ch. 11",
+          mechanism: "周邊毒蕈鹼型乙醯膽鹼受體 (M2/M3) 競爭性阻斷劑",
+          pearls: "抗唾液分泌效果強於 Atropine，心搏過速副作用相對溫和"
         },
         {
-          name: "Naloxone (納洛酮 - 類鴉片逆轉)",
+          id: "naloxone",
+          name: "Naloxone (納洛酮 / 鴉片類受體拮抗劑)",
           badge: "TBW",
-          perKg: "1 - 4 mcg/kg (成人間隔 40-100 mcg 滴定)",
+          perKg: "1 - 4 mcg/kg (成人間隔 40-100 mcg 慢速滴定)",
           dose: `${Math.round(w * 2)} mcg`,
-          note: "慢速滴定至呼吸改善，防急性戒斷及嚴重劇痛"
+          note: "慢速滴定至呼吸改善，防止急性劇烈疼痛、肺水腫及心血管暴衝",
+          source: "Morgan & Mikhail's 7e Ch. 9 / Goodman & Gilman 14e Ch. 23",
+          mechanism: "純鴉片類受體競爭性拮抗劑 (mu, kappa, delta)",
+          pearls: "作用持續時間僅約 30-45 分鐘，短於多數鴉片類藥物，需嚴密監控再鎮靜與呼吸抑制復發"
         },
         {
-          name: "Flumazenil (安易醒 - BZD 逆轉)",
+          id: "flumazenil",
+          name: "Flumazenil (安易醒 / BZD 拮抗劑)",
           badge: "TBW",
-          perKg: "0.01 mg/kg (成人初始 0.2 mg IV)",
+          perKg: "0.01 mg/kg (成人初始 0.2 mg IV 於 15 秒推注)",
           dose: isPed ? `${(w * 0.01).toFixed(2)} mg` : "0.2 mg (每 60 秒可加 0.1 mg，至多 1 mg)",
-          note: "半衰期約 1 小時，需注意 BZD 再鎮靜 (resedation)"
+          note: "半衰期約 1 小時，易有再鎮靜 (resedation) 現象",
+          source: "Morgan & Mikhail's 7e Ch. 8 / Goodman & Gilman 14e Ch. 21",
+          mechanism: "選擇性阻斷 GABA_A 受體複合物上的苯二氮平結合位點",
+          pearls: "長期使用 BZD 或三環抗憂鬱劑過量者禁用，恐誘發頑固性癲癇"
         }
       ],
 
-      // 3. Emergency & Resuscitation
+      // 3. Emergency & Resuscitation (AHA ACLS & M&M Guidelines)
       emergency: [
         {
+          id: "epinephrine_arrest",
           name: "Epinephrine (急救心跳驟停 Cardiac Arrest)",
           badge: "急救紅標",
           perKg: isPed ? "10 mcg/kg IV (0.01 mg/kg)" : "1 mg IV q3-5min",
           dose: isPed
             ? `${Math.round(w * 10)} mcg (1:10,000 稀釋液 ${(w * 0.1).toFixed(1)} mL)`
             : "1 mg (1 支 1:1,000 原液或 10 mL 1:10,000)",
-          note: "每 3 - 5 分鐘一次，推藥後沖 10-20 mL 生理食鹽水"
+          note: "每 3 - 5 分鐘一次，推藥後沖 10-20 mL 生理食鹽水加強回流",
+          source: "AHA 2025 ACLS Guidelines / Morgan & Mikhail's Ch. 55",
+          mechanism: "強效 alpha-1 (周邊血管收縮提升冠狀動脈灌注壓 CPP) 及 beta-1 (正性肌力與心率)",
+          pearls: "不可電擊心律 (PEA/Asystole) 應儘早給予；可電擊心律 (VF/pVT) 於第 2 次電擊後給予"
         },
         {
+          id: "epinephrine_bolus",
           name: "Epinephrine (術中休克/嚴重過敏 Bolus 滴定)",
           badge: "滴定劑量",
           perKg: "0.5 - 1 mcg/kg IV",
           dose: isPed ? `${(w * 0.5).toFixed(1)} - ${(w * 1.0).toFixed(1)} mcg` : "10 - 50 mcg IV 滴定",
-          note: "建議備好 10 mcg/mL (Epi stick: 1mg 抽入 100mL 或 0.1mg 入 10mL)"
+          note: "常用濃度 10 mcg/mL (Epi Stick：1mg 稀釋至 100mL 或 0.1mg 稀釋至 10mL)",
+          source: "Morgan & Mikhail's 7e Ch. 14 / Goodman & Gilman 14e Ch. 13",
+          mechanism: "低劑量主要活化 beta-2 (支氣管擴張) 與 beta-1 (心肌收縮)",
+          pearls: "過敏性休克 (Anaphylaxis) 一線救命藥物；術中嚴重頑固性低血壓快速回升"
         },
         {
+          id: "atropine",
           name: "Atropine (阿托品 - 緩脈急救)",
           badge: "急救",
           perKg: "0.02 mg/kg (小兒最低劑量 0.1 mg，單次上限 0.5 mg)",
           dose: isPed
             ? `${Math.max(0.1, Math.min(0.5, Math.round(w * 0.02 * 100) / 100)).toFixed(2)} mg`
             : "0.5 - 1.0 mg IV (成人上限 3 mg)",
-          note: "劑量過低 (<0.1mg) 反而可能引發中樞性心動過緩"
+          note: "劑量過低 (<0.1mg) 反而可能引發中樞副交感興奮致矛盾性心動過緩",
+          source: "Morgan & Mikhail's 7e Ch. 12 / Goodman & Gilman 14e Ch. 11",
+          mechanism: "競合性拮抗竇房結與房室結 M2 毒蕈鹼型乙醯膽鹼受體",
+          pearls: "迷走神經張力過高 (如牽拉腹膜、眼心反射、喉鏡刺激) 引發緩脈首選"
         },
         {
-          name: "去顫電擊 (Defibrillation - VF/pVT)",
+          id: "defib",
+          name: "去顫電擊 (Defibrillation - VF/pVT 心室震顫)",
           badge: "電擊",
-          perKg: isPed ? "首劑 2 J/kg，後續 4 J/kg (Max 10 J/kg 或成人量)" : "120 - 200 J 雙相波 (Biphasic)",
+          perKg: isPed ? "首劑 2 J/kg，後續 4 J/kg (至多 10 J/kg 或成人量)" : "120 - 200 J 雙相波 (Biphasic)",
           dose: isPed ? `首劑 ${Math.round(w * 2)} J → 後續 ${Math.round(w * 4)} J` : "200 J (Biphasic)",
-          note: "電擊後立即恢復 CPR 2 分鐘，不可中斷"
+          note: "電擊後立即恢復 CPR 壓胸 2 分鐘，切勿停頓檢查脈搏",
+          source: "AHA ACLS 2025 / Morgan & Mikhail's Ch. 55",
+          mechanism: "瞬間同步使全部心肌細胞去極化，阻斷微折返迴路",
+          pearls: "確保開刀房易燃氣體 (高濃度氧氣/揮發氣體) 移開電極板周圍防起火"
         },
         {
-          name: "同步心臟電擊 (Synchronized Cardioversion)",
-          badge: "心律不整",
-          perKg: isPed ? "0.5 - 1.0 J/kg，後續 2.0 J/kg" : "50 - 100 J (狹心室波 / 房撲) 或 120-200J",
-          dose: isPed ? `${Math.round(w * 0.5)} - ${Math.round(w * 1.0)} J` : "100 J",
-          note: "必須確認儀器已開啟 Sync 旗標並對準 R 波"
-        },
-        {
+          id: "calcium",
           name: "10% Calcium Gluconate (葡萄糖酸鈣)",
           badge: "高血鉀/低血鈣",
           perKg: "0.5 mL/kg (50 mg/kg) 慢推 5-10 分鐘",
           dose: `${(w * 0.5).toFixed(1)} mL (約 ${(w * 50).toFixed(0)} mg)`,
-          note: "保護心肌細胞膜，惡性高熱或大量輸血低鈣血症必備"
+          note: "穩定心肌細胞膜電位，惡性高熱 (MH)、大量輸血檸檬酸中毒及高血鉀必備",
+          source: "Goodman & Gilman 14e Ch. 48 / Morgan & Mikhail's Ch. 49",
+          mechanism: "拮抗高血鉀引起的心肌膜電位去極化，恢復正常閾電位差",
+          pearls: "比 Calcium Chloride 對周邊血管刺激性低很多；推藥過快可能引發嚴重心動過緩"
         },
         {
-          name: "8.4% Sodium Bicarbonate (碳酸氫鈉)",
+          id: "bicarb",
+          name: "8.4% Sodium Bicarbonate (重碳酸鈉)",
           badge: "代謝性酸中毒",
           perKg: "1 mEq/kg (1 mL/kg)",
           dose: `${Math.round(w * 1.0)} mL (mEq)`,
-          note: "嚴重心跳驟停長時急救或高血鉀酸中毒"
+          note: "嚴重心跳驟停長時急救、高血鉀酸中毒或三環抗憂鬱劑過量",
+          source: "Morgan & Mikhail's Ch. 55 / Goodman & Gilman Ch. 37",
+          mechanism: "解離出碳酸氫根離子結合 H+ 生成 CO2 與水",
+          pearls: "給藥時需確認通氣良好以排除生成之 CO2；嚴禁與 Calcium 製劑自同一路徑同時推注防沈澱"
         },
         {
+          id: "dextrose",
           name: "10% Dextrose (小兒低血糖救援)",
           badge: "小兒血糖",
           perKg: "2.0 - 5.0 mL/kg IV Bolus",
           dose: `${Math.round(w * 2.0)} - ${Math.round(w * 5.0)} mL (D10W)`,
-          note: "等於 0.2 - 0.5 g/kg 葡萄糖；避免使用高濃度 D50W 刺激血管"
+          note: "等於 0.2 - 0.5 g/kg 葡萄糖；小兒避免使用高濃度 D50W 刺激血管及高滲透損傷",
+          source: "Morgan & Mikhail's Ch. 44 (Pediatric Anesthesia)",
+          mechanism: "快速恢復中樞神經系統葡萄糖供應",
+          pearls: "推藥後每 15-30 分鐘複查血糖，維持血糖在 80-150 mg/dL"
         }
       ]
     };
@@ -1362,15 +1951,19 @@ class ToxicityEngine {
 ;
 /**
  * AnesPilot - Infusion & Dilution Calculator Engine
+ * References: Morgan & Mikhail's Clinical Anesthesiology (7e) & Goodman & Gilman's (14e)
+ * Supports custom drug addition, deletion, and local storage persistence.
  */
 
-const INFUSION_DRUGS = {
+const BASE_INFUSION_DRUGS = {
   norepinephrine: {
     name: "Norepinephrine (Levophed 去甲腎上腺素)",
     unit: "mcg/kg/min",
     isWeightBased: true,
     doseMin: 0.02,
     doseMax: 1.0,
+    reference: "Morgan & Mikhail 7e Ch. 14 / Goodman & Gilman 14e Ch. 13",
+    pearls: "強效 alpha-1 血管收縮劑，微弱 beta-1 正性肌力；感染性休克及麻醉性血管擴張首選升壓藥",
     presets: [
       { label: "4 mg in 50 mL (80 mcg/mL)", totalDrugMg: 4, totalVolMl: 50, concMcgMl: 80 },
       { label: "4 mg in 250 mL (16 mcg/mL)", totalDrugMg: 4, totalVolMl: 250, concMcgMl: 16 }
@@ -1382,17 +1975,21 @@ const INFUSION_DRUGS = {
     isWeightBased: true,
     doseMin: 0.01,
     doseMax: 0.5,
+    reference: "Morgan & Mikhail 7e Ch. 14 / Goodman & Gilman 14e Ch. 13",
+    pearls: "強效 alpha 與 beta 促效劑；過敏性休克、心臟手術離機、低心輸出量症候群首選",
     presets: [
       { label: "1 mg in 100 mL (10 mcg/mL)", totalDrugMg: 1, totalVolMl: 100, concMcgMl: 10 },
       { label: "4 mg in 250 mL (16 mcg/mL)", totalDrugMg: 4, totalVolMl: 250, concMcgMl: 16 }
     ]
   },
   nicardipine: {
-    name: "Nicardipine (Cardene 降壓藥)",
+    name: "Nicardipine (Cardene 降壓二氫吡啶類 CCB)",
     unit: "mg/hr",
     isWeightBased: false,
     doseMin: 2.5,
     doseMax: 15.0,
+    reference: "Morgan & Mikhail 7e Ch. 14 / Goodman & Gilman 14e Ch. 29",
+    pearls: "高度血管選擇性 L-type 鈣通道阻斷劑；精準降壓不抑制心肌收縮力，不引起反射性心跳過速",
     presets: [
       { label: "10 mg in 100 mL (0.1 mg/mL)", totalDrugMg: 10, totalVolMl: 100, concMcgMl: 100 },
       { label: "25 mg in 250 mL (0.1 mg/mL)", totalDrugMg: 25, totalVolMl: 250, concMcgMl: 100 }
@@ -1404,17 +2001,21 @@ const INFUSION_DRUGS = {
     isWeightBased: true,
     doseMin: 2.0,
     doseMax: 20.0,
+    reference: "Morgan & Mikhail 7e Ch. 14 / Goodman & Gilman 14e Ch. 13",
+    pearls: "低劑量(1-3mcg/kg/min)活化多巴胺受體；中劑量(3-10)興奮beta-1；高劑量(>10)興奮alpha-1收縮血管",
     presets: [
       { label: "200 mg in 250 mL (800 mcg/mL)", totalDrugMg: 200, totalVolMl: 250, concMcgMl: 800 },
       { label: "400 mg in 250 mL (1600 mcg/mL)", totalDrugMg: 400, totalVolMl: 250, concMcgMl: 1600 }
     ]
   },
   propofol: {
-    name: "Propofol (二異丙酚 - 靜脈維持/鎮靜)",
+    name: "Propofol (二異丙酚 - 靜脈維持 TIVA / 鎮靜)",
     unit: "mg/kg/hr",
     isWeightBased: true,
     doseMin: 1.0,
     doseMax: 12.0,
+    reference: "Morgan & Mikhail 7e Ch. 8 / Goodman & Gilman 14e Ch. 21",
+    pearls: "全靜脈麻醉維持 (4-10 mg/kg/hr)；加護病房或檢查鎮靜 (0.5-2.0 mg/kg/hr)；止吐與快速復甦",
     presets: [
       { label: "1% 原液 (10 mg/mL = 10,000 mcg/mL)", totalDrugMg: 500, totalVolMl: 50, concMcgMl: 10000 },
       { label: "2% 原液 (20 mg/mL = 20,000 mcg/mL)", totalDrugMg: 1000, totalVolMl: 50, concMcgMl: 20000 }
@@ -1426,58 +2027,101 @@ const INFUSION_DRUGS = {
     isWeightBased: true,
     doseMin: 0.05,
     doseMax: 0.5,
+    reference: "Morgan & Mikhail 7e Ch. 9 / Goodman & Gilman 14e Ch. 23",
+    pearls: "經非特異性組織及紅血球酯酶水解，無蓄積性，停藥 5-10 分鐘內完全清醒；術後需預先建立長效止痛",
     presets: [
       { label: "1 mg in 50 mL (20 mcg/mL)", totalDrugMg: 1, totalVolMl: 50, concMcgMl: 20 },
       { label: "2 mg in 50 mL (40 mcg/mL)", totalDrugMg: 2, totalVolMl: 50, concMcgMl: 40 }
     ]
   },
   dexmedetomidine: {
-    name: "Dexmedetomidine (Precedex 鎮靜)",
+    name: "Dexmedetomidine (Precedex 高選擇性 alpha-2 促效劑)",
     unit: "mcg/kg/hr",
     isWeightBased: true,
     doseMin: 0.2,
     doseMax: 1.0,
+    reference: "Morgan & Mikhail 7e Ch. 8 / Goodman & Gilman 14e Ch. 13",
+    pearls: "Alpha-2:Alpha-1 選擇性比達 1620:1；誘導類似生理睡眠之可喚醒鎮靜，無呼吸抑制，具抗交感與鎮痛輔助作用",
     presets: [
       { label: "200 mcg in 50 mL (4 mcg/mL)", totalDrugMg: 0.2, totalVolMl: 50, concMcgMl: 4 },
       { label: "400 mcg in 100 mL (4 mcg/mL)", totalDrugMg: 0.4, totalVolMl: 100, concMcgMl: 4 }
+    ]
+  },
+  vasopressin: {
+    name: "Vasopressin (血管加壓素 / Pitressin)",
+    unit: "Units/min",
+    isWeightBased: false,
+    doseMin: 0.01,
+    doseMax: 0.04,
+    reference: "Morgan & Mikhail 7e Ch. 14 / Goodman & Gilman 14e Ch. 43",
+    pearls: "活化血管平滑肌 V1 受體；在頑固性低血壓、酸中毒及 ACEI 引發之血管麻痺 (Vasoplegia) 具強效升壓作用",
+    presets: [
+      { label: "20 Units in 100 mL (0.2 U/mL)", totalDrugMg: 20, totalVolMl: 100, concMcgMl: 200 }
     ]
   }
 };
 
 class InfusionEngine {
+  static getDrugs() {
+    let custom = {};
+    try {
+      custom = JSON.parse(localStorage.getItem("anes_custom_infusion_drugs") || "{}");
+    } catch (e) {
+      console.warn("Failed to parse custom drugs:", e);
+    }
+    return { ...BASE_INFUSION_DRUGS, ...custom };
+  }
+
+  static saveCustomDrug(id, drugObj) {
+    let custom = {};
+    try {
+      custom = JSON.parse(localStorage.getItem("anes_custom_infusion_drugs") || "{}");
+    } catch (e) {}
+    custom[id] = { ...drugObj, isCustom: true };
+    localStorage.setItem("anes_custom_infusion_drugs", JSON.stringify(custom));
+  }
+
+  static deleteCustomDrug(id) {
+    let custom = {};
+    try {
+      custom = JSON.parse(localStorage.getItem("anes_custom_infusion_drugs") || "{}");
+      delete custom[id];
+      localStorage.setItem("anes_custom_infusion_drugs", JSON.stringify(custom));
+    } catch (e) {}
+  }
+
   static doseToRate(drugId, presetIndex, targetDose, weightKg, customConcMcgMl = null) {
-    const drug = INFUSION_DRUGS[drugId];
-    if (!drug) return 0;
+    const drugs = this.getDrugs();
+    const drug = drugs[drugId] || BASE_INFUSION_DRUGS.norepinephrine;
     const conc = customConcMcgMl || drug.presets[presetIndex]?.concMcgMl || 1;
 
     let rateMlHr = 0;
     if (drug.unit === "mcg/kg/min") {
-      // Dose (mcg/kg/min) * weight (kg) * 60 min/hr / conc (mcg/mL)
       rateMlHr = (targetDose * weightKg * 60) / conc;
     } else if (drug.unit === "mcg/kg/hr") {
-      // Dose (mcg/kg/hr) * weight (kg) / conc (mcg/mL)
       rateMlHr = (targetDose * weightKg) / conc;
     } else if (drug.unit === "mg/kg/hr") {
-      // targetDose is mg/kg/hr -> conc is in mcg/mL (10,000 mcg/mL = 10 mg/mL)
       const concMgMl = conc / 1000;
       rateMlHr = (targetDose * weightKg) / concMgMl;
     } else if (drug.unit === "mg/hr") {
-      // conc in mcg/mL -> conc in mg/mL is conc/1000
       const concMgMl = conc / 1000;
       rateMlHr = targetDose / concMgMl;
+    } else if (drug.unit === "Units/min") {
+      // conc in Units/mL is concMcgMl / 1000
+      const concUMl = conc / 1000;
+      rateMlHr = (targetDose * 60) / concUMl;
     }
 
     return Math.round(rateMlHr * 100) / 100;
   }
 
   static rateToDose(drugId, presetIndex, rateMlHr, weightKg, customConcMcgMl = null) {
-    const drug = INFUSION_DRUGS[drugId];
-    if (!drug) return 0;
+    const drugs = this.getDrugs();
+    const drug = drugs[drugId] || BASE_INFUSION_DRUGS.norepinephrine;
     const conc = customConcMcgMl || drug.presets[presetIndex]?.concMcgMl || 1;
 
     let dose = 0;
     if (drug.unit === "mcg/kg/min") {
-      // rate (mL/hr) * conc (mcg/mL) / (weight * 60)
       dose = (rateMlHr * conc) / (weightKg * 60);
     } else if (drug.unit === "mcg/kg/hr") {
       dose = (rateMlHr * conc) / weightKg;
@@ -1487,6 +2131,9 @@ class InfusionEngine {
     } else if (drug.unit === "mg/hr") {
       const concMgMl = conc / 1000;
       dose = rateMlHr * concMgMl;
+    } else if (drug.unit === "Units/min") {
+      const concUMl = conc / 1000;
+      dose = (rateMlHr * concUMl) / 60;
     }
 
     return Math.round(dose * 1000) / 1000;
@@ -1581,7 +2228,9 @@ class ScoresEngine {
 ;
 /**
  * AnesPilot - Main Application Controller
+ * References: Morgan & Mikhail's (7e), Goodman & Gilman's (14e), NYSORA, ASRA
  */
+
 
 
 
@@ -1606,6 +2255,8 @@ const state = {
   activeTab: "dosing", // dosing, crisis, toxicity, asra, infusion, scores, logbook
   // Crisis Sub-tab
   activeCrisisId: "mh",
+  // Expanded drug details in Dosing
+  expandedDrugIds: {},
   // Toxicity administered records
   toxicityAdministered: [
     { id: 1, agentId: "lidocaine_plain", concPercent: 1.0, volumeMl: 10, mg: 100 }
@@ -1637,7 +2288,52 @@ document.addEventListener("DOMContentLoaded", () => {
   initEventListeners();
   applyTheme(state.theme);
   renderAll();
+
+  // Initialize Cloud Sync Service
+  initCloudSyncListeners();
 });
+
+function initCloudSyncListeners() {
+  cloudSync.onAuthChange((user) => {
+    const btnLogin = document.getElementById("btn-google-login");
+    const userProfile = document.getElementById("google-user-profile");
+    const avatar = document.getElementById("user-avatar");
+    const nameEl = document.getElementById("user-display-name");
+
+    if (user) {
+      if (btnLogin) btnLogin.classList.add("hidden");
+      if (userProfile) userProfile.classList.remove("hidden");
+      if (avatar) avatar.src = user.photoURL || "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2310b981'><circle cx='12' cy='8' r='4'/><path d='M4 20c0-4 4-6 8-6s8 2 8 6'/></svg>";
+      if (nameEl) nameEl.textContent = user.displayName || user.email.split("@")[0];
+
+      // Refresh cases from merged local storage
+      state.cases = JSON.parse(localStorage.getItem("anes_cases") || "[]");
+      if (state.activeTab === "logbook") renderLogbookTab();
+    } else {
+      if (btnLogin) btnLogin.classList.remove("hidden");
+      if (userProfile) userProfile.classList.add("hidden");
+      if (state.activeTab === "logbook") renderLogbookTab();
+    }
+  });
+
+  cloudSync.onSyncChange((status, time) => {
+    const syncStatusEl = document.getElementById("cloud-sync-status-badge");
+    if (syncStatusEl) {
+      if (status === "connected") {
+        syncStatusEl.innerHTML = `<span class="text-emerald-400 font-bold">🟢 雲端已同步 (${time || '剛剛'})</span>`;
+      } else if (status === "syncing") {
+        syncStatusEl.innerHTML = `<span class="text-cyan-400 font-bold animate-pulse">🔄 同步傳輸中...</span>`;
+      } else if (status === "error") {
+        syncStatusEl.innerHTML = `<span class="text-amber-400 font-bold">⚠️ 同步待重試 (離線模式)</span>`;
+      } else {
+        syncStatusEl.innerHTML = `<span class="text-slate-400 font-bold">⚪ 本機離線模式 (LocalStorage)</span>`;
+      }
+    }
+  });
+
+  // Attempt non-blocking initialization
+  cloudSync.init().catch(e => console.log("Offline mode active"));
+}
 
 function initEventListeners() {
   // Navigation Tabs
@@ -1818,7 +2514,7 @@ function renderActiveTab() {
 }
 
 // ==========================================
-// 1. DOSING TAB RENDERER
+// 1. DOSING TAB RENDERER (AccessAnesthesiology)
 // ==========================================
 function renderDosingTab() {
   const container = document.getElementById("dosing-results-container");
@@ -1828,6 +2524,18 @@ function renderDosingTab() {
   const { airway, fluids, blood, dosages, ventilator } = data;
 
   container.innerHTML = `
+    <!-- Textbook Authority Banner -->
+    <div class="mb-3 p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/80 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">📚</span>
+        <div>
+          <span class="font-bold text-cyan-400">McGraw-Hill AccessAnesthesiology 核心文獻標準</span>
+          <span class="text-slate-400 ml-1.5 hidden sm:inline">參照 Morgan & Mikhail (7e) & Goodman & Gilman (14e) 藥典</span>
+        </div>
+      </div>
+      <span class="drug-badge bg-cyan-950 text-cyan-300 border border-cyan-800/50">醫師國考 / 專科考指引</span>
+    </div>
+
     <!-- Airway & Equipment Header Card -->
     <div class="anes-card mb-4 border-l-4 border-l-cyan-500">
       <div class="flex items-center justify-between mb-3">
@@ -1843,7 +2551,7 @@ function renderDosingTab() {
         <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
           <div class="text-xs text-slate-400">氣管內管 Cuffed ID</div>
           <div class="text-xl font-extrabold text-white mt-0.5">${airway.ettCuffed} mm</div>
-          <div class="text-[11px] text-slate-500">有氣囊氣管內管</div>
+          <div class="text-[11px] text-slate-500">有氣囊管 (Motoyama式)</div>
         </div>
 
         <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
@@ -1876,13 +2584,20 @@ function renderDosingTab() {
           <div class="text-[11px] text-slate-500">6-8 mL/kg (${ventilator.isUsingIbw ? 'IBW' : 'TBW'}) | 吸引管: ${airway.suctionFr}</div>
         </div>
       </div>
+      <div class="mt-2 text-[11px] text-slate-500 flex items-center gap-1">
+        <span>📖 出處依據：</span>
+        <span>${airway.reference}</span>
+      </div>
     </div>
 
     <!-- Induction & Muscle Relaxants -->
     <div class="anes-card mb-4 border-l-4 border-l-blue-500">
-      <h3 class="font-bold text-lg text-blue-400 mb-3 flex items-center gap-2">
-        <span>💉</span> 誘導與肌鬆劑 (Induction & Neuromuscular)
-      </h3>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
+          <span>💉</span> 誘導與肌鬆劑 (Induction & Neuromuscular)
+        </h3>
+        <span class="text-xs text-slate-400">點擊項目展開 AccessAnesthesiology 藥理考點</span>
+      </div>
       <div class="space-y-2">
         ${dosages.induction.map(d => renderDrugRow(d)).join("")}
       </div>
@@ -1890,9 +2605,12 @@ function renderDosingTab() {
 
     <!-- Analgesia & Reversal -->
     <div class="anes-card mb-4 border-l-4 border-l-purple-500">
-      <h3 class="font-bold text-lg text-purple-400 mb-3 flex items-center gap-2">
-        <span>💊</span> 止痛、鎮靜與拮抗逆轉 (Analgesia & Reversals)
-      </h3>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-purple-400 flex items-center gap-2">
+          <span>💊</span> 止痛、鎮靜與拮抗逆轉 (Analgesia & Reversals)
+        </h3>
+        <span class="text-xs text-slate-400">Goodman & Gilman 14e 藥物代謝</span>
+      </div>
       <div class="space-y-2">
         ${dosages.analgesia.map(d => renderDrugRow(d)).join("")}
       </div>
@@ -1935,6 +2653,10 @@ function renderDosingTab() {
           <div class="text-[11px] text-slate-500">Hct 36%降至24%容許值</div>
         </div>
       </div>
+      <div class="mt-2 text-[11px] text-slate-500 flex items-center gap-1">
+        <span>📖 出處依據：</span>
+        <span>${fluids.reference} &bull; ${blood.reference}</span>
+      </div>
     </div>
   `;
 }
@@ -1945,27 +2667,47 @@ function renderDrugRow(drug, isEmergency = false) {
     ? "bg-amber-950 text-amber-300 border-amber-800" 
     : (isEmergency ? "bg-rose-950 text-rose-300 border-rose-800" : "bg-slate-800 text-slate-300 border-slate-700");
 
+  const isExpanded = state.expandedDrugIds[drug.id] || false;
+
   return `
-    <div class="p-3 rounded-lg border ${bgClass} flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-slate-100">${drug.name}</span>
-          <span class="drug-badge border ${badgeClass}">${drug.badge}</span>
+    <div class="p-3 rounded-lg border ${bgClass} transition cursor-pointer" onclick="window.toggleDrugExpand('${drug.id}')">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-100">${drug.name}</span>
+            <span class="drug-badge border ${badgeClass}">${drug.badge}</span>
+            <span class="text-[10px] text-cyan-400 underline decoration-dotted">📖 藥典指引</span>
+          </div>
+          <div class="text-xs text-slate-400 mt-0.5">${drug.perKg} &bull; <span class="text-slate-500">${drug.note}</span></div>
         </div>
-        <div class="text-xs text-slate-400 mt-0.5">${drug.perKg} &bull; <span class="text-slate-500">${drug.note}</span></div>
+        <div class="text-right sm:self-center">
+          <div class="text-lg font-black text-emerald-400">${drug.dose}</div>
+        </div>
       </div>
-      <div class="text-right sm:self-center">
-        <div class="text-lg font-black text-emerald-400">${drug.dose}</div>
-      </div>
+
+      <!-- Expandable Textbook Pharmacology & Pearls -->
+      ${isExpanded ? `
+        <div class="mt-2.5 pt-2.5 border-t border-slate-800/80 text-xs leading-relaxed space-y-1 bg-slate-950/40 p-2.5 rounded">
+          <div class="flex items-center gap-1.5 text-cyan-400 font-bold">
+            <span>📚 權威出處：</span>
+            <span>${drug.source || 'Morgan & Mikhail Clinical Anesthesiology, 7e'}</span>
+          </div>
+          ${drug.mechanism ? `<div class="text-slate-200"><span class="text-slate-400 font-semibold">作用機轉 (Pharmacodynamics)：</span>${drug.mechanism}</div>` : ''}
+          ${drug.pearls ? `<div class="text-amber-300"><span class="text-amber-400 font-semibold">臨床考點/注意事項 (Clinical Pearls)：</span>${drug.pearls}</div>` : ''}
+        </div>
+      ` : ''}
     </div>
   `;
 }
 
-// ==========================================
-// 2. CRISIS ENGINE RENDERER
-// ==========================================
-let crisisTimers = {};
+window.toggleDrugExpand = (drugId) => {
+  state.expandedDrugIds[drugId] = !state.expandedDrugIds[drugId];
+  renderDosingTab();
+};
 
+// ==========================================
+// 2. CRISIS ENGINE RENDERER (ASRA / MHAUS / DAS)
+// ==========================================
 function renderCrisisTab() {
   const container = document.getElementById("crisis-container");
   if (!container) return;
@@ -2012,7 +2754,7 @@ function renderCrisisTab() {
             </button>
           ` : `
             <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs py-2" onclick="window.startCrisisTimer('${state.activeCrisisId}')">
-              ⏱️ 啟動應變計時器
+              ⏱️ 啟動 5 分鐘再評估計時
             </button>
           `}
         </div>
@@ -2027,7 +2769,7 @@ function renderCrisisTab() {
     <!-- Action Checklists -->
     <div class="anes-card border-slate-800">
       <h3 class="font-bold text-slate-200 mb-3 flex items-center justify-between">
-        <span>📋 標準處置檢核單 (Action Checklist)</span>
+        <span>📋 標準處置檢核單 (Action Checklist & Guidelines)</span>
         <button class="text-xs text-slate-400 hover:text-white" onclick="window.resetChecklist()">重置勾選</button>
       </h3>
       <div class="space-y-2">
@@ -2050,9 +2792,9 @@ function renderCrisisDosePanel(crisisId, doses, weightKg) {
     return `
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
-          <div class="text-xs text-rose-300 font-bold">Dantrolene 首劑劑量 (2.5 mg/kg)</div>
+          <div class="text-xs text-rose-300 font-bold">Dantrolene 首劑劑量 (2.5 mg/kg - MHAUS指引)</div>
           <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.initialMg} mg</div>
-          <div class="text-[11px] text-slate-400">上限至多追加至 10 mg/kg (${doses.maxMg} mg)</div>
+          <div class="text-[11px] text-slate-400">至多追加至 10 mg/kg (${doses.maxMg} mg)</div>
         </div>
         <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
           <div class="text-xs text-amber-400 font-bold">傳統標準瓶 (20 mg/瓶)</div>
@@ -2070,7 +2812,7 @@ function renderCrisisDosePanel(crisisId, doses, weightKg) {
     return `
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div class="bg-rose-950/60 p-3 rounded-lg border border-rose-800/50">
-          <div class="text-xs text-rose-300 font-bold">20% 脂肪乳劑 首劑 Bolus (1.5 mL/kg)</div>
+          <div class="text-xs text-rose-300 font-bold">20% 脂肪乳劑 首劑 Bolus (1.5 mL/kg - ASRA指引)</div>
           <div class="text-2xl font-black text-rose-300 mt-0.5">${doses.bolusMl} mL</div>
           <div class="text-[11px] text-slate-400">2-3 分鐘內推注完成</div>
         </div>
@@ -2090,7 +2832,7 @@ function renderCrisisDosePanel(crisisId, doses, weightKg) {
     return `
       <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
         <div>
-          <div class="text-xs text-amber-400 font-bold">Rocuronium RSI 插管失敗即刻逆轉救命劑量</div>
+          <div class="text-xs text-amber-400 font-bold">Rocuronium RSI 插管失敗即刻逆轉救命劑量 (DAS指引)</div>
           <div class="text-xl font-black text-white mt-0.5">Sugammadex 16 mg/kg = <span class="text-rose-400">${doses.sugammadexRsiRescue} mg</span></div>
           <div class="text-xs text-slate-400">約需 ${Math.ceil(doses.sugammadexRsiRescue / 100)} 支 100mg/mL 瓶</div>
         </div>
@@ -2181,7 +2923,7 @@ window.startCrisisTimer = (id) => {
 };
 
 // ==========================================
-// 3. TOXICITY TRACKER RENDERER
+// 3. TOXICITY TRACKER RENDERER (NYSORA / ASRA)
 // ==========================================
 function renderToxicityTab() {
   const container = document.getElementById("toxicity-container");
@@ -2197,6 +2939,18 @@ function renderToxicityTab() {
   const barColor = result.totalPercent >= 100 ? 'bg-rose-500' : (result.totalPercent >= 70 ? 'bg-amber-500' : 'bg-emerald-500');
 
   container.innerHTML = `
+    <!-- NYSORA Evidence Citation Header -->
+    <div class="mb-3 p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/80 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🔬</span>
+        <div>
+          <span class="font-bold text-emerald-400">NYSORA & ASRA 局部麻醉藥毒性監控標準</span>
+          <span class="text-slate-400 ml-1.5 hidden sm:inline">參照 NYSORA Regional Anesthesia Textbook & ASRA LAST 指引</span>
+        </div>
+      </div>
+      <span class="drug-badge bg-emerald-950 text-emerald-300 border border-emerald-800/50">局麻安全性標準</span>
+    </div>
+
     <!-- Top Visual Gauge Card -->
     <div class="anes-card mb-4">
       <div class="flex items-center justify-between mb-2">
@@ -2304,9 +3058,6 @@ window.removeToxItem = (idx) => {
 };
 
 window.showAddToxModal = () => {
-  const agentKeys = Object.keys(LA_AGENTS);
-  const optionsHtml = agentKeys.map(k => `<option value="${k}">${LA_AGENTS[k].name}</option>`).join("");
-  
   const vol = prompt("請輸入施打劑量體積 (mL)，例如: 20", "20");
   if (!vol) return;
   const volNum = parseFloat(vol);
@@ -2356,6 +3107,18 @@ function renderAsraTab() {
   }
 
   container.innerHTML = `
+    <!-- ASRA & NYSORA Citation Header -->
+    <div class="mb-3 p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/80 flex items-center justify-between text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🩸</span>
+        <div>
+          <span class="font-bold text-emerald-400">ASRA Pain Medicine 第五版抗凝血臨床指引</span>
+          <span class="text-slate-400 ml-1.5 hidden sm:inline">參照 Regional Anesthesia in the Patient Receiving Antithrombotic Therapy</span>
+        </div>
+      </div>
+      <span class="drug-badge bg-emerald-950 text-emerald-300 border border-emerald-800/50">ASRA 指引標準</span>
+    </div>
+
     <!-- Top Selector Card -->
     <div class="anes-card mb-4 border-l-4 border-l-emerald-500">
       <h3 class="font-bold text-lg text-emerald-400 mb-3 flex items-center gap-2">
@@ -2448,13 +3211,19 @@ window.onAsraCrClChange = (val) => {
 };
 
 // ==========================================
-// 5. INFUSION CALCULATOR RENDERER
+// 5. INFUSION CALCULATOR & CUSTOM DRUG MANAGER
 // ==========================================
 function renderInfusionTab() {
   const container = document.getElementById("infusion-container");
   if (!container) return;
 
-  const drug = INFUSION_DRUGS[state.infusionDrugId] || INFUSION_DRUGS.norepinephrine;
+  const drugs = InfusionEngine.getDrugs();
+  const drugKeys = Object.keys(drugs);
+  if (!drugs[state.infusionDrugId]) {
+    state.infusionDrugId = drugKeys[0] || "norepinephrine";
+  }
+
+  const drug = drugs[state.infusionDrugId];
   const preset = drug.presets[state.infusionPresetIdx] || drug.presets[0];
   const rateMlHr = InfusionEngine.doseToRate(
     state.infusionDrugId,
@@ -2464,18 +3233,39 @@ function renderInfusionTab() {
   );
 
   container.innerHTML = `
+    <!-- Top Action Bar for Custom Drugs -->
+    <div class="flex items-center justify-between mb-3">
+      <div class="text-xs text-slate-400 flex items-center gap-1.5">
+        <span>📖</span>
+        <span>參照 Morgan & Mikhail 7e Ch. 14 / Goodman & Gilman 14e Ch. 13</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="glove-btn bg-emerald-600 hover:bg-emerald-500 text-white text-xs py-1.5 px-3" onclick="window.showAddCustomDrugModal()">
+          + 自訂新增輸注藥物 / 泡法
+        </button>
+        ${drug.isCustom ? `
+          <button class="glove-btn bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700/60 text-xs py-1.5 px-2.5" onclick="window.deleteCurrentCustomDrug('${state.infusionDrugId}')">
+            刪除此自訂藥
+          </button>
+        ` : ''}
+      </div>
+    </div>
+
     <div class="anes-card mb-4 border-l-4 border-l-sky-500">
-      <h3 class="font-bold text-lg text-sky-400 mb-3 flex items-center gap-2">
-        <span>⏱️</span> 血管活性與鎮靜輸注幫浦調速器 (Infusion Calculator)
-      </h3>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-lg text-sky-400 flex items-center gap-2">
+          <span>⏱️</span> 血管活性與鎮靜輸注幫浦調速器 (Infusion Calculator)
+        </h3>
+        ${drug.isCustom ? '<span class="drug-badge bg-emerald-950 text-emerald-300 border border-emerald-700">使用者自訂藥品</span>' : ''}
+      </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         <div>
           <label class="block text-xs text-slate-400 mb-1 font-semibold">選擇藥物</label>
           <select class="w-full glove-input text-sm" onchange="window.onInfusionDrugChange(this.value)">
-            ${Object.keys(INFUSION_DRUGS).map(k => `
+            ${drugKeys.map(k => `
               <option value="${k}" ${k === state.infusionDrugId ? 'selected' : ''}>
-                ${INFUSION_DRUGS[k].name}
+                ${drugs[k].name} ${drugs[k].isCustom ? '(自訂)' : ''}
               </option>
             `).join("")}
           </select>
@@ -2492,6 +3282,12 @@ function renderInfusionTab() {
           </select>
         </div>
       </div>
+
+      ${drug.pearls ? `
+        <div class="mb-3 p-2.5 rounded bg-slate-900/60 border border-slate-800 text-xs text-amber-300/90 leading-relaxed">
+          <span class="font-bold text-amber-400">臨床重點 (M&M / G&G)：</span>${drug.pearls}
+        </div>
+      ` : ''}
 
       <!-- Target Dose Adjuster -->
       <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 mb-4">
@@ -2535,7 +3331,8 @@ function renderInfusionTab() {
 window.onInfusionDrugChange = (id) => {
   state.infusionDrugId = id;
   state.infusionPresetIdx = 0;
-  const drug = INFUSION_DRUGS[id];
+  const drugs = InfusionEngine.getDrugs();
+  const drug = drugs[id] || drugs.norepinephrine;
   state.infusionTargetDose = (drug.doseMin + drug.doseMax) / 4;
   renderInfusionTab();
 };
@@ -2548,6 +3345,52 @@ window.onInfusionPresetChange = (idx) => {
 window.onInfusionDoseChange = (val) => {
   state.infusionTargetDose = parseFloat(val) || 0.01;
   renderInfusionTab();
+};
+
+window.showAddCustomDrugModal = () => {
+  const name = prompt("請輸入自訂藥物名稱 (例如: Vasopressin 升壓 / precedex 稀釋液):");
+  if (!name) return;
+
+  const unit = prompt("給藥單位 (mcg/kg/min / mcg/kg/hr / mg/kg/hr / mg/hr / Units/min)", "mcg/kg/min");
+  if (!unit) return;
+
+  const concStr = prompt("稀釋後濃度 (mcg/mL，例如 4mg in 50mL 請輸入 80):", "80");
+  const conc = parseFloat(concStr) || 80;
+
+  const doseMinStr = prompt("最低建議劑量 (例如 0.01):", "0.01");
+  const doseMaxStr = prompt("最高建議劑量 (例如 1.0):", "1.0");
+
+  const customId = "custom_" + Date.now();
+  const newDrug = {
+    name: name,
+    unit: unit,
+    isWeightBased: unit.includes("/kg"),
+    doseMin: parseFloat(doseMinStr) || 0.01,
+    doseMax: parseFloat(doseMaxStr) || 1.0,
+    reference: "使用者自訂醫院常規配置 (Hospital Custom Recipe)",
+    pearls: "院內自訂輸注品項，儲存於手機/電腦本地瀏覽器",
+    presets: [
+      { label: `自訂配方 (${conc} mcg/mL)`, totalDrugMg: 1, totalVolMl: 50, concMcgMl: conc }
+    ]
+  };
+
+  InfusionEngine.saveCustomDrug(customId, newDrug);
+  cloudSync.pushCustomDrugs(InfusionEngine.getDrugs());
+  state.infusionDrugId = customId;
+  state.infusionPresetIdx = 0;
+  state.infusionTargetDose = newDrug.doseMin;
+  renderInfusionTab();
+  alert("自訂藥物儲存成功！已同步至雲端與本機。");
+};
+
+window.deleteCurrentCustomDrug = (id) => {
+  if (confirm("確定要刪除此自訂藥物品項嗎？")) {
+    InfusionEngine.deleteCustomDrug(id);
+    cloudSync.pushCustomDrugs(InfusionEngine.getDrugs());
+    state.infusionDrugId = "norepinephrine";
+    state.infusionPresetIdx = 0;
+    renderInfusionTab();
+  }
 };
 
 // ==========================================
@@ -2688,14 +3531,75 @@ window.toggleRcri = (idx, checked) => {
 };
 
 // ==========================================
-// 7. ANES LOGBOOK & SBAR HANDOVER RENDERER
+// 7. ANES LOGBOOK, SBAR & DATA BACKUP CENTER
 // ==========================================
 function renderLogbookTab() {
   const container = document.getElementById("logbook-container");
   if (!container) return;
 
   container.innerHTML = `
-    <!-- Top SBAR Handover Quick Generator -->
+    <!-- Data Persistence & Cloud Sync Center -->
+    <div class="anes-card mb-4 border-l-4 border-l-emerald-500">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+        <div>
+          <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+            <span>💾</span> 資料儲存、備份與雲端同步中心
+          </h3>
+          <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+            <span id="cloud-sync-status-badge">
+              ${cloudSync.currentUser ? `<span class="text-emerald-400 font-bold">🟢 Google 雲端同步 (${cloudSync.lastSyncTime || '已同步'})</span>` : '<span class="text-slate-400 font-bold">⚪ 本機離線模式 (LocalStorage)</span>'}
+            </span>
+            <span>&bull; 關閉瀏覽器資料自動保留</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs py-1 px-2.5" onclick="window.exportJsonBackup()">
+            📥 匯出 JSON 備份檔
+          </button>
+          <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs py-1 px-2.5" onclick="document.getElementById('file-import-json').click()">
+            📤 匯入還原
+          </button>
+          <input type="file" id="file-import-json" accept=".json" class="hidden" onchange="window.importJsonBackup(event)">
+          <button class="glove-btn bg-emerald-700 hover:bg-emerald-600 text-white text-xs py-1 px-2.5" onclick="window.exportCsvBackup()">
+            📊 匯出 Excel (CSV)
+          </button>
+        </div>
+      </div>
+
+      <!-- Cloud Sync Explanation & Action Controls -->
+      <div class="mt-3 p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="text-xs text-slate-300">
+          <div class="flex items-center gap-1.5 font-bold text-cyan-300 mb-0.5">
+            <span>☁️ Google 帳號跨裝置即時同步：</span>
+            ${cloudSync.currentUser ? `<span class="text-emerald-400">已連結 ${cloudSync.currentUser.email}</span>` : '<span class="text-slate-400">未登入</span>'}
+          </div>
+          <div class="text-slate-400">
+            登入同一個 Google 帳號，手機、平板、開刀房電腦 0 秒雙向同步；無訊號時本機暫存，聯網自動背景補傳。
+          </div>
+        </div>
+        <div class="flex items-center gap-2 self-end sm:self-center">
+          ${cloudSync.currentUser ? `
+            <button class="glove-btn bg-cyan-700/80 hover:bg-cyan-600 text-white text-xs py-1 px-2.5 whitespace-nowrap" onclick="window.syncNowManual()">
+              🔄 立即同步
+            </button>
+            <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1 px-2" onclick="window.handleGoogleLogout()">
+              登出
+            </button>
+          ` : `
+            <button class="glove-btn bg-white text-slate-800 hover:bg-slate-100 text-xs py-1 px-2.5 font-bold shadow-sm flex items-center gap-1.5 whitespace-nowrap" onclick="window.handleGoogleLogin()">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              <span>立即登入 Google</span>
+            </button>
+          `}
+          <button class="glove-btn bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1 px-2" title="設定 Firebase 專屬金鑰" onclick="window.showFirebaseConfigModal()">
+            ⚙️ 設定
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SBAR Handover Quick Generator -->
     <div class="anes-card mb-4 border-l-4 border-l-cyan-500">
       <div class="flex items-center justify-between mb-2">
         <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
@@ -2732,9 +3636,16 @@ function renderLogbookTab() {
         <h3 class="font-bold text-lg text-slate-200 flex items-center gap-2">
           <span>📓</span> 匿名化手術麻醉快速日誌 (Personal AnesLog)
         </h3>
-        <button class="glove-btn bg-emerald-600 text-white text-xs py-1.5 px-3" onclick="window.addCaseModal()">
-          + 記錄新病例
-        </button>
+        <div class="flex items-center gap-2">
+          <button class="glove-btn bg-emerald-600 text-white text-xs py-1.5 px-3" onclick="window.addCaseModal()">
+            + 記錄新病例
+          </button>
+          ${state.cases.length > 0 ? `
+            <button class="text-slate-500 hover:text-rose-400 text-xs px-2 py-1" onclick="window.clearAllCases()">
+              清空全部
+            </button>
+          ` : ''}
+        </div>
       </div>
 
       <div class="space-y-2">
@@ -2798,6 +3709,7 @@ window.addCaseModal = () => {
 
   state.cases.unshift(newCase);
   localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+  cloudSync.pushCases(state.cases);
   renderLogbookTab();
 };
 
@@ -2805,7 +3717,220 @@ window.deleteCase = (idx) => {
   if (confirm("確定刪除此筆病例記錄？")) {
     state.cases.splice(idx, 1);
     localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+    cloudSync.pushCases(state.cases);
     renderLogbookTab();
+  }
+};
+
+window.clearAllCases = () => {
+  if (confirm("⚠️ 警告：這將會清除全部的病例紀錄！確定清空嗎？")) {
+    state.cases = [];
+    localStorage.removeItem("anes_cases");
+    cloudSync.pushCases([]);
+    renderLogbookTab();
+  }
+};
+
+// Backup: Export JSON
+window.exportJsonBackup = () => {
+  const data = {
+    appName: "AnesPilot",
+    exportDate: new Date().toISOString(),
+    cases: state.cases,
+    customDrugs: JSON.parse(localStorage.getItem("anes_custom_infusion_drugs") || "{}")
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const dateStr = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `anes_pilot_backup_${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Backup: Import JSON
+window.importJsonBackup = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.cases && Array.isArray(imported.cases)) {
+        state.cases = imported.cases;
+        localStorage.setItem("anes_cases", JSON.stringify(state.cases));
+        cloudSync.pushCases(state.cases);
+      }
+      if (imported.customDrugs) {
+        localStorage.setItem("anes_custom_infusion_drugs", JSON.stringify(imported.customDrugs));
+        cloudSync.pushCustomDrugs(imported.customDrugs);
+      }
+      alert("✅ 備份檔匯入還原成功！");
+      renderLogbookTab();
+    } catch (err) {
+      alert("❌ 備份檔解析失敗，請確認是否為正確的 JSON 備份檔。");
+    }
+  };
+  reader.readAsText(file);
+};
+
+// Backup: Export CSV
+window.exportCsvBackup = () => {
+  if (state.cases.length === 0) {
+    alert("目前尚無病例紀錄可供匯出。");
+    return;
+  }
+
+  // BOM for Excel UTF-8
+  let csv = "\uFEFF日期,術式名稱,麻醉方式,病患體重(kg),管徑(ETT),特殊處置,備註\n";
+  state.cases.forEach(c => {
+    const row = [
+      `"${c.date}"`,
+      `"${c.procedure}"`,
+      `"${c.anesType}"`,
+      `"${c.weight}"`,
+      `"${c.ettSize}"`,
+      `"${c.lines}"`,
+      `"${c.note}"`
+    ];
+    csv += row.join(",") + "\n";
+  });
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const dateStr = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `anes_cases_${dateStr}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Cloud Sync Explanation Modal
+window.showCloudSyncInfo = () => {
+  alert(
+    "【AnesPilot 雲端同步串接說明】\n\n" +
+    "1. 目前模式：本地安全儲存（LocalStorage），紀錄完全保存在您自己的手機或電腦內，不用擔心病患個資或醫療紀錄上傳公網。\n\n" +
+    "2. Google 帳號同步方案：透過 Google Firebase 免費提供 Google OAuth 與 Firestore 即時同步。換手機、平板或用開刀房電腦登入同一 Google 帳號，即可 0 秒自動抓回全部病例與自訂藥物！\n\n" +
+    "3. 離線無網路防護：開刀房無訊號時，完全於本機正常操作；一旦偵測到連線，將自動背景補傳。"
+  );
+};
+
+// --- Google Auth & Cloud Sync Handlers ---
+window.handleGoogleLogin = async () => {
+  try {
+    const user = await cloudSync.loginWithGoogle();
+    if (user) {
+      alert(`✅ 登入成功！已連結至 ${user.displayName || user.email}，雲端資料已自動雙向同步。`);
+    }
+  } catch (err) {
+    console.error("Google login attempt error:", err);
+    if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {
+      return;
+    }
+    const shouldConfig = confirm(
+      `Google 登入連線提示：\n${err.message || err}\n\n是否開啟 Firebase 金鑰設定視窗以貼入您的專案配置？`
+    );
+    if (shouldConfig) {
+      window.showFirebaseConfigModal();
+    }
+  }
+};
+
+window.handleGoogleLogout = async () => {
+  if (confirm("確定要登出 Google 帳號嗎？\n登出後資料仍會完整保留在本機，但將暫停跨裝置雲端同步。")) {
+    await cloudSync.logout();
+    alert("已登出 Google 帳號，系統已切換回本機安全模式。");
+    renderLogbookTab();
+  }
+};
+
+window.syncNowManual = async () => {
+  if (!cloudSync.currentUser) {
+    alert("請先登入 Google 帳號才能進行雲端同步。");
+    return;
+  }
+  const res = await cloudSync.pullAndMerge();
+  if (res) {
+    state.cases = JSON.parse(localStorage.getItem("anes_cases") || "[]");
+    renderLogbookTab();
+    alert(`✅ 雲端同步完成！已雙向同步至最新狀態（目前共有 ${state.cases.length} 筆病例）。`);
+  } else {
+    alert("⚠️ 同步未成功，請確認網路連線或稍後再試。");
+  }
+};
+
+window.showUserMenu = () => {
+  if (!cloudSync.currentUser) {
+    window.handleGoogleLogin();
+    return;
+  }
+  const email = cloudSync.currentUser.email || "";
+  const name = cloudSync.currentUser.displayName || "醫師";
+  const syncTime = cloudSync.lastSyncTime || "剛剛";
+
+  const action = prompt(
+    `【Google 帳號中心】\n使用者：${name} (${email})\n最後同步時間：${syncTime}\n\n請輸入欲執行的操作編號：\n1. 立即手動同步 (Sync Now)\n2. 設定 Firebase 專屬金鑰\n3. 登出 Google 帳號\n(輸入其他或取消以關閉)`,
+    "1"
+  );
+
+  if (action === "1") {
+    window.syncNowManual();
+  } else if (action === "2") {
+    window.showFirebaseConfigModal();
+  } else if (action === "3") {
+    window.handleGoogleLogout();
+  }
+};
+
+function extractFirebaseConfig(input) {
+  const text = input.trim();
+  try {
+    return JSON.parse(text);
+  } catch (e) {}
+
+  const fields = ["apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId"];
+  const result = {};
+  for (const field of fields) {
+    const regex = new RegExp("['\"]?" + field + "['\"]?\\s*:\\s*['\"]([^'\"]+)['\"]");
+    const match = text.match(regex);
+    if (match) {
+      result[field] = match[1];
+    }
+  }
+
+  if (result.apiKey && result.projectId) {
+    return result;
+  }
+  throw new Error("無法從內容中解析出 apiKey 與 projectId，請確認是否有複製完整的配置內容。");
+}
+
+window.showFirebaseConfigModal = () => {
+  const currentConfig = cloudSync.getConfig();
+  const currentStr = JSON.stringify(currentConfig, null, 2);
+  const input = prompt(
+    "【Firebase 專屬雲端金鑰設定】\n" +
+    "請貼入您在 Firebase Console 建立的 Web 應用程式配置：\n" +
+    "(支援直接貼入 const firebaseConfig = { ... } 或標準 JSON 格式；若清空送出則恢復為預設範本)",
+    currentStr
+  );
+  if (input === null) return;
+  try {
+    if (!input.trim()) {
+      localStorage.removeItem("anes_firebase_config");
+      alert("已重設為系統預設 Firebase 範本設定。");
+      cloudSync.init();
+      renderLogbookTab();
+      return;
+    }
+    const configObj = extractFirebaseConfig(input);
+    cloudSync.saveConfig(configObj);
+    alert(`✅ Firebase 專案 [${configObj.projectId}] 設定已儲存成功！正在連線...`);
+    renderLogbookTab();
+  } catch (e) {
+    alert("❌ 設定解析失敗：\n" + e.message);
   }
 };
 

@@ -15,11 +15,11 @@
   <!-- Custom Dark OR & High Contrast Clinical Styles -->
   <link rel="stylesheet" href="./css/app.css">
 </head>
-<body class="bg-[#05070a] text-slate-100 min-h-screen">
+<body class="min-h-screen">
   <div class="app-container pb-24 md:pb-8">
     
     <!-- Top Nav Header -->
-    <header class="sticky top-0 z-30 bg-[#070b12]/95 backdrop-blur-md border-b border-slate-800/80 px-3 py-2.5">
+    <header class="app-header sticky top-0 z-30 backdrop-blur-md border-b px-3 py-2.5">
       <div class="flex items-center justify-between gap-2">
         <!-- Logo & Branding -->
         <div class="flex items-center gap-2">
@@ -37,15 +37,32 @@
 
         <!-- Quick Patient Summary Badge & Crisis Action -->
         <div class="flex items-center gap-2">
+          <!-- Google Sign-In & Cloud Sync Profile -->
+          <div id="google-auth-container" class="flex items-center">
+            <button id="btn-google-login" class="glove-btn py-1 px-2.5 bg-white text-slate-800 hover:bg-slate-100 border border-slate-300 font-bold text-xs rounded-lg shadow-sm flex items-center gap-1.5" onclick="window.handleGoogleLogin()">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              <span class="hidden sm:inline">Google 登入同步</span>
+              <span class="sm:hidden">登入</span>
+            </button>
+
+            <div id="google-user-profile" class="hidden flex items-center gap-1.5 cursor-pointer bg-slate-900/80 hover:bg-slate-800/80 p-1 pr-2 rounded-full border border-slate-700/80" onclick="window.showUserMenu()">
+              <img id="user-avatar" class="w-6 h-6 rounded-full border border-emerald-500 object-cover" src="" alt="User">
+              <div class="text-left hidden sm:block">
+                <div id="user-display-name" class="text-[11px] font-bold text-slate-100 truncate max-w-[80px]">醫師</div>
+              </div>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" title="雲端即時同步中"></span>
+            </div>
+          </div>
+
           <!-- Theme Toggle -->
-          <button id="btn-theme-toggle" class="glove-btn py-1.5 px-2.5 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800">
+          <button id="btn-theme-toggle" class="glove-btn py-1.5 px-2 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800">
             <span id="theme-icon">🌙 刀房暗室</span>
           </button>
 
           <!-- CRISIS RED BUTTON -->
-          <button id="btn-quick-crisis" class="glove-btn py-1.5 px-3 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs rounded-lg shadow-lg shadow-red-950/80 border border-red-500 flex items-center gap-1.5 animate-pulse">
+          <button id="btn-quick-crisis" class="glove-btn py-1.5 px-2.5 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs rounded-lg shadow-lg shadow-red-950/80 border border-red-500 flex items-center gap-1 animate-pulse">
             <span>🚨</span>
-            <span class="tracking-wide">CRISIS 危急應變</span>
+            <span class="tracking-wide">CRISIS</span>
           </button>
         </div>
       </div>
@@ -126,7 +143,7 @@
     </header>
 
     <!-- Desktop / Tablet Top Tabs (Hidden on small screens) -->
-    <div class="hidden md:flex bg-[#0a0f18] border-b border-slate-800 px-3 overflow-x-auto">
+    <div class="desktop-tabs-bar hidden md:flex border-b px-3 overflow-x-auto">
       <div class="nav-tab active" data-tab="dosing">
         <span>⚡ 體重速查盤</span>
       </div>
@@ -189,7 +206,7 @@
     </main>
 
     <!-- Mobile Bottom Tab Navigation (Fixed at bottom for thumb friendliness) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070b12]/95 backdrop-blur-lg border-t border-slate-800 flex justify-around items-stretch safe-area-bottom">
+    <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg border-t flex justify-around items-stretch safe-area-bottom">
       <div class="nav-tab active" data-tab="dosing">
         <span class="text-base">⚡</span>
         <span>速查盤</span>
