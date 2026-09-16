@@ -7,9 +7,11 @@ echo ========================================================
 echo.
 cd /d "C:\Users\chunh\.gemini\antigravity\scratch\anes-pilot"
 
-:: 強制指定 GitHub 認證走 Device 裝置碼模式，徹底停用 127.0.0.1 瀏覽器跳轉
+:: 強制指定 GitHub 認證走文字主控台 Device 模式，不跳出易誤關的白色彈窗
 set GCM_GITHUB_AUTHMODES=device
 set GCM_OAUTH_FLOW=device
+set GCM_GUI=false
+set GCM_NO_UI=1
 
 echo 正在檢查本機狀態...
 git add -A
@@ -25,7 +27,7 @@ echo.
 echo --------------------------------------------------------
 echo 【提示】：
 echo 若下方出現「enter code: XXXX-XXXX」，請複製該 8 碼，
-echo 在瀏覽器開啟的網頁貼上授權，授權後【請稍候此視窗自動推送】！
+echo 在瀏覽器開啟的網頁貼上授權，授權後【請靜候此視窗自動推送】！
 echo --------------------------------------------------------
 echo.
 git push origin main
@@ -40,7 +42,7 @@ if %PUSH_STATUS% equ 0 (
 ) else (
     echo ========================================================
     echo  [推送未完成]
-    echo  若尚未完成授權，請執行桌面上的「GitHub登入認證.bat」！
+    echo  若仍遇到驗證問題，可採用更直接的 GitHub Token 方式！
     echo ========================================================
 )
 echo.
