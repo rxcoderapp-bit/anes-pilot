@@ -7,6 +7,10 @@ echo ========================================================
 echo.
 cd /d "C:\Users\chunh\.gemini\antigravity\scratch\anes-pilot"
 
+:: 強制指定 GitHub 認證走 Device 裝置碼模式，徹底停用 127.0.0.1 瀏覽器跳轉
+set GCM_GITHUB_AUTHMODES=device
+set GCM_OAUTH_FLOW=device
+
 echo 正在檢查本機狀態...
 git add -A
 git diff-index --quiet HEAD --
@@ -17,6 +21,12 @@ if %errorlevel% neq 0 (
 
 echo.
 echo 正在將最新程式碼同步推送到 GitHub (https://github.com/rxcoderapp-bit/anes-pilot)...
+echo.
+echo --------------------------------------------------------
+echo 【提示】：
+echo 若下方出現「enter code: XXXX-XXXX」，請複製該 8 碼，
+echo 在瀏覽器開啟的網頁貼上授權，授權後【請稍候此視窗自動推送】！
+echo --------------------------------------------------------
 echo.
 git push origin main
 set PUSH_STATUS=%errorlevel%

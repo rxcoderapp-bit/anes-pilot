@@ -1,0 +1,184 @@
+﻿Diagnose log at 2026-09-16T01:54:03Z
+
+AppPath: C:\Program Files\Git\mingw64\bin\git-credential-manager.exe
+InstallDir: C:\Program Files\Git\mingw64\bin\
+Version: 2.7.3+5fa7116896c82164996a609accd1c5ad90fe730a
+
+------------
+Diagnostic: Environment
+Skipped: False
+Success: True
+Exception: None
+Log:
+OSType: Windows
+OSVersion: 10.0 (build 26200)
+Reading environment variables... OK
+ Variables:
+SESSIONNAME=Console
+ProgramFiles(x86)=C:\Program Files (x86)
+AGY_BROWSER_ACTIVE_PORT_FILE=C:\Users\chunh\AppData\Roaming\Antigravity\DevToolsActivePort
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 154 Stepping 4, GenuineIntel
+VBOX_MSI_INSTALL_PATH=C:\Program Files\Oracle\VirtualBox\
+EFC_9920_1262719628=1
+ALLUSERSPROFILE=C:\ProgramData
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+MIC_LD_LIBRARY_PATH=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\compiler\lib\mic
+USERPROFILE=C:\Users\chunh
+USERDOMAIN=R5
+PROCESSOR_REVISION=9a04
+ANTIGRAVITY_SOURCE_METADATA={"tool":{"conversationId":"45804c7a-e533-462e-a431-d045abaff7db","stepIndex":830,"toolCall":{"id":"call_46197","name":"run_command","argumentsJson":"{\"CommandLine\":\"\\u0026 \\\"C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\git-credential-manager.exe\\\" diagnose\",\"Cwd\":\"C:\\\\Users\\\\chunh\\\\.gemini\\\\antigravity\\\\scratch\\\\anes-pilot\",\"IsDaemon\":false,\"WaitMsBeforeAsync\":5000,\"toolAction\":\"Diagnosing GCM\",\"toolSummary\":\"Run GCM diagnose\"}","thinkingSignature":"EoAJCv0IARFNMg+/r+GG6S5LjgCUP3thbd90RsDC/TdBskvfPxEXI1rnH81OV8hg8sh2HOe7qstbDzeC7Den2ezLtNh8QKsXuhrjIR6ezrjby0k2ESjJ+QoqxrHozsdjhfvMdf2R5dCYYAUWeUV2OcQ2ULKmL2pe72C497XD2T050Jsb3QEhPoyzBUHJNjRERyHkCvslCLKUu1ELJDW1avXB2NzUUV/6xesAiqqSlKr4mDAs5Du9WN5MaviZKi9z7ZzyCF0srD3MtG0jAVKOe0NXSfgx6rZTmRu6RqthjCSkHlsz+q+HkNMzetmznC0e2QsfeFyCxWHX6j+wX2gT+X7SHu/N9bh4yxCK1Q/f5b33H8rJsmqKJGQZe/8ObGtEfQMvC9PqLyqBEgUS0hTysNxaKs729zEsrhgC4H0iAyqw+zSrjHHmRTIu+IZ94hOXFz56N9LIH1NBmYxVXwgXxljALIOU3kjjNViLa+I0H5Az6eWzgL6KWJSzncdbYj1NkFYurqsw8wz6mYpP4sEwG1cHGH+cy6G8gziuQLhVQg8jKFDpHPqwhNzvDUoeHLztTXQf10+c7PXz7FV4O7k7XKJzSlHypXw71jGE4Hh09wA1tvSkLzC2QCA0rvexyAvjxd3w+L2KS52qesKN2VOaxgJe7oiVCpEqwWpmWqXbFXTUkHnxCEIHBDha01jezaJFbDgTSci4nR9MGTSAzUwv5X6szBGbFMUaFjW+ITDWk6eD1+sDSnlEq5cDa+4ds8S5Gooux7VagQfte9ZfGsEvbNTmuN1J+zfcx5fy91iTBNoWRcRe4y3FQW8wRtVioj9yZEoLgEUQWmSt+8fOr9+hswlGGO1xz+IxGDF48XPW/aCqXw0iyiGYBV3wa9XTh+E1SjbuMVw9Vl+kk4OQiLTlpD8Xr4hh/jaAM5nvXu4EKh+/o4v88hDoyVUcprFFjyZo/gtEjlHbPHa+xCL/7INgPjB52OMIFTeXKXxbglO6FAUTdJKVKjaeBZ8vVwwZBp4Eced7iFJ1OO0e9axgtnW/f4SMPuK+jknbGwn1hbddtcenlNRa5RbBR2nAnzqLJ87GKf6gJ3K8OWXWiFtz7t9OxOEHZEd7ucZc+Jdv2o+nH2HLcQ2X81VH6ZCIfZ2qSXwJvk6EWzQCb44y+pxeY4ia2U7OuShIUn5E9oEnwhGnMuh1rsM5wbbCk4HAwX1eBZmWiKyouoUvEuH0QRyfe1SvvCl8nQGYwFxlzAqVBkpOYn3ser2UZ/jpfFWgS6isiKia1VMTlVzvnWueJPIuFHZ0wezJFrRvRrMPin40vWvGnMKBSuHtklQrTOtJdZ+jU5CthPvKDienbyx/6LKuZJ5HxtS6lywkE3rhWAtC6RzVV9/g6iEXlRVPMQ0g6NdF3htEqPhuD5A2KqqCXD2zqxPL7fYaJwMsTB2sNPOY2vDF7Gg/bPoIPIgVZpU1PJebwt1y2a2ea+1nw/eyl164orVgyB4FjyDigYpHXY+arO9R6bPIZi/eHBXDx2zPtDp0CkyH/oA2"}}}
+TEMP=C:\Users\chunh\AppData\Local\Temp
+FPS_BROWSER_APP_PROFILE_STRING=Internet Explorer
+FPS_BROWSER_USER_PROFILE_STRING=Default
+LOGONSERVER=\\R5
+USERNAME=chunh
+SystemRoot=C:\WINDOWS
+ProgramData=C:\ProgramData
+AGY_BROWSER_WS_URL=ws://127.0.0.1:5060/devtools/browser/766331c0-994d-4b7a-b3de-3c59f3b67bd6
+PATH=C:/Users/chunh/.gemini/antigravity/bin;C:\Users\chunh\AppData\Roaming\Antigravity\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\Common Files\Acronis\SnapAPI\;C:\Program Files (x86)\Common Files\Acronis\VirtualFile\;C:\Program Files (x86)\Common Files\Acronis\VirtualFile64\;C:\Program Files\Calibre2\;C:\Program Files (x86)\Paragon Software\LinuxFS for Windows\;C:\Program Files\dotnet\;C:\Program Files (x86)\Common Files\Acronis\FileProtector\;C:\Program Files (x86)\Common Files\Acronis\FileProtector64\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\pcsuite\;C:\Users\chunh\AppData\Local\hermes\bin;C:\Users\chunh\AppData\Local\hermes\hermes-agent\venv\Scripts;C:\Users\chunh\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\chunh\AppData\Local\Programs\Python\Python311\;C:\Users\chunh\.local\bin;C:\Users\chunh\AppData\Local\Microsoft\WindowsApps;C:\Users\chunh\AppData\Local\Programs\Ollama;C:\Users\chunh\AppData\Roaming\npm;C:\Users\chunh\AppData\Local\Microsoft\WinGet\Links;C:\Users\chunh\AppData\AndroidCLI
+HERMES_HOME=C:\Users\chunh\AppData\Local\hermes
+PROCESSOR_ARCHITECTURE=AMD64
+CommonProgramFiles=C:\Program Files\Common Files
+ANTIGRAVITY_TRAJECTORY_ID=bfb67a9c-9ca3-49c0-9ffe-a164f7fd5f3b
+PROCESSOR_LEVEL=6
+ANTIGRAVITY_LS_ADDRESS=localhost:14683
+ANTIGRAVITY_PROJECT_ID=outside-of-project
+HOMEPATH=\Users\chunh
+EFC_9920_3789132940=1
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+ANTIGRAVITY_AGENT=1
+CommonProgramW6432=C:\Program Files\Common Files
+TMP=C:\Users\chunh\AppData\Local\Temp
+USERDOMAIN_ROAMINGPROFILE=R5
+ProgramW6432=C:\Program Files
+DriverData=C:\Windows\System32\Drivers\DriverData
+EFC_9920_4126798990=1
+INTEL_DEV_REDIST=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\
+windir=C:\WINDOWS
+GIT_TRACE2_PARENT_SID=218d5d56-42c3-42ae-9297-f6b9d0f695fd
+SystemDrive=C:
+NUMBER_OF_PROCESSORS=8
+OS=Windows_NT
+ZES_ENABLE_SYSMAN=1
+ProgramFiles=C:\Program Files
+ComSpec=C:\WINDOWS\system32\cmd.exe
+HOMEDRIVE=C:
+EFC_9920_2283032206=1
+PSModulePath=C:\Users\chunh\OneDrive\文件\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+ANTIGRAVITY_CSRF_TOKEN=2fa5582c-d7b3-4299-9d54-4baecc9fbce1
+ANTIGRAVITY_CONVERSATION_ID=45804c7a-e533-462e-a431-d045abaff7db
+APPDATA=C:\Users\chunh\AppData\Roaming
+OneDrive=C:\Users\chunh\OneDrive
+COMPUTERNAME=R5
+LOCALAPPDATA=C:\Users\chunh\AppData\Local
+ANTIGRAVITY_AGENTAPI_EXE=C:\Users\chunh\AppData\Local\Programs\antigravity\resources\bin\language_server.exe
+HERMES_GIT_BASH_PATH=C:\Program Files\Git\bin\bash.exe
+CHROME_DEVTOOLS_MCP_JS=C:\Users\chunh\AppData\Local\Programs\antigravity\resources\app.asar.unpacked\node_modules\chrome-devtools-mcp\build\src\bin\chrome-devtools-mcp.js
+EFC_9920_2775293581=1
+PUBLIC=C:\Users\Public
+ANTIGRAVITY_LS_VERSION=hub-2.13.0
+EFC_9920_1592913036=1
+
+
+------------
+Diagnostic: File system
+Skipped: False
+Success: True
+Exception: None
+Log:
+Temporary directory is 'C:\Users\chunh\AppData\Local\Temp\'...
+Checking basic file I/O...
+Writing to temporary file 'C:\Users\chunh\AppData\Local\Temp\6b854414b93e7fb2392f6b59'... OK
+Reading from temporary file 'C:\Users\chunh\AppData\Local\Temp\6b854414b93e7fb2392f6b59'... OK
+Deleting temporary file 'C:\Users\chunh\AppData\Local\Temp\6b854414b93e7fb2392f6b59'... OK
+Testing IFileSystem instance...
+UserHomePath: C:\Users\chunh
+UserDataDirectoryPath: C:\Users\chunh\.gcm
+GetCurrentDirectory(): C:\Users\chunh\.gemini\antigravity\scratch\anes-pilot
+
+------------
+Diagnostic: Networking
+Skipped: False
+Success: True
+Exception: None
+Log:
+Checking networking and HTTP stack...
+Creating HTTP client... OK
+IsNetworkAvailable: True
+Sending HEAD request to http://example.com...Sending HEAD request to https://example.com... OK
+ OK
+Acquiring free TCP port... OK
+Testing local HTTP loopback connections...
+Creating new HTTP listener for http://localhost:5256/... OK
+Waiting for loopback connection... OK
+Writing response... OK
+Waiting for response data... OK
+Loopback connection data OK
+
+------------
+Diagnostic: Git
+Skipped: False
+Success: True
+Exception: None
+Log:
+Getting Git version... OK
+Git version is '2.53.0.windows.2'
+Locating current repository...Git repository at 'C:/Users/chunh/.gemini/antigravity/scratch/anes-pilot/.git'
+ OK
+Listing all Git configuration... OK
+Git configuration:
+file:C:/Program Files/Git/etc/gitconfig	diff.astextplain.textconv=astextplain
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.process=git-lfs filter-process
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.required=true
+file:C:/Program Files/Git/etc/gitconfig	http.sslbackend=schannel
+file:C:/Program Files/Git/etc/gitconfig	core.autocrlf=true
+file:C:/Program Files/Git/etc/gitconfig	core.fscache=true
+file:C:/Program Files/Git/etc/gitconfig	core.symlinks=false
+file:C:/Program Files/Git/etc/gitconfig	pull.rebase=false
+file:C:/Program Files/Git/etc/gitconfig	credential.helper=manager
+file:C:/Program Files/Git/etc/gitconfig	credential.https://dev.azure.com.usehttppath=true
+file:C:/Program Files/Git/etc/gitconfig	init.defaultbranch=master
+file:C:/Users/chunh/.gitconfig	windows.appendatomically=false
+file:C:/Users/chunh/.gitconfig	credential.github.authmodes=device
+file:.git/config	core.repositoryformatversion=0
+file:.git/config	core.filemode=false
+file:.git/config	core.bare=false
+file:.git/config	core.logallrefupdates=true
+file:.git/config	core.symlinks=false
+file:.git/config	core.ignorecase=true
+file:.git/config	user.name=Antigravity
+file:.git/config	user.email=anespilot@local.dev
+file:.git/config	remote.origin.url=https://github.com/rxcoderapp-bit/anes-pilot.git
+file:.git/config	remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+file:.git/config	branch.main.remote=origin
+file:.git/config	branch.main.merge=refs/heads/main
+
+
+------------
+Diagnostic: Credential storage
+Skipped: False
+Success: True
+Exception: None
+Log:
+ICredentialStore instance is of type: CredentialStore
+Writing test credential... OK
+Reading test credential... OK
+Deleting test credential... OK
+
+------------
+Diagnostic: Microsoft authentication (AAD/MSA)
+Skipped: False
+Success: True
+Exception: None
+Log:
+Broker is not enabled.
+Flow type is: Auto
+Gathering MSAL token cache data... OK
+CacheDirectory: C:\Users\chunh\AppData\Local\.IdentityService
+CacheFileName: msal.cache
+CacheFilePath: C:\Users\chunh\AppData\Local\.IdentityService\msal.cache
+Creating cache helper... OK
+Verifying MSAL token cache persistence... OK
+
