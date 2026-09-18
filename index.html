@@ -13,7 +13,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Custom Dark OR & High Contrast Clinical Styles -->
-  <link rel="stylesheet" href="./css/app.css?v=1.3.0">
+  <link rel="stylesheet" href="./css/app.css?v=1.3.1">
   <style>
     /* Instant Universal Text Selection */
     *, *::before, *::after {
@@ -37,6 +37,11 @@
     body.theme-light {
       background-color: #f1f5f9 !important;
       color: #0f172a !important;
+    }
+    body.theme-light .app-header {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     }
     body.theme-light header {
       background-color: rgba(255, 255, 255, 0.96) !important;
@@ -96,10 +101,17 @@
     }
     body.theme-light .drug-badge-ibw,
     body.theme-light .drug-badge.bg-amber-950,
-    body.theme-light [class*="bg-amber-950"] {
+    body.theme-light [class*="bg-amber-950"],
+    body.theme-light #profile-ibw-badge {
       background-color: #fef3c7 !important;
       color: #92400e !important;
-      border: 1px solid #fcd34d !important;
+      border: 1px solid #f59e0b !important;
+    }
+    body.theme-light #profile-ibw-badge span {
+      color: #92400e !important;
+    }
+    body.theme-light #profile-display-ibw {
+      color: #b45309 !important;
     }
     body.theme-light .drug-badge-emergency,
     body.theme-light .drug-badge.bg-rose-950,
@@ -143,7 +155,7 @@
           <div>
             <div class="flex items-center gap-1.5">
               <span class="font-extrabold text-base tracking-tight text-white">AnesPilot</span>
-              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.0</span>
+              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.1</span>
             </div>
             <div class="text-[10px] text-slate-400 font-medium">麻醉副駕駛 &bull; 開刀房臨床隨身手冊</div>
           </div>
@@ -184,7 +196,7 @@
       <!-- Quick Patient Profile Adjuster Bar -->
       <div class="mt-2.5 p-2 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
         <!-- Current Patient Stats Display -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5 flex-wrap">
           <div class="flex items-center gap-1">
             <span class="text-xs text-slate-400">體重:</span>
             <span id="profile-display-weight" class="font-black text-emerald-400 text-base">70 kg</span>
@@ -195,8 +207,9 @@
             <span id="profile-display-age" class="font-bold text-slate-200 text-xs">35 歲 (成人)</span>
           </div>
           <div class="h-3 w-px bg-slate-700"></div>
-          <div class="flex items-center gap-1 text-[11px] text-slate-400">
-            <span id="profile-display-ibw">IBW: 65.5 kg</span>
+          <div id="profile-ibw-badge" class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-950/70 border border-amber-500/50 shadow-sm cursor-pointer hover:border-amber-400 transition-all" title="點擊查看 Devine 與 BMI 公式換算詳解">
+            <span class="text-xs font-bold text-amber-400">IBW:</span>
+            <span id="profile-display-ibw" class="font-black text-amber-300 text-base tracking-wide">65.9 kg</span>
           </div>
         </div>
 
@@ -239,7 +252,7 @@
         </div>
 
         <div>
-          <label class="text-[11px] text-slate-400 font-semibold">身高 (cm，計算 IBW)</label>
+          <label class="text-[11px] text-slate-400 font-semibold">身高 (cm)</label>
           <div class="flex items-center gap-1 mt-0.5">
             <input type="number" id="input-height" min="40" max="220" value="170" step="1" class="glove-input w-full py-1 text-center font-bold">
           </div>
@@ -353,7 +366,7 @@
   </div>
 
   <!-- Main ES Module Script with Version Query -->
-  <script type="module" src="./js/app.js?v=1.3.0"></script>
+  <script type="module" src="./js/app.js?v=1.3.1"></script>
 
   <!-- Service Worker Registration with Immediate Update & Cache Buster -->
   <script>
@@ -367,9 +380,9 @@
       });
 
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=1.3.0')
+        navigator.serviceWorker.register('./sw.js?v=1.3.1')
           .then((reg) => {
-            console.log('AnesPilot Offline Service Worker Ready (v1.3.0):', reg.scope);
+            console.log('AnesPilot Offline Service Worker Ready (v1.3.1):', reg.scope);
             reg.update();
           })
           .catch((err) => console.log('Service Worker setup note:', err));

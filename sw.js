@@ -3,7 +3,7 @@
  * Ensures 100% offline availability in ORs without signal.
  */
 
-const CACHE_NAME = "anespilot-v1.3.0";
+const CACHE_NAME = "anespilot-v1.3.1";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -25,7 +25,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("[ServiceWorker] Pre-caching offline assets v1.3.0");
+      console.log("[ServiceWorker] Pre-caching offline assets v1.3.1");
       return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
         console.warn("[ServiceWorker] Pre-caching note:", err);
       });

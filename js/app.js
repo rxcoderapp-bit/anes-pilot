@@ -175,26 +175,56 @@ function initEventListeners() {
     });
   }
 
+  // IBW Badge Click Info (Devine vs BMI comparison)
+  const ibwBadge = document.getElementById("profile-ibw-badge");
+  if (ibwBadge) {
+    ibwBadge.addEventListener("click", () => {
+      const p = state.patient;
+      const dosing = DosingEngine.calculateAll(p);
+      if (!dosing.ibw) return;
+      const hM = p.heightCm / 100;
+      const bmi22 = (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
+      const bmiGender = p.isFemale 
+        ? (Math.round(21 * hM * hM * 10) / 10).toFixed(1)
+        : (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
+      alert(
+        `【理想體重 (IBW) 計算公式說明】\n\n` +
+        `目前病患設定：身高 ${p.heightCm} cm (${p.isFemale ? '女性' : '男性'})\n\n` +
+        `1. Devine 公式 (1974) 【本系統採用】：${dosing.ibw} kg\n` +
+        `   • 醫學地位：國際麻醉醫學界唯一金標準（《Morgan & Mikhail》、《Miller》、ARDSNet）\n` +
+        `   • 臨床用途：肌鬆劑 (Rocuronium/Cisatracurium) 與保護性潮氣量 (6-8 mL/kg) 唯一指定標準。\n\n` +
+        `2. 衛福部/國健署 BMI 理想體重法：${bmi22} kg (男女分計: ${bmiGender} kg)\n` +
+        `   • 計算公式：22 × 身高(m)²\n` +
+        `   • 臨床用途：大眾健康管理、體態評估與營養代謝門診。\n\n` +
+        `★ 麻醉藥物動力學與機械通氣設定，強烈建議依 Devine 公式以確保給藥安全！`
+      );
+    });
+  }
+
   // Quick Patient Presets
   document.querySelectorAll(".preset-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const w = parseFloat(btn.dataset.w);
       const a = parseFloat(btn.dataset.a);
       const h = parseFloat(btn.dataset.h);
-      const female = btn.dataset.f === "true";
+      const f = btn.dataset.f === "true";
 
       state.patient.weightKg = w;
       state.patient.ageYears = a;
       state.patient.heightCm = h;
-      state.patient.isFemale = female;
+      state.patient.isFemale = f;
       state.patient.isPediatric = a < 12;
 
+      // Sync inputs
       if (weightInput) weightInput.value = w;
       if (weightSlider) weightSlider.value = w;
       if (ageInput) ageInput.value = a;
       if (heightInput) heightInput.value = h;
       if (genderToggle) {
-        genderToggle.textContent = female ? "女性 ♀" : "男性 ♂";
+        genderToggle.textContent = f ? "女性 ♀" : "男性 ♂";
+        genderToggle.className = f 
+          ? "glove-btn bg-pink-950/60 text-pink-300 border border-pink-700/50"
+          : "glove-btn bg-sky-950/60 text-sky-300 border border-sky-700/50";
       }
 
       renderAll();
@@ -254,8 +284,26 @@ function renderProfilePill() {
       pillAge.textContent = `${p.ageYears} 歲 ${p.isPediatric ? '(小兒)' : '(成人)'}`;
     }
   }
+  const ibwBadge = document.getElementById("profile-ibw-badge");
   if (pillIbw) {
-    pillIbw.textContent = dosing.ibw ? `IBW: ${dosing.ibw} kg` : `BSA: ${dosing.bsa || '--'} m²`;
+    if (dosing.ibw) {
+      const label = ibwBadge ? ibwBadge.querySelector("span:first-child") : null;
+      if (label) label.textContent = "IBW:";
+      pillIbw.textContent = `${dosing.ibw} kg`;
+      if (ibwBadge) {
+        ibwBadge.style.display = "flex";
+        const hM = p.heightCm / 100;
+        const bmi22 = (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
+        ibwBadge.title = `【理想體重 IBW】\n• Devine 麻醉金標準: ${dosing.ibw} kg\n• 國健署 BMI(22)法: ${bmi22} kg\n(點擊查看詳細公式比較)`;
+      }
+    } else {
+      const label = ibwBadge ? ibwBadge.querySelector("span:first-child") : null;
+      if (label) label.textContent = "BSA:";
+      pillIbw.textContent = dosing.bsa ? `${dosing.bsa} m²` : '--';
+      if (ibwBadge) {
+        ibwBadge.title = "體表面積 BSA (Mosteller 公式)";
+      }
+    }
   }
 }
 
