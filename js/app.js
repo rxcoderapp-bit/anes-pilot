@@ -190,11 +190,11 @@ function initEventListeners() {
         alert(
           `【小兒理想體重 (Pediatric IBW) 計算說明】\n\n` +
           `目前病患設定：${p.ageYears < 1 ? Math.round(p.ageYears * 12) + ' 個月大' : p.ageYears + ' 歲'}小兒，身高 ${p.heightCm} cm (${p.isFemale ? '女性' : '男性'})\n\n` +
-          `★ Traub-Johnson 兒科權威公式【本系統採用】：${dosing.ibw} kg\n` +
-          `   • 計算公式：(身高吋)² × 1.65 / 1000\n` +
+          `★ 兒科權威公式 Traub & Kichen (1983)【本系統採用】：${dosing.ibw} kg\n` +
+          `   • 計算公式：IBW (kg) = 2.396 × e^(0.01863 × 身高cm)\n` +
           `   • 醫學依據：專為 1~17 歲或身高 < 152cm 之小兒設計，精準匹配 CDC/WHO 生長曲線第 50 百分位數標準體重。\n` +
-          `   • 臨床重要性：小兒肥胖時之保護性通氣潮氣量 (6-8 mL/kg) 與親水性藥物劑量安全基準（修正了成人 Devine 公式 45.5kg 導致嚴重氣壓傷之致命風險）。\n\n` +
-          `註：年滿 18 歲且身高 ≥ 152.4cm 則切換為成人 Devine 麻醉金標準公式。`
+          `   • 臨床重要性：小兒肥胖時之保護性通氣潮氣量 (6-8 mL/kg) 與親水性藥物劑量安全基準（徹底杜絕成人 Devine 公式 45.5kg 導致嚴重氣壓傷之致命風險）。\n\n` +
+          `註：年滿 18 歲且身高 ≥ 152.4cm 則自動切換為成人 Devine 麻醉金標準公式。`
         );
       } else {
         const bmiGender = p.isFemale 
@@ -308,7 +308,7 @@ function renderProfilePill() {
         ibwBadge.style.display = "flex";
         const isPed = p.ageYears < 18 || (p.heightCm / 2.54) < 60;
         if (isPed) {
-          ibwBadge.title = `【小兒理想體重】\n• Traub-Johnson 兒科權威公式: ${dosing.ibw} kg (匹配 CDC/WHO 50th%)\n(點擊查看詳細公式說明)`;
+          ibwBadge.title = `【小兒理想體重】\n• Traub & Kichen 兒科權威公式: ${dosing.ibw} kg (匹配 CDC/WHO 50th%)\n(點擊查看詳細公式說明)`;
         } else {
           const hM = p.heightCm / 100;
           const bmi22 = (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
