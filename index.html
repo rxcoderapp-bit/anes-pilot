@@ -13,7 +13,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Custom Dark OR & High Contrast Clinical Styles -->
-  <link rel="stylesheet" href="./css/app.css?v=1.3.1">
+  <link rel="stylesheet" href="./css/app.css?v=1.3.2">
   <style>
     /* Instant Universal Text Selection */
     *, *::before, *::after {
@@ -155,7 +155,7 @@
           <div>
             <div class="flex items-center gap-1.5">
               <span class="font-extrabold text-base tracking-tight text-white">AnesPilot</span>
-              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.1</span>
+              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.2</span>
             </div>
             <div class="text-[10px] text-slate-400 font-medium">麻醉副駕駛 &bull; 開刀房臨床隨身手冊</div>
           </div>
@@ -366,7 +366,7 @@
   </div>
 
   <!-- Main ES Module Script with Version Query -->
-  <script type="module" src="./js/app.js?v=1.3.1"></script>
+  <script type="module" src="./js/app.js?v=1.3.2"></script>
 
   <!-- Service Worker Registration with Immediate Update & Cache Buster -->
   <script>
@@ -380,9 +380,9 @@
       });
 
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=1.3.1')
+        navigator.serviceWorker.register('./sw.js?v=1.3.2')
           .then((reg) => {
-            console.log('AnesPilot Offline Service Worker Ready (v1.3.1):', reg.scope);
+            console.log('AnesPilot Offline Service Worker Ready (v1.3.2):', reg.scope);
             reg.update();
           })
           .catch((err) => console.log('Service Worker setup note:', err));

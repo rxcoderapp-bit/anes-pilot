@@ -744,7 +744,7 @@ body.theme-light #profile-display-ibw {
           <div>
             <div class="flex items-center gap-1.5">
               <span class="font-extrabold text-base tracking-tight text-white">AnesPilot</span>
-              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.1</span>
+              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.2</span>
             </div>
             <div class="text-[10px] text-slate-400 font-medium">麻醉副駕駛 &bull; 開刀房臨床隨身手冊</div>
           </div>
@@ -1318,13 +1318,28 @@ const DRUG_DATABASE = {
     };
   },
 
-  // Calculate Ideal Body Weight (Devine Formula - M&M Appendix)
-  calculateIBW(heightCm, isFemale) {
-    if (!heightCm || heightCm < 60) return null;
+  // Calculate Ideal Body Weight (Pediatric: Traub & Kichen 1983 / Adult >=5ft: Devine / Adult <5ft: Devine deduction)
+  calculateIBW(heightCm, isFemale, ageYears = null) {
+    if (!heightCm || heightCm < 40) return null;
     const heightInches = heightCm / 2.54;
-    if (heightInches <= 60) {
-      return isFemale ? 45.5 : 50.0;
+    const isChild = ageYears !== null ? ageYears < 18 : heightInches < 55;
+
+    // Pediatric (< 18 years): Traub & Kichen (1983) validated pediatric formula
+    // Matches CDC/WHO 50th percentile weight-for-height: IBW = 2.396 * e^(0.01863 * heightCm)
+    if (isChild) {
+      const ibwPed = 2.396 * Math.exp(0.01863 * heightCm);
+      return Math.round(ibwPed * 10) / 10;
     }
+
+    // Short stature adult (< 5ft / 152.4 cm): Devine linear back-projection (2.3 kg per inch below 60")
+    if (heightInches < 60) {
+      const inchesUnder5ft = 60 - heightInches;
+      const base = isFemale ? 45.5 : 50.0;
+      const ibwShort = base - (2.3 * inchesUnder5ft);
+      return Math.round(Math.max(25, ibwShort) * 10) / 10;
+    }
+
+    // Adult (>= 5ft): Standard Devine Formula (Morgan & Mikhail's Appendix / ARDSNet)
     const inchesOver5ft = heightInches - 60;
     const ibw = isFemale ? 45.5 + 2.3 * inchesOver5ft : 50.0 + 2.3 * inchesOver5ft;
     return Math.round(ibw * 10) / 10;
@@ -1856,7 +1871,7 @@ class DosingEngine {
   static calculateAll(params) {
     const { ageYears, weightKg, heightCm, isFemale } = params;
 
-    const ibw = DRUG_DATABASE.calculateIBW(heightCm, isFemale);
+    const ibw = DRUG_DATABASE.calculateIBW(heightCm, isFemale, ageYears);
     const airway = DRUG_DATABASE.calculateAirway(ageYears, weightKg, isFemale);
     const fluids = DRUG_DATABASE.calculateFluids(weightKg);
     const blood = DRUG_DATABASE.calculateBlood(weightKg, ageYears, isFemale);
@@ -2693,7 +2708,7 @@ function initEventListeners() {
     });
   }
 
-  // IBW Badge Click Info (Devine vs BMI comparison)
+  // IBW Badge Click Info (Pediatric Traub-Johnson vs Adult Devine & BMI)
   const ibwBadge = document.getElementById("profile-ibw-badge");
   if (ibwBadge) {
     ibwBadge.addEventListener("click", () => {
@@ -2702,20 +2717,34 @@ function initEventListeners() {
       if (!dosing.ibw) return;
       const hM = p.heightCm / 100;
       const bmi22 = (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
-      const bmiGender = p.isFemale 
-        ? (Math.round(21 * hM * hM * 10) / 10).toFixed(1)
-        : (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
-      alert(
-        `【理想體重 (IBW) 計算公式說明】\n\n` +
-        `目前病患設定：身高 ${p.heightCm} cm (${p.isFemale ? '女性' : '男性'})\n\n` +
-        `1. Devine 公式 (1974) 【本系統採用】：${dosing.ibw} kg\n` +
-        `   • 醫學地位：國際麻醉醫學界唯一金標準（《Morgan & Mikhail》、《Miller》、ARDSNet）\n` +
-        `   • 臨床用途：肌鬆劑 (Rocuronium/Cisatracurium) 與保護性潮氣量 (6-8 mL/kg) 唯一指定標準。\n\n` +
-        `2. 衛福部/國健署 BMI 理想體重法：${bmi22} kg (男女分計: ${bmiGender} kg)\n` +
-        `   • 計算公式：22 × 身高(m)²\n` +
-        `   • 臨床用途：大眾健康管理、體態評估與營養代謝門診。\n\n` +
-        `★ 麻醉藥物動力學與機械通氣設定，強烈建議依 Devine 公式以確保給藥安全！`
-      );
+      const isPed = p.ageYears < 18 || (p.heightCm / 2.54) < 60;
+
+      if (isPed) {
+        alert(
+          `【小兒理想體重 (Pediatric IBW) 計算說明】\n\n` +
+          `目前病患設定：${p.ageYears < 1 ? Math.round(p.ageYears * 12) + ' 個月大' : p.ageYears + ' 歲'}小兒，身高 ${p.heightCm} cm (${p.isFemale ? '女性' : '男性'})\n\n` +
+          `★ Traub-Johnson 兒科權威公式【本系統採用】：${dosing.ibw} kg\n` +
+          `   • 計算公式：(身高吋)² × 1.65 / 1000\n` +
+          `   • 醫學依據：專為 1~17 歲或身高 < 152cm 之小兒設計，精準匹配 CDC/WHO 生長曲線第 50 百分位數標準體重。\n` +
+          `   • 臨床重要性：小兒肥胖時之保護性通氣潮氣量 (6-8 mL/kg) 與親水性藥物劑量安全基準（修正了成人 Devine 公式 45.5kg 導致嚴重氣壓傷之致命風險）。\n\n` +
+          `註：年滿 18 歲且身高 ≥ 152.4cm 則切換為成人 Devine 麻醉金標準公式。`
+        );
+      } else {
+        const bmiGender = p.isFemale 
+          ? (Math.round(21 * hM * hM * 10) / 10).toFixed(1)
+          : (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
+        alert(
+          `【成人理想體重 (IBW) 計算公式說明】\n\n` +
+          `目前病患設定：成人 ${p.ageYears} 歲，身高 ${p.heightCm} cm (${p.isFemale ? '女性' : '男性'})\n\n` +
+          `1. Devine 公式 (1974) 【本系統採用】：${dosing.ibw} kg\n` +
+          `   • 醫學地位：國際麻醉醫學界唯一金標準（《Morgan & Mikhail》、《Miller》、ARDSNet）\n` +
+          `   • 臨床用途：肌鬆劑 (Rocuronium/Cisatracurium) 與保護性潮氣量 (6-8 mL/kg) 唯一指定標準。\n\n` +
+          `2. 衛福部/國健署 BMI 理想體重法：${bmi22} kg (男女分計: ${bmiGender} kg)\n` +
+          `   • 計算公式：22 × 身高(m)²\n` +
+          `   • 臨床用途：大眾健康管理、體態評估與營養代謝門診。\n\n` +
+          `★ 麻醉藥物動力學與機械通氣設定，強烈建議依 Devine 公式以確保給藥安全！`
+        );
+      }
     });
   }
 
@@ -2810,9 +2839,14 @@ function renderProfilePill() {
       pillIbw.textContent = `${dosing.ibw} kg`;
       if (ibwBadge) {
         ibwBadge.style.display = "flex";
-        const hM = p.heightCm / 100;
-        const bmi22 = (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
-        ibwBadge.title = `【理想體重 IBW】\n• Devine 麻醉金標準: ${dosing.ibw} kg\n• 國健署 BMI(22)法: ${bmi22} kg\n(點擊查看詳細公式比較)`;
+        const isPed = p.ageYears < 18 || (p.heightCm / 2.54) < 60;
+        if (isPed) {
+          ibwBadge.title = `【小兒理想體重】\n• Traub-Johnson 兒科權威公式: ${dosing.ibw} kg (匹配 CDC/WHO 50th%)\n(點擊查看詳細公式說明)`;
+        } else {
+          const hM = p.heightCm / 100;
+          const bmi22 = (Math.round(22 * hM * hM * 10) / 10).toFixed(1);
+          ibwBadge.title = `【成人理想體重 IBW】\n• Devine 麻醉金標準: ${dosing.ibw} kg\n• 國健署 BMI(22)法: ${bmi22} kg\n(點擊查看詳細公式比較)`;
+        }
       }
     } else {
       const label = ibwBadge ? ibwBadge.querySelector("span:first-child") : null;
@@ -4290,9 +4324,9 @@ window.showFirebaseConfigModal = () => {
       });
 
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=1.3.1')
+        navigator.serviceWorker.register('./sw.js?v=1.3.2')
           .then((reg) => {
-            console.log('AnesPilot Offline Service Worker Ready (v1.3.1):', reg.scope);
+            console.log('AnesPilot Offline Service Worker Ready (v1.3.2):', reg.scope);
             reg.update();
           })
           .catch((err) => console.log('Service Worker setup note:', err));

@@ -100,13 +100,28 @@ export const DRUG_DATABASE = {
     };
   },
 
-  // Calculate Ideal Body Weight (Devine Formula - M&M Appendix)
-  calculateIBW(heightCm, isFemale) {
-    if (!heightCm || heightCm < 60) return null;
+  // Calculate Ideal Body Weight (Pediatric: Traub & Kichen 1983 / Adult >=5ft: Devine / Adult <5ft: Devine deduction)
+  calculateIBW(heightCm, isFemale, ageYears = null) {
+    if (!heightCm || heightCm < 40) return null;
     const heightInches = heightCm / 2.54;
-    if (heightInches <= 60) {
-      return isFemale ? 45.5 : 50.0;
+    const isChild = ageYears !== null ? ageYears < 18 : heightInches < 55;
+
+    // Pediatric (< 18 years): Traub & Kichen (1983) validated pediatric formula
+    // Matches CDC/WHO 50th percentile weight-for-height: IBW = 2.396 * e^(0.01863 * heightCm)
+    if (isChild) {
+      const ibwPed = 2.396 * Math.exp(0.01863 * heightCm);
+      return Math.round(ibwPed * 10) / 10;
     }
+
+    // Short stature adult (< 5ft / 152.4 cm): Devine linear back-projection (2.3 kg per inch below 60")
+    if (heightInches < 60) {
+      const inchesUnder5ft = 60 - heightInches;
+      const base = isFemale ? 45.5 : 50.0;
+      const ibwShort = base - (2.3 * inchesUnder5ft);
+      return Math.round(Math.max(25, ibwShort) * 10) / 10;
+    }
+
+    // Adult (>= 5ft): Standard Devine Formula (Morgan & Mikhail's Appendix / ARDSNet)
     const inchesOver5ft = heightInches - 60;
     const ibw = isFemale ? 45.5 + 2.3 * inchesOver5ft : 50.0 + 2.3 * inchesOver5ft;
     return Math.round(ibw * 10) / 10;

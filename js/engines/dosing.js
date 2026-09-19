@@ -7,7 +7,7 @@ export class DosingEngine {
   static calculateAll(params) {
     const { ageYears, weightKg, heightCm, isFemale } = params;
 
-    const ibw = DRUG_DATABASE.calculateIBW(heightCm, isFemale);
+    const ibw = DRUG_DATABASE.calculateIBW(heightCm, isFemale, ageYears);
     const airway = DRUG_DATABASE.calculateAirway(ageYears, weightKg, isFemale);
     const fluids = DRUG_DATABASE.calculateFluids(weightKg);
     const blood = DRUG_DATABASE.calculateBlood(weightKg, ageYears, isFemale);
