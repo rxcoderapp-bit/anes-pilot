@@ -13,7 +13,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Custom Dark OR & High Contrast Clinical Styles -->
-  <link rel="stylesheet" href="./css/app.css?v=1.3.2">
+  <link rel="stylesheet" href="./css/app.css?v=1.4.0">
   <style>
     /* Instant Universal Text Selection */
     *, *::before, *::after {
@@ -155,7 +155,7 @@
           <div>
             <div class="flex items-center gap-1.5">
               <span class="font-extrabold text-base tracking-tight text-white">AnesPilot</span>
-              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.3.2</span>
+              <span id="app-version-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">v1.4.0</span>
             </div>
             <div class="text-[10px] text-slate-400 font-medium">麻醉副駕駛 &bull; 開刀房臨床隨身手冊</div>
           </div>
@@ -180,14 +180,22 @@
             </div>
           </div>
 
-          <!-- Theme Toggle -->
-          <button id="btn-theme-toggle" class="glove-btn py-1.5 px-2 bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg hover:bg-slate-800">
-            <span id="theme-icon">🌙 刀房暗室</span>
+          <!-- Uiverse Animated Sun & Moon Smooth Switch -->
+          <button id="btn-theme-toggle" class="theme-toggle-switch" aria-label="切換日間/刀房暗室模式" title="切換日間/刀房暗室模式">
+            <span class="theme-track">
+              <span class="theme-star theme-star-1"></span>
+              <span class="theme-star theme-star-2"></span>
+              <span class="theme-star theme-star-3"></span>
+              <span class="theme-orb">
+                <span class="moon-crater"></span>
+              </span>
+            </span>
+            <span id="theme-icon" class="theme-label hidden sm:inline-block">🌙 刀房暗室</span>
           </button>
 
-          <!-- CRISIS RED BUTTON -->
-          <button id="btn-quick-crisis" class="glove-btn py-1.5 px-2.5 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-xs rounded-lg shadow-lg shadow-red-950/80 border border-red-500 flex items-center gap-1 animate-pulse">
-            <span>🚨</span>
+          <!-- Uiverse CRISIS 3D EMERGENCY BUTTON -->
+          <button id="btn-quick-crisis" class="crisis-3d-btn" title="緊急危機應變流程 (ACLS / MH / LAST / DAS)">
+            <span class="text-sm">🚨</span>
             <span class="tracking-wide">CRISIS</span>
           </button>
         </div>
@@ -213,22 +221,22 @@
           </div>
         </div>
 
-        <!-- Patient Quick Presets -->
+        <!-- Patient Quick Presets (Neumorphic Inset Pills) -->
         <div class="flex items-center gap-1.5 overflow-x-auto text-xs py-0.5">
           <span class="text-[10px] text-slate-500 font-bold uppercase mr-0.5">速套:</span>
-          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="10" data-a="1" data-h="75" data-f="false">
+          <button class="preset-btn" data-w="10" data-a="1" data-h="75" data-f="false">
             👶 1歲 10kg
           </button>
-          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="18" data-a="5" data-h="110" data-f="true">
+          <button class="preset-btn" data-w="18" data-a="5" data-h="110" data-f="true">
             🧒 5歲 18kg
           </button>
-          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-[11px] whitespace-nowrap" data-w="55" data-a="32" data-h="160" data-f="true">
+          <button class="preset-btn" data-w="55" data-a="32" data-h="160" data-f="true">
             👩 55kg (女)
           </button>
-          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 font-semibold text-[11px] whitespace-nowrap border border-cyan-900/60" data-w="70" data-a="40" data-h="172" data-f="false">
+          <button class="preset-btn" data-w="70" data-a="40" data-h="172" data-f="false">
             👨 70kg (男)
           </button>
-          <button class="preset-btn px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold text-[11px] whitespace-nowrap" data-w="100" data-a="50" data-h="170" data-f="false">
+          <button class="preset-btn" data-w="100" data-a="50" data-h="170" data-f="false">
             🦹 100kg (肥胖)
           </button>
         </div>
@@ -366,7 +374,7 @@
   </div>
 
   <!-- Main ES Module Script with Version Query -->
-  <script type="module" src="./js/app.js?v=1.3.2"></script>
+  <script type="module" src="./js/app.js?v=1.4.0"></script>
 
   <!-- Service Worker Registration with Immediate Update & Cache Buster -->
   <script>
@@ -380,9 +388,9 @@
       });
 
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=1.3.2')
+        navigator.serviceWorker.register('./sw.js?v=1.4.0')
           .then((reg) => {
-            console.log('AnesPilot Offline Service Worker Ready (v1.3.2):', reg.scope);
+            console.log('AnesPilot Offline Service Worker Ready (v1.4.0):', reg.scope);
             reg.update();
           })
           .catch((err) => console.log('Service Worker setup note:', err));

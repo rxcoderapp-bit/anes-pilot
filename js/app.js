@@ -324,6 +324,15 @@ function renderProfilePill() {
       }
     }
   }
+
+  // Sync Neumorphic Inset Preset Buttons Active State
+  document.querySelectorAll(".preset-btn").forEach(btn => {
+    const w = parseFloat(btn.dataset.w);
+    const a = parseFloat(btn.dataset.a);
+    const f = btn.dataset.f === "true";
+    const isActive = Math.abs(p.weightKg - w) < 0.2 && Math.abs(p.ageYears - a) < 0.2 && p.isFemale === f;
+    btn.classList.toggle("active", isActive);
+  });
 }
 
 function renderActiveTab() {
@@ -615,12 +624,12 @@ function renderCrisisTab() {
         <span>📋 標準處置檢核單 (Action Checklist & Guidelines)</span>
         <button class="text-xs text-slate-400 hover:text-white" onclick="window.resetChecklist()">重置勾選</button>
       </h3>
-      <div class="space-y-2">
+      <div class="space-y-2 crisis-checklist">
         ${currentMod.actionSteps.map((step, idx) => `
-          <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900/80 border border-slate-800/80 cursor-pointer transition">
-            <input type="checkbox" id="check-${step.id}" class="mt-1 w-5 h-5 rounded accent-rose-500 bg-slate-950 cursor-pointer">
-            <div>
-              <div class="font-bold text-slate-100 text-sm">${idx + 1}. ${step.title}</div>
+          <label class="tactile-checklist-item" for="check-${step.id}">
+            <input type="checkbox" id="check-${step.id}" class="tactile-checkbox">
+            <div class="flex-1">
+              <div class="font-bold text-slate-100 text-sm checklist-title">${idx + 1}. ${step.title}</div>
               <div class="text-xs text-slate-400 mt-0.5 leading-relaxed">${step.desc}</div>
             </div>
           </label>
@@ -751,12 +760,17 @@ window.toggleMetronome = () => {
     audioService.stopMetronome();
     if (heart) heart.classList.remove("metronome-pulse");
     if (text) text.textContent = "開啟 CPR 110bpm 節拍器";
-    if (btn) btn.className = "glove-btn bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm px-4 shadow-md";
+    if (btn) {
+      btn.className = "glove-btn bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm px-4 shadow-md";
+      btn.classList.remove("metronome-pulse-rings");
+    }
   } else {
     audioService.startMetronome(110);
     if (heart) heart.classList.add("metronome-pulse");
     if (text) text.textContent = "🔊 節拍器運作中 (點此關閉)";
-    if (btn) btn.className = "glove-btn bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-4 shadow-md";
+    if (btn) {
+      btn.className = "glove-btn bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-4 shadow-md metronome-pulse-rings";
+    }
   }
 };
 
@@ -794,16 +808,16 @@ function renderToxicityTab() {
       <span class="drug-badge bg-emerald-950 text-emerald-300 border border-emerald-800/50">局麻安全性標準</span>
     </div>
 
-    <!-- Top Visual Gauge Card -->
-    <div class="anes-card mb-4">
-      <div class="flex items-center justify-between mb-2">
+    <!-- Top Visual Gauge Card (Uiverse Neon Glowing / Breathing Alert) -->
+    <div class="anes-card mb-4 ${result.totalPercent >= 100 ? 'card-toxic-glow' : (result.totalPercent >= 70 ? 'card-caution-glow' : '')}">
+      <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
         <h3 class="font-bold text-lg text-slate-100 flex items-center gap-2">
           <span>🧪</span> 局部麻醉藥綜合毒性儀表板 (Toxicity Index)
         </h3>
         <div class="flex items-center gap-2">
-          <label class="text-xs text-slate-300 flex items-center gap-1.5 cursor-pointer bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800">
-            <input type="checkbox" id="check-tox-risk" ${state.toxicityHighRisk ? 'checked' : ''} onchange="window.toggleToxRisk(this.checked)" class="w-4 h-4 accent-amber-500">
-            <span>高風險體質 (年長衰弱/心肝腎衰竭，上限降20%)</span>
+          <label class="text-xs text-slate-300 flex items-center gap-2 cursor-pointer bg-slate-900/90 px-3 py-1.5 rounded-full border border-slate-700/80 hover:border-amber-500/60 transition">
+            <input type="checkbox" id="check-tox-risk" ${state.toxicityHighRisk ? 'checked' : ''} onchange="window.toggleToxRisk(this.checked)" class="tactile-checkbox !w-4 !h-4 !min-w-[16px] !mt-0">
+            <span class="font-semibold">高風險體質 (年長衰弱/心肝腎衰竭，上限降20%)</span>
           </label>
         </div>
       </div>
@@ -1149,21 +1163,34 @@ function renderInfusionTab() {
         </div>
       </div>
 
-      <!-- Output Pump Rate -->
-      <div class="p-4 rounded-xl bg-gradient-to-r from-sky-950/60 to-blue-950/60 border border-sky-800/60 flex items-center justify-between">
+      <!-- Output Pump Rate (Uiverse Dynamic Fluid Flow Indicator) -->
+      <div class="p-4 rounded-xl bg-gradient-to-r from-sky-950/70 via-blue-950/70 to-slate-900 border border-sky-600/60 flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden pump-active-display">
+        <!-- Animated fluid stream line -->
+        <div class="infusion-flow-stream"></div>
+
         <div>
-          <div class="text-xs font-bold text-sky-300 uppercase tracking-wide">注射幫浦設定流速 (Syringe Pump Rate)</div>
-          <div class="text-4xl font-black text-white mt-1">
-            ${rateMlHr} <span class="text-xl text-sky-400 font-normal">mL/hr</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-sky-300 uppercase tracking-wide">注射幫浦設定流速 (Syringe Pump Rate)</span>
+            <span class="drip-indicator">
+              <span class="drip-dot"></span>
+              <span>運轉推注中</span>
+            </span>
+          </div>
+          <div class="text-4xl font-black text-white mt-1 flex items-baseline gap-2">
+            <span>${rateMlHr}</span>
+            <span class="text-xl text-sky-400 font-semibold">mL/hr</span>
           </div>
           <div class="text-xs text-slate-400 mt-1">
             基準體重: ${state.patient.weightKg} kg &bull; 濃度: ${preset.concMcgMl} mcg/mL
           </div>
         </div>
 
-        <div class="text-right">
-          <span class="drug-badge bg-sky-900/80 text-sky-200 border border-sky-600">
+        <div class="text-right flex flex-col items-end gap-1.5">
+          <span class="drug-badge bg-sky-900/90 text-sky-200 border border-sky-500 shadow-sm">
             精確雙向算式
+          </span>
+          <span class="text-[11px] text-cyan-400 font-mono">
+            ≈ ${(rateMlHr / 60).toFixed(2)} mL/min
           </span>
         </div>
       </div>
@@ -1278,21 +1305,21 @@ function renderScoresTab() {
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
-        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" ${state.apfelFemale ? 'checked' : ''} onchange="window.toggleApfel('female', this.checked)" class="w-4 h-4 accent-purple-500">
-          <span class="text-xs text-slate-200">女性 (Female)</span>
+        <label class="tactile-checklist-item !p-2.5">
+          <input type="checkbox" ${state.apfelFemale ? 'checked' : ''} onchange="window.toggleApfel('female', this.checked)" class="tactile-checkbox !w-4 !h-4 !min-w-[16px] !mt-0">
+          <span class="text-xs text-slate-200 checklist-title font-semibold">女性 (Female)</span>
         </label>
-        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" ${state.apfelNonSmoker ? 'checked' : ''} onchange="window.toggleApfel('nonSmoker', this.checked)" class="w-4 h-4 accent-purple-500">
-          <span class="text-xs text-slate-200">不吸菸者 (Non-smoker)</span>
+        <label class="tactile-checklist-item !p-2.5">
+          <input type="checkbox" ${state.apfelNonSmoker ? 'checked' : ''} onchange="window.toggleApfel('nonSmoker', this.checked)" class="tactile-checkbox !w-4 !h-4 !min-w-[16px] !mt-0">
+          <span class="text-xs text-slate-200 checklist-title font-semibold">不吸菸者 (Non-smoker)</span>
         </label>
-        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" ${state.apfelHistory ? 'checked' : ''} onchange="window.toggleApfel('history', this.checked)" class="w-4 h-4 accent-purple-500">
-          <span class="text-xs text-slate-200">PONV 或暈車病史</span>
+        <label class="tactile-checklist-item !p-2.5">
+          <input type="checkbox" ${state.apfelHistory ? 'checked' : ''} onchange="window.toggleApfel('history', this.checked)" class="tactile-checkbox !w-4 !h-4 !min-w-[16px] !mt-0">
+          <span class="text-xs text-slate-200 checklist-title font-semibold">PONV 或暈車病史</span>
         </label>
-        <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" ${state.apfelOpioids ? 'checked' : ''} onchange="window.toggleApfel('opioids', this.checked)" class="w-4 h-4 accent-purple-500">
-          <span class="text-xs text-slate-200">預期術後使用鴉片類</span>
+        <label class="tactile-checklist-item !p-2.5">
+          <input type="checkbox" ${state.apfelOpioids ? 'checked' : ''} onchange="window.toggleApfel('opioids', this.checked)" class="tactile-checkbox !w-4 !h-4 !min-w-[16px] !mt-0">
+          <span class="text-xs text-slate-200 checklist-title font-semibold">預期術後鴉片類</span>
         </label>
       </div>
 
@@ -1316,9 +1343,9 @@ function renderScoresTab() {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
         ${stopBangLabels.map((lbl, idx) => `
-          <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" ${state.stopBangAnswers[idx] ? 'checked' : ''} onchange="window.toggleStopBang(${idx}, this.checked)" class="w-4 h-4 accent-amber-500">
-            <span class="text-xs text-slate-200">${lbl}</span>
+          <label class="tactile-checklist-item !p-2.5">
+            <input type="checkbox" ${state.stopBangAnswers[idx] ? 'checked' : ''} onchange="window.toggleStopBang(${idx}, this.checked)" class="tactile-checkbox !w-4 !h-4 !min-w-[16px] !mt-0">
+            <span class="text-xs text-slate-200 checklist-title font-semibold">${lbl}</span>
           </label>
         `).join("")}
       </div>
@@ -1340,9 +1367,9 @@ function renderScoresTab() {
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
         ${rcriLabels.map((lbl, idx) => `
-          <label class="p-2.5 rounded bg-slate-900 border border-slate-800 flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" ${state.rcriCriteria[idx] ? 'checked' : ''} onchange="window.toggleRcri(${idx}, this.checked)" class="w-4 h-4 accent-rose-500">
-            <span class="text-xs text-slate-200">${lbl}</span>
+          <label class="tactile-checklist-item !p-2.5">
+            <input type="checkbox" ${state.rcriCriteria[idx] ? 'checked' : ''} onchange="window.toggleRcri(${idx}, this.checked)" class="tactile-checkbox !w-4 !h-4 !min-w-[16px] !mt-0">
+            <span class="text-xs text-slate-200 checklist-title font-semibold">${lbl}</span>
           </label>
         `).join("")}
       </div>
